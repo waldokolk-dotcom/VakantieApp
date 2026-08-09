@@ -8,8 +8,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=58">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=58">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=59">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=59">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -5071,8 +5071,7 @@
         margin-top:4px !important;
       }
       #meenemen .pack-updated{
-        line-height:1.35 !important;
-        margin-top:5px !important;
+        display:none !important;
       }
       #meenemen .pack-due,
       #meenemen .seg,
@@ -5081,9 +5080,14 @@
         width:100% !important;
       }
       #meenemen .pack-due{
-        margin-top:3px !important;
+        grid-column:1/3 !important;
+        grid-row:3 !important;
+        margin-top:0 !important;
+        min-height:42px !important;
       }
       #meenemen .seg{
+        grid-column:1/-1 !important;
+        grid-row:2 !important;
         display:grid !important;
         grid-template-columns:repeat(3,minmax(0,1fr)) !important;
         gap:6px !important;
@@ -5100,7 +5104,14 @@
       #meenemen .seg button[data-status="ready"]::after{content:"Klaar"}
       #meenemen .seg button[data-status="packed"]::after{content:"Ingepakt"}
       #meenemen .pack-actions{
+        grid-column:3 !important;
+        grid-row:3 !important;
         justify-content:flex-end !important;
+        align-self:stretch !important;
+      }
+      #meenemen .pack-actions .icon-btn{
+        min-width:42px !important;
+        min-height:42px !important;
       }
 
       /* Forms generic */
@@ -6503,6 +6514,7 @@ function ensureSupabaseReady(){
 document.getElementById("connectBtn").onclick = ()=>ensureSupabaseReady().catch(()=>{});
 
 async function connect(){
+  let authenticated=false;
   const url = sbUrl.value.trim().replace(/\/rest\/v1\/?$/,"");
   const key = sbKey.value.trim();
   const msg = document.getElementById("connectMsg");
@@ -6518,6 +6530,7 @@ async function connect(){
       const {error}=await client.auth.signInAnonymously();
       if(error) throw error;
     }
+    authenticated=true;
     localStorage.setItem("vakantie_sb_url",url);
     localStorage.setItem("vakantie_sb_key",key);
 
@@ -6536,7 +6549,8 @@ async function connect(){
     await refreshTripDrivenUI();
     return client;
   }catch(err){
-    client=null;
+    // Houd een geldige client beschikbaar als alleen een aanvullend scherm faalt.
+    if(!authenticated) client=null;
     console.error(err);
     msg.innerHTML='<span class="error">Verbinding mislukt: '+esc(err.message)+'</span>';
     top.textContent="Verbinding mislukt";
@@ -7866,8 +7880,9 @@ function renderJourneyForTrip(){
     updateHotelCountdowns();
     updateRegionalClocks?.();
     updateHotelCostCards();
-  if(document.getElementById("tripCostTotal")) document.getElementById("tripCostTotal").textContent=euro(total);
-  if(document.getElementById("hotelsTabList")) renderHotelsTab();
+    const tripTotal=costData.reduce((sum,item)=>sum+(Number(item.amount_cents)||0),0);
+    if(document.getElementById("tripCostTotal")) document.getElementById("tripCostTotal").textContent=euro(tripTotal);
+    if(document.getElementById("hotelsTabList")) renderHotelsTab();
     return;
   }
 
