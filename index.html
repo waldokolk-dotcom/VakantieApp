@@ -8,8 +8,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=59">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=59">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=61">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=61">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -147,6 +147,23 @@
     .pack-item.packed .pack-name{text-decoration:line-through;color:#65766f}
     .pack-main{min-width:0}
     .pack-name{font-size:1.02rem;font-weight:850;line-height:1.15}
+    .auto-pack-badge{
+      display:inline-flex;align-items:center;margin-left:7px;padding:3px 7px;border-radius:999px;
+      background:#e7f3e5;color:#226947;border:1px solid #bed8bc;
+      font-size:.62rem;font-weight:900;line-height:1.15;vertical-align:middle;text-decoration:none;
+    }
+    .pack-extra{grid-column:1/-1;border-top:1px solid #ebe4d6;padding-top:8px}
+    .pack-extra summary{cursor:pointer;color:#2d6f50;font-size:.78rem;font-weight:900;list-style:none}
+    .pack-extra summary::-webkit-details-marker{display:none}
+    .pack-extra summary::before{content:"＋";display:inline-block;margin-right:6px}
+    .pack-extra[open] summary::before{content:"−"}
+    .pack-extra summary span{float:right;color:#60776b;font-weight:750}
+    .pack-extra-body{padding-top:10px;display:grid;gap:9px}
+    .pack-note-label,.pack-calc-grid label{font-size:.72rem;font-weight:850;color:#4d6358}
+    .pack-note-label textarea{width:100%;min-height:64px;resize:vertical;margin-top:5px;padding:9px;border:1px solid #ddd5c5;border-radius:10px}
+    .pack-calc-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+    .pack-calc-grid input{width:100%;margin-top:5px;padding:8px;border:1px solid #ddd5c5;border-radius:9px}
+    .pack-calc-result{padding:9px 11px;border-radius:10px;background:#eaf5e7;color:#1d6745;font-size:.82rem;font-weight:900}
     .pack-meta{font-size:.78rem;color:var(--muted);margin-top:5px}
     .pack-updated{font-size:.7rem;color:#53806a;margin-top:4px;font-weight:700}
     .pack-due{
@@ -5113,6 +5130,19 @@
         min-width:42px !important;
         min-height:42px !important;
       }
+      #meenemen .pack-extra{
+        grid-column:1/-1 !important;
+        grid-row:4 !important;
+        width:100% !important;
+      }
+      #meenemen .pack-extra summary span{
+        float:none;
+        display:block;
+        margin:3px 0 0 22px;
+      }
+      #meenemen .pack-calc-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+      }
 
       /* Forms generic */
       .form-grid,
@@ -6351,6 +6381,7 @@ function setupProfileSelector(){
 let client = null;
 let packingData = [];
 let costData = [];
+let automaticChecklistEnsuredForTrip=null;
 
 let tripCatalog={};
 let currentTripId=localStorage.getItem("vakantie_current_trip") || "vakantie-2026";
@@ -6461,6 +6492,58 @@ function packingBelongsToTrip(item,tripId=currentTripId){
 function packingIdForCurrentTrip(rawId){
   if(currentTripId==="vakantie-2026") return rawId;
   return `${currentTripId}::${rawId}`;
+}
+
+const AUTOMATIC_TRAVEL_CHECKLIST = [
+  {slug:"id-bewijs",name:"Geldig paspoort of ID-kaart per reiziger",category:"Documenten",quantity:2},
+  {slug:"rijbewijs",name:"Geldig rijbewijs van de bestuurder",category:"Documenten",quantity:1},
+  {slug:"kentekenbewijs",name:"Kentekenbewijs / kentekencard",category:"Documenten",quantity:1},
+  {slug:"verzekering",name:"Autoverzekeringsbewijs / groene kaart",category:"Documenten",quantity:1},
+  {slug:"gevarendriehoek",name:"Gevarendriehoek",category:"Auto",quantity:1},
+  {slug:"veiligheidshesjes",name:"Veiligheidshesjes binnen handbereik",category:"Auto",quantity:2},
+  {slug:"verbanddoos",name:"Complete verbanddoos voor de auto",category:"Auto",quantity:1},
+  {slug:"oostenrijk-vignet",name:"Oostenrijks vignet controleren (bij snelweggebruik)",category:"Auto",quantity:1},
+  {slug:"dierenpaspoort-chloe",name:"EU-dierenpaspoort Chloë",category:"Twee honden",quantity:1},
+  {slug:"dierenpaspoort-sterre",name:"EU-dierenpaspoort Sterre",category:"Twee honden",quantity:1},
+  {slug:"microchips",name:"Microchipregistratie van beide honden controleren",category:"Twee honden",quantity:2},
+  {slug:"rabies",name:"Geldige rabiësvaccinatie van beide honden controleren",category:"Twee honden",quantity:2},
+  {slug:"lijnen",name:"Hondenlijnen van maximaal 1,5 meter",category:"Twee honden",quantity:2},
+  {slug:"muilkorven",name:"Passende muilkorf voor beide honden",category:"Twee honden",quantity:2},
+  {slug:"poepzakjes",name:"Voldoende hondenpoepzakjes",category:"Twee honden",quantity:1},
+  {slug:"veilig-vervoer",name:"Veilige hondenbox of afscheidingsrek in de auto",category:"Twee honden",quantity:1}
+];
+
+function isAutomaticChecklistItem(item){
+  return String(item?.id||"").includes("auto-check-2026-");
+}
+
+async function ensureAutomaticTravelChecklist(){
+  if(!client || automaticChecklistEnsuredForTrip===currentTripId) return;
+
+  const records=AUTOMATIC_TRAVEL_CHECKLIST.map(item=>({
+    id:packingIdForCurrentTrip("auto-check-2026-"+item.slug),
+    name:item.name,
+    category:item.category,
+    owner:"Samen",
+    quantity:item.quantity,
+    status:"todo",
+    due_date:null,
+    updated_at:new Date().toISOString(),
+    updated_by:"Automatisch toegevoegd · officiële reischeck"
+  }));
+
+  const ids=records.map(item=>item.id);
+  const {data,error}=await client.from("packing").select("id").in("id",ids);
+  if(error) throw error;
+  const existing=new Set((data||[]).map(item=>String(item.id)));
+  const missing=records.filter(item=>!existing.has(String(item.id)));
+
+  if(missing.length){
+    const {error:insertError}=await client.from("packing").insert(missing);
+    if(insertError) throw insertError;
+  }
+
+  automaticChecklistEnsuredForTrip=currentTripId;
 }
 
 
@@ -7947,6 +8030,16 @@ async function refreshTripDrivenUI(){
 
 async function loadPacking(){
   if(!client) return;
+  try{
+    await ensureAutomaticTravelChecklist();
+  }catch(checkError){
+    console.warn("Automatische reischeck kon niet worden aangevuld:",checkError);
+  }
+  try{
+    await ensurePackingDetailsDatabase();
+  }catch(detailsError){
+    console.warn("Paklijstopmerkingen konden niet worden geladen:",detailsError);
+  }
 
   // Bestaande EV-items horen gewoon bij Auto.
   // Deze update is idempotent: zodra alles op Auto staat, verandert er niets meer.
@@ -8006,6 +8099,92 @@ let packingIconDbRowId=null;
 let packingIconExactRules={};
 let packingIconDbLoaded=false;
 let packingIconLearningDone=false;
+
+const PACK_DETAILS_DB_TRIP="__system__";
+const PACK_DETAILS_DB_MOOD_PREFIX="__packing_details__:";
+let packingDetailsDbRowId=null;
+let packingDetails={};
+let packingDetailsLoadedTrip=null;
+let packingDetailsSaveTimer=null;
+
+function packingTripDays(){
+  const meta=tripMeta();
+  const start=new Date((meta.start_date||"")+"T12:00:00");
+  const end=new Date((meta.end_date||"")+"T12:00:00");
+  if(Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 1;
+  return Math.max(1,Math.round((end-start)/86400000)+1);
+}
+
+function defaultPackingCalculation(item){
+  const name=String(item?.name||"").toLowerCase();
+  if(name.includes("luier")) return {dayQty:4,nightQty:1,days:packingTripDays(),packSize:21,note:""};
+  if(name.includes("paracetamol")) return {dayQty:4,nightQty:0,days:packingTripDays(),packSize:0,note:""};
+  return {dayQty:0,nightQty:0,days:packingTripDays(),packSize:0,note:""};
+}
+
+function packingDetailsFor(item){
+  return {...defaultPackingCalculation(item),...(packingDetails[item.id]||{})};
+}
+
+function packingCalculationResult(details){
+  const perDay=(Number(details.dayQty)||0)+(Number(details.nightQty)||0);
+  const days=Math.max(0,Number(details.days)||0);
+  const total=perDay*days;
+  const packSize=Math.max(0,Number(details.packSize)||0);
+  const packs=packSize>0 && total>0 ? Math.ceil(total/packSize) : null;
+  return {total,packs};
+}
+
+async function ensurePackingDetailsDatabase(){
+  if(!client || packingDetailsLoadedTrip===currentTripId) return;
+  packingDetailsDbRowId=null;
+  packingDetails={};
+
+  const mood=PACK_DETAILS_DB_MOOD_PREFIX+currentTripId;
+  const {data,error}=await client.from("memories")
+    .select("id,text,updated_at")
+    .eq("trip_id",PACK_DETAILS_DB_TRIP)
+    .eq("mood",mood)
+    .order("updated_at",{ascending:false})
+    .limit(1);
+  if(error) throw error;
+
+  const row=data?.[0];
+  if(row){
+    packingDetailsDbRowId=row.id;
+    packingDetails=safeJsonParse(row.text,{})?.items || {};
+  }else{
+    const {data:newRow,error:insertError}=await client.from("memories").insert({
+      trip_id:PACK_DETAILS_DB_TRIP,
+      stop_id:null,
+      mood,
+      text:JSON.stringify({version:1,items:{}}),
+      created_by:actorName(),
+      updated_at:new Date().toISOString()
+    }).select("id").single();
+    if(insertError) throw insertError;
+    packingDetailsDbRowId=newRow.id;
+  }
+  packingDetailsLoadedTrip=currentTripId;
+}
+
+async function persistPackingDetails(){
+  if(!client || !packingDetailsDbRowId) return;
+  const {error}=await client.from("memories").update({
+    text:JSON.stringify({version:1,items:packingDetails}),
+    updated_at:new Date().toISOString(),
+    created_by:actorName()
+  }).eq("id",packingDetailsDbRowId);
+  if(error) throw error;
+}
+
+function schedulePackingDetailsSave(){
+  clearTimeout(packingDetailsSaveTimer);
+  packingDetailsSaveTimer=setTimeout(()=>persistPackingDetails().catch(err=>{
+    console.error(err);
+    alert("Opmerking/berekening opslaan mislukt: "+err.message);
+  }),450);
+}
 
 /* Keyword library. The exact mapping learned from your own items is stored
    in Supabase, so both Waldo and Brigitte get the same icon for the same item. */
@@ -8308,6 +8487,11 @@ function renderPacking(){
       const ready=item.status==="ready";
       const metaParts=[item.owner||"", `aantal ${item.quantity||1}`].filter(Boolean);
       const itemIcon=packingItemIcon(item.name,item.category);
+      const details=packingDetailsFor(item);
+      const calculation=packingCalculationResult(details);
+      const resultText=calculation.total>0
+        ? `${calculation.total.toLocaleString("nl-NL")} totaal${calculation.packs ? ` · ${calculation.packs} pak${calculation.packs===1?"":"ken"}` : ""}`
+        : "Vul een aantal per dag in";
 
       return `<div class="pack-item ${packed?"packed":""}" data-pack-row="${esc(item.id)}">
         <button class="status-btn ${packed?"packed":ready?"ready":""}" data-cycle="${esc(item.id)}" title="Volgende status">${packed?"✓":ready?"•":"○"}</button>
@@ -8315,7 +8499,7 @@ function renderPacking(){
         <span class="pack-item-icon" aria-hidden="true" title="${esc(item.name)}">${itemIcon}</span>
 
         <div class="pack-main">
-          <div class="pack-name">${esc(item.name)}</div>
+          <div class="pack-name">${esc(item.name)}${isAutomaticChecklistItem(item)?'<span class="auto-pack-badge" title="Automatisch toegevoegd op basis van officiële reisregels">Automatisch toegevoegd</span>':""}</div>
           <div class="pack-meta">${metaParts.map(esc).join(" · ")}</div>
           <div class="pack-updated">↻ Laatst aangepast door ${esc(item.updated_by||"onbekend")}${item.updated_at ? " · "+esc(formatUpdated(item.updated_at)) : ""}</div>
         </div>
@@ -8335,6 +8519,21 @@ function renderPacking(){
           <button class="icon-btn" data-edit="${esc(item.id)}" title="Wijzigen">✎</button>
           <button class="icon-btn" data-delete="${esc(item.id)}" title="Verwijderen">×</button>
         </div>
+        <details class="pack-extra">
+          <summary>Opmerking & berekening <span>${esc(resultText)}</span></summary>
+          <div class="pack-extra-body">
+            <label class="pack-note-label">Vrije opmerking
+              <textarea data-pack-detail="note" data-pack-id="${esc(item.id)}" placeholder="Bijv. merk, maat of aandachtspunt">${esc(details.note||"")}</textarea>
+            </label>
+            <div class="pack-calc-grid">
+              <label>Overdag / per dag<input data-pack-detail="dayQty" data-pack-id="${esc(item.id)}" type="number" min="0" step="0.25" value="${esc(details.dayQty)}"></label>
+              <label>Extra per nacht<input data-pack-detail="nightQty" data-pack-id="${esc(item.id)}" type="number" min="0" step="0.25" value="${esc(details.nightQty)}"></label>
+              <label>Aantal dagen<input data-pack-detail="days" data-pack-id="${esc(item.id)}" type="number" min="1" step="1" value="${esc(details.days)}"></label>
+              <label>Per verpakking<input data-pack-detail="packSize" data-pack-id="${esc(item.id)}" type="number" min="0" step="1" value="${esc(details.packSize)}" placeholder="optioneel"></label>
+            </div>
+            <div class="pack-calc-result" data-pack-result="${esc(item.id)}">${esc(resultText)}</div>
+          </div>
+        </details>
       </div>`;
     }).join("");
 
@@ -8422,6 +8621,30 @@ packingListEl.addEventListener("click",async event=>{
 packingListEl.addEventListener("change",async event=>{
   const input=event.target.closest("[data-due]");
   if(input) await updatePackingDue(input.dataset.due,input.value);
+});
+
+packingListEl.addEventListener("input",event=>{
+  const input=event.target.closest("[data-pack-detail]");
+  if(!input) return;
+  const id=input.dataset.packId;
+  const item=packingData.find(entry=>entry.id===id);
+  if(!item) return;
+
+  const details=packingDetailsFor(item);
+  const field=input.dataset.packDetail;
+  details[field]=field==="note" ? input.value : Math.max(0,Number(input.value)||0);
+  packingDetails[id]=details;
+
+  const calculation=packingCalculationResult(details);
+  const resultText=calculation.total>0
+    ? `${calculation.total} nodig${calculation.packs ? ` · ${calculation.packs} ${calculation.packs===1?"pak":"pakken"}` : ""}`
+    : "Vul aantallen in om te berekenen";
+  const panel=input.closest(".pack-extra");
+  const resultEl=panel?.querySelector("[data-pack-result]");
+  const summaryResult=panel?.querySelector("summary span");
+  if(resultEl) resultEl.textContent=resultText;
+  if(summaryResult) summaryResult.textContent=calculation.total>0 ? resultText : "";
+  schedulePackingDetailsSave();
 });
 
 async function savePackingPatch(id,patch){
@@ -11393,6 +11616,7 @@ async function generateWalkRoutes(){
     ];
 
     const found=[];
+    const alternatives=[];
     let attempts=0;
 
     for(const group of shifted){
@@ -11423,18 +11647,16 @@ async function generateWalkRoutes(){
           console.warn("Hoogteprofiel niet beschikbaar",elevError);
         }
 
+        const candidate={route,elevation,points:group,origin,loopCheck,googleUrl:walkGoogleUrl(origin,group)};
+
         if(walkRouteFits(route,elevation,profile)){
           const duplicate=found.some(x=>Math.abs(x.route.distance-route.distance)<250);
           if(!duplicate){
-            found.push({
-              route,
-              elevation,
-              points:group,
-              origin,
-              loopCheck,
-              googleUrl:walkGoogleUrl(origin,group)
-            });
+            found.push(candidate);
           }
+        }else{
+          const duplicate=alternatives.some(x=>Math.abs(x.route.distance-route.distance)<250);
+          if(!duplicate) alternatives.push(candidate);
         }
       }catch(routeError){
         console.warn("Rondwandeling kandidaat overgeslagen",routeError);
@@ -11443,8 +11665,20 @@ async function generateWalkRoutes(){
       if(found.length<3) await sleepMs(1050);
     }
 
-    walkRouteResults=found;
-    renderWalkRouteCards(found);
+    const nearestAlternatives=alternatives
+      .sort((a,b)=>{
+        const score=result=>{
+          const km=result.route.distance/1000;
+          const ascent=Number(result.elevation.ascent)||0;
+          return Math.abs(km-profile.targetKm)+Math.max(0,ascent-profile.maxAscent)/250;
+        };
+        return score(a)-score(b);
+      })
+      .slice(0,3);
+    const displayed=found.length ? found : nearestAlternatives;
+
+    walkRouteResults=displayed;
+    renderWalkRouteCards(displayed);
 
     if(found.length){
       status.className="route-status";
@@ -11452,18 +11686,22 @@ async function generateWalkRoutes(){
         `${found.length} rondwandeling${found.length===1?"":"en"} gevonden voor niveau ${profile.label}. `+
         `Alle voorstellen starten en eindigen bij ${liveTodayHotel.hotel} én gebruiken niet simpelweg dezelfde weg terug.`;
       other.hidden=false;
-    }else{
-      status.className="route-status error";
+    }else if(displayed.length){
+      status.className="route-status";
       status.innerHTML=`
-        <strong>Geen passende route gevonden voor ${esc(profile.label)}.</strong><br>
-        De route-service reageerde wel, maar de gevonden round trips vielen buiten de ingestelde afstand/stijging.
-        <br><br>
-        <button class="route-link secondary" type="button" onclick="walkRouteOffset+=1; generateWalkRoutesFromButton(event)">
-          Probeer andere routepunten
-        </button>
-        <a class="route-link" href="${esc(externalFootPlannerUrl(origin))}" target="_blank" rel="noopener">
-          Open wandelplanner ↗
-        </a>`;
+        <strong>Geen exacte match voor ${esc(profile.label)}, daarom toon ik de beste alternatieven.</strong><br>
+        Deze rondwandelingen liggen het dichtst bij de gekozen afstand en stijging. Controleer de afstand en hoogtemeters op de kaarten.`;
+      other.hidden=false;
+    }else{
+      const fallbackGroups=[4,5,6].map(variant=>walkFallbackPoints(origin,profile,variant));
+      const fallbackLinks=fallbackGroups.map((group,index)=>`
+        <a class="route-link secondary" href="${esc(walkGoogleUrl(origin,group))}" target="_blank" rel="noopener">
+          Alternatief ${index+1} openen ↗
+        </a>`).join(" ");
+      status.className="route-status";
+      status.innerHTML=`
+        <strong>De routeservice gaf geen bruikbare lus terug; hier zijn automatisch drie andere voorstellen.</strong><br><br>
+        ${fallbackLinks}`;
       other.hidden=false;
     }
 
