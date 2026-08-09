@@ -6405,15 +6405,46 @@ function showView(id){
   document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
   document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
   document.getElementById(id).classList.add("active");
+
+  // Meenemen mag nooit proberen te laden voordat de gedeelde client klaar is.
+  if(id==="meenemen"){
+    const list=document.getElementById("packingList");
+    if(!client && list) list.innerHTML='<div class="empty">Verbinden met Supabase\u2026</div>';
+    ensureSupabaseReady()
+      .then(()=>loadPacking())
+      .catch(err=>{
+        if(list) list.innerHTML='<div class="empty"><span class="error">Paklijst kon niet worden geladen: '+esc(err.message)+'</span></div>';
+      });
+  }
 }
 document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>showView(b.dataset.view));
 
 const sbUrl = document.getElementById("sbUrl");
 const sbKey = document.getElementById("sbKey");
+const DEFAULT_SUPABASE_KEY = "sb_publishable_2myvIM4AglliVISIQC3Y_g_pXfyxyp5";
 sbUrl.value = localStorage.getItem("vakantie_sb_url") || sbUrl.value;
-sbKey.value = localStorage.getItem("vakantie_sb_key") || "";
+sbKey.value = localStorage.getItem("vakantie_sb_key") || DEFAULT_SUPABASE_KEY;
 
-document.getElementById("connectBtn").onclick = connect;
+let supabaseReadyPromise = null;
+let realtimeSubscribed = false;
+
+function ensureSupabaseReady(){
+  if(client) return Promise.resolve(client);
+  if(!supabaseReadyPromise){
+    supabaseReadyPromise=connect()
+      .then(()=>{
+        if(!client) throw new Error("Supabase-client is niet beschikbaar.");
+        return client;
+      })
+      .catch(err=>{
+        supabaseReadyPromise=null;
+        throw err;
+      });
+  }
+  return supabaseReadyPromise;
+}
+
+document.getElementById("connectBtn").onclick = ()=>ensureSupabaseReady().catch(()=>{});
 
 async function connect(){
   const url = sbUrl.value.trim().replace(/\/rest\/v1\/?$/,"");
@@ -6442,13 +6473,19 @@ async function connect(){
     await ensurePackingIconDatabase();
     await loadTripManager();
     await Promise.all([loadPacking(),loadCosts(),loadMemories()]);
-    subscribeRealtime();
+    if(!realtimeSubscribed){
+      subscribeRealtime();
+      realtimeSubscribed=true;
+    }
     await refreshTripDrivenUI();
+    return client;
   }catch(err){
+    client=null;
     console.error(err);
     msg.innerHTML='<span class="error">Verbinding mislukt: '+esc(err.message)+'</span>';
     top.textContent="Verbinding mislukt";
     top.className="status-pill bad";
+    throw err;
   }
 }
 
@@ -9442,8 +9479,8 @@ renderRangeCard();
 
 setupProfileSelector();
 
-// Probeer automatisch opnieuw te verbinden als gegevens eerder lokaal zijn opgeslagen.
-if(sbKey.value) connect();
+// GitHub Pages en nieuwe telefoons verbinden direct met de ingebouwde publieke frontend-configuratie.
+ensureSupabaseReady().catch(err=>console.warn("Automatisch verbinden mislukt:",err));
 
 
 
@@ -13654,8 +13691,8 @@ document.getElementById("saveChargeSession")?.addEventListener("click",saveCharg
 });
 
 
-/* ===== v52: mobiele navigatie ===== */
-(function setupMobileNavigation(){
+/* ===== v53: mobiele navigatie, pas koppelen nadat de knoppen in de DOM staan ===== */
+function setupMobileNavigation(){
   const isMobile=()=>window.matchMedia("(max-width:620px)").matches;
   const nav=document.getElementById("mobileAppNav");
   const sheet=document.getElementById("mobileMoreSheet");
@@ -13697,7 +13734,13 @@ document.getElementById("saveChargeSession")?.addEventListener("click",saveCharg
   window.addEventListener("resize",()=>{
     if(!isMobile()) sheet.hidden=true;
   });
-})();
+}
+
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",setupMobileNavigation,{once:true});
+}else{
+  setupMobileNavigation();
+}
 
 </script>
 
