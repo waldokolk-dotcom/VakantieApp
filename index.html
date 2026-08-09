@@ -4,6 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>Vakantie 2026</title>
+  <meta name="theme-color" content="#155c38">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=58">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=58">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -97,7 +103,8 @@
     .row-title{font-weight:800}
     .row-meta{color:var(--muted);font-size:.9rem;margin-top:3px}
     .status-btn{
-      width:34px;height:34px;border-radius:50%;border:2px solid #b9c6bd;background:white;cursor:pointer;font-weight:900;color:white;
+      width:44px;height:44px;border-radius:50%;border:2px solid #b9c6bd;background:white;cursor:pointer;font-weight:900;color:white;
+      touch-action:manipulation;-webkit-tap-highlight-color:transparent;
     }
     .status-btn.ready{background:#8aa98d;border-color:#8aa98d}
     .status-btn.packed{background:var(--green);border-color:var(--green)}
@@ -5036,15 +5043,64 @@
         font-size:1.05rem !important;
       }
       #meenemen .pack-item{
-        grid-template-columns:38px minmax(0,1fr) !important;
-        gap:9px !important;
-        padding:10px !important;
+        grid-template-columns:44px 40px minmax(0,1fr) !important;
+        gap:8px !important;
+        padding:12px 10px !important;
+        align-items:start !important;
+      }
+      #meenemen .status-btn{
+        grid-column:1 !important;
+        grid-row:1 !important;
+      }
+      #meenemen .pack-item-icon{
+        grid-column:2 !important;
+        grid-row:1 !important;
+      }
+      #meenemen .pack-main{
+        grid-column:3 !important;
+        grid-row:1 !important;
+        padding-top:2px !important;
+      }
+      #meenemen .pack-name{
+        font-size:1rem !important;
+        line-height:1.25 !important;
+        overflow-wrap:anywhere;
+      }
+      #meenemen .pack-meta{
+        line-height:1.35 !important;
+        margin-top:4px !important;
+      }
+      #meenemen .pack-updated{
+        line-height:1.35 !important;
+        margin-top:5px !important;
       }
       #meenemen .pack-due,
       #meenemen .seg,
       #meenemen .pack-actions{
-        grid-column:2 !important;
+        grid-column:1/-1 !important;
         width:100% !important;
+      }
+      #meenemen .pack-due{
+        margin-top:3px !important;
+      }
+      #meenemen .seg{
+        display:grid !important;
+        grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+        gap:6px !important;
+      }
+      #meenemen .seg button{
+        min-height:42px !important;
+        touch-action:manipulation;
+        font-size:0 !important;
+        white-space:normal !important;
+        line-height:1.1 !important;
+      }
+      #meenemen .seg button::after{font-size:11px;font-weight:850}
+      #meenemen .seg button[data-status="todo"]::after{content:"Nog doen"}
+      #meenemen .seg button[data-status="ready"]::after{content:"Klaar"}
+      #meenemen .seg button[data-status="packed"]::after{content:"Ingepakt"}
+      #meenemen .pack-actions{
+        justify-content:flex-end !important;
       }
 
       /* Forms generic */
@@ -8293,12 +8349,6 @@ function renderPacking(){
     </div>`;
   }).join("");
 
-  el.querySelectorAll("[data-cycle]").forEach(btn=>btn.onclick=()=>cyclePacking(btn.dataset.cycle));
-  el.querySelectorAll("[data-status-id]").forEach(btn=>btn.onclick=()=>setPackingStatus(btn.dataset.statusId,btn.dataset.status));
-  el.querySelectorAll("[data-due]").forEach(inp=>inp.onchange=()=>updatePackingDue(inp.dataset.due,inp.value));
-  el.querySelectorAll("[data-edit]").forEach(btn=>btn.onclick=()=>editPackingItem(btn.dataset.edit));
-  el.querySelectorAll("[data-delete]").forEach(btn=>btn.onclick=()=>deletePackingItem(btn.dataset.delete));
-
   el.querySelectorAll("[data-toggle-category]").forEach(toggle=>{
     toggle.onclick=(event)=>{
       event.stopPropagation();
@@ -8324,15 +8374,65 @@ function renderPacking(){
   updatePackingExpandButton();
 }
 
+// Eén vaste handler blijft bestaan wanneer de paklijst na iedere wijziging opnieuw wordt getekend.
+// Dit voorkomt verloren onclick-handlers in Safari/iOS.
+const packingListEl=document.getElementById("packingList");
+packingListEl.addEventListener("click",async event=>{
+  const button=event.target.closest("button");
+  if(!button || !packingListEl.contains(button) || button.dataset.toggleCategory!==undefined) return;
+
+  if(button.dataset.cycle){
+    event.preventDefault();
+    await cyclePacking(button.dataset.cycle);
+    return;
+  }
+  if(button.dataset.statusId){
+    event.preventDefault();
+    await setPackingStatus(button.dataset.statusId,button.dataset.status);
+    return;
+  }
+  if(button.dataset.edit){
+    event.preventDefault();
+    await ensureSupabaseReady();
+    await editPackingItem(button.dataset.edit);
+    return;
+  }
+  if(button.dataset.delete){
+    event.preventDefault();
+    await ensureSupabaseReady();
+    await deletePackingItem(button.dataset.delete);
+  }
+});
+
+packingListEl.addEventListener("change",async event=>{
+  const input=event.target.closest("[data-due]");
+  if(input) await updatePackingDue(input.dataset.due,input.value);
+});
+
 async function savePackingPatch(id,patch){
-  if(!client) return false;
+  try{
+    await ensureSupabaseReady();
+  }catch(err){
+    alert("Supabase is nog niet beschikbaar: "+err.message);
+    return false;
+  }
+
+  const item=packingData.find(x=>x.id===id);
+  if(!item) return false;
+  const previous={...item};
+
   patch.updated_at=new Date().toISOString();
   patch.updated_by=actorName();
-  const {error}=await client.from("packing").update(patch).eq("id",id);
-  if(error){ alert("Opslaan mislukt: "+error.message); return false; }
-  const item=packingData.find(x=>x.id===id);
-  if(item) Object.assign(item,patch);
+  Object.assign(item,patch);
   renderPacking();
+
+  const {error}=await client.from("packing").update(patch).eq("id",id);
+  if(error){
+    Object.assign(item,previous);
+    renderPacking();
+    alert("Opslaan mislukt: "+error.message);
+    return false;
+  }
   return true;
 }
 
@@ -8343,7 +8443,8 @@ async function setPackingStatus(id,status){
 async function cyclePacking(id){
   const item=packingData.find(x=>x.id===id);
   if(!item) return;
-  const next=item.status==="todo"?"ready":item.status==="ready"?"packed":"todo";
+  // De grote ronde knop is op telefoon een directe klaar/niet-klaar-schakelaar.
+  const next=item.status==="packed"?"todo":"packed";
   await setPackingStatus(id,next);
 }
 
