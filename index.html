@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>Vakantie 2026</title>
+<!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -4743,7 +4744,363 @@
       }
     }
 
-  </style>
+  
+    /* ===== v52: echte mobiele app-opbouw ===== */
+    .mobile-app-nav,
+    .mobile-more-sheet{display:none}
+
+    @media(max-width:620px){
+      html,body{
+        width:100%;
+        max-width:100%;
+        overflow-x:hidden;
+      }
+      body{
+        padding-bottom:84px;
+      }
+      .shell{
+        width:100%;
+        max-width:100%;
+        padding:0 10px 20px !important;
+      }
+
+      /* Desktop-tabs verdwijnen alleen op telefoon */
+      .legacy-nav{
+        display:none !important;
+      }
+
+      .legacy-header{
+        min-height:72px !important;
+        grid-template-columns:minmax(0,1fr) auto !important;
+        gap:8px !important;
+        align-items:center !important;
+        padding:8px 2px 10px !important;
+      }
+      .legacy-brand{
+        align-items:center !important;
+        gap:10px !important;
+        min-width:0;
+      }
+      .legacy-sun{
+        width:42px !important;
+        height:42px !important;
+        margin-top:0 !important;
+        font-size:22px !important;
+        flex:0 0 auto;
+      }
+      .legacy-brand-text{
+        font-size:24px !important;
+        line-height:1.05 !important;
+        white-space:nowrap;
+      }
+      .legacy-user{
+        margin-top:0 !important;
+        min-width:44px !important;
+        width:44px !important;
+        height:44px !important;
+        padding:0 !important;
+        display:flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+        border-radius:13px !important;
+        overflow:hidden;
+        font-size:0 !important;
+      }
+      .legacy-user::before{
+        content:"🛏️";
+        font-size:20px;
+      }
+
+      .view{
+        width:100%;
+        max-width:100%;
+        overflow-x:hidden;
+      }
+
+      /* bottom nav */
+      .mobile-app-nav{
+        position:fixed;
+        left:8px;
+        right:8px;
+        bottom:max(8px,env(safe-area-inset-bottom));
+        z-index:4000;
+        display:grid;
+        grid-template-columns:repeat(5,minmax(0,1fr));
+        gap:4px;
+        padding:7px;
+        border:1px solid rgba(214,205,185,.95);
+        border-radius:20px;
+        background:rgba(255,253,247,.96);
+        backdrop-filter:blur(18px);
+        box-shadow:0 12px 34px rgba(28,59,43,.20);
+      }
+      .mobile-app-nav button{
+        border:0;
+        background:transparent;
+        color:#66756d;
+        border-radius:14px;
+        min-width:0;
+        min-height:54px;
+        padding:5px 2px;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        gap:3px;
+        cursor:pointer;
+      }
+      .mobile-app-nav button span{
+        font-size:18px;
+        line-height:1;
+      }
+      .mobile-app-nav button b{
+        font-size:9px;
+        line-height:1.05;
+      }
+      .mobile-app-nav button.active{
+        background:#e9f5e7;
+        color:#126044;
+      }
+
+      .mobile-more-sheet{
+        position:fixed;
+        inset:0;
+        z-index:5000;
+      }
+      .mobile-more-sheet:not([hidden]){
+        display:block;
+      }
+      .mobile-more-backdrop{
+        position:absolute;
+        inset:0;
+        width:100%;
+        height:100%;
+        border:0;
+        background:rgba(13,42,31,.30);
+      }
+      .mobile-more-panel{
+        position:absolute;
+        left:10px;
+        right:10px;
+        bottom:max(82px,calc(74px + env(safe-area-inset-bottom)));
+        border:1px solid #ded5c4;
+        border-radius:22px;
+        background:#fffdf8;
+        box-shadow:0 20px 55px rgba(23,61,49,.25);
+        padding:15px;
+      }
+      .mobile-more-head{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        margin-bottom:12px;
+      }
+      .mobile-more-head small{
+        display:block;
+        color:#5b8d64;
+        font-size:9px;
+        font-weight:900;
+        letter-spacing:.12em;
+      }
+      .mobile-more-head strong{
+        display:block;
+        margin-top:2px;
+        font-size:18px;
+      }
+      .mobile-more-head button{
+        width:36px;
+        height:36px;
+        border:0;
+        border-radius:11px;
+        background:#eff2ea;
+        color:#52665c;
+        font-size:22px;
+      }
+      .mobile-more-grid{
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:8px;
+      }
+      .mobile-more-grid button{
+        min-height:78px;
+        border:1px solid #e4dccd;
+        border-radius:15px;
+        background:#fff;
+        color:#193f32;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        gap:6px;
+        font-weight:900;
+      }
+      .mobile-more-grid button span{font-size:23px}
+      .mobile-more-grid button b{font-size:12px}
+
+      /* Today blocks stack nicely */
+      .today-weather-grid,
+      .today-bottom-grid{
+        grid-template-columns:1fr !important;
+        gap:12px !important;
+      }
+      .today-weather-card,
+      .today-planner,
+      .today-dog-card,
+      .today-handy-card{
+        min-width:0 !important;
+        width:100% !important;
+      }
+      .today-choice-row{
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:7px !important;
+      }
+      .today-choice-row button{
+        min-width:0 !important;
+        white-space:normal !important;
+      }
+      .pace-switch{
+        width:100% !important;
+        display:grid !important;
+        grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+      }
+      .pace-switch button{
+        min-width:0 !important;
+        padding:9px 3px !important;
+        font-size:10px !important;
+      }
+      .today-timeline{
+        grid-template-columns:1fr !important;
+      }
+
+      /* Paklijst compact */
+      #meenemen .card{
+        padding:16px !important;
+      }
+      #meenemen .section-intro{
+        font-size:.92rem !important;
+        line-height:1.35 !important;
+        margin-bottom:12px !important;
+      }
+      #meenemen .pack-add{
+        padding:12px !important;
+        margin-bottom:12px !important;
+      }
+      #meenemen .pack-add-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:8px !important;
+      }
+      #meenemen .pack-add-grid label:first-child{
+        grid-column:1/-1 !important;
+      }
+      #meenemen .pack-add-grid .btn,
+      #meenemen .pack-add-grid button{
+        grid-column:1/-1 !important;
+        width:100% !important;
+      }
+      #meenemen .pack-add-grid input,
+      #meenemen .pack-add-grid select{
+        padding:10px !important;
+        min-width:0 !important;
+      }
+      #meenemen .toolbar{
+        display:grid !important;
+        grid-template-columns:1fr 1fr !important;
+        gap:8px !important;
+      }
+      #meenemen .toolbar input{
+        grid-column:1/-1 !important;
+        width:100% !important;
+        min-width:0 !important;
+      }
+      #meenemen .toolbar select,
+      #meenemen .toolbar .btn{
+        width:100% !important;
+        min-width:0 !important;
+      }
+      #meenemen #toggleAllPacking{
+        grid-column:1/-1 !important;
+      }
+      #meenemen #refreshPacking{
+        grid-column:1/2 !important;
+      }
+      #meenemen .kpis{
+        grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+        gap:7px !important;
+      }
+      #meenemen .kpi{
+        padding:10px !important;
+        border-radius:14px !important;
+      }
+      #meenemen .kpi b{
+        font-size:1.05rem !important;
+      }
+      #meenemen .pack-item{
+        grid-template-columns:38px minmax(0,1fr) !important;
+        gap:9px !important;
+        padding:10px !important;
+      }
+      #meenemen .pack-due,
+      #meenemen .seg,
+      #meenemen .pack-actions{
+        grid-column:2 !important;
+        width:100% !important;
+      }
+
+      /* Forms generic */
+      .form-grid,
+      .charge-form-grid,
+      .receipt-form-grid,
+      .trip-form-grid{
+        grid-template-columns:1fr !important;
+      }
+      .toolbar{
+        max-width:100%;
+      }
+      input,select,textarea,button{
+        max-width:100%;
+      }
+
+      /* Omgeving remains tiled and no horizontal strip */
+      .env-category-strip.env-category-grid{
+        grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+        overflow:visible !important;
+      }
+      .env-main-grid{
+        grid-template-columns:1fr !important;
+      }
+
+      /* Cards and layouts */
+      .legacy-hotel-grid,
+      .hotels-tab-list,
+      .trip-overview-grid,
+      .memory-grid{
+        grid-template-columns:1fr !important;
+      }
+
+      p,span,strong,a,button,label,
+      .row-title,.row-meta,.env-place-name,.env-place-address{
+        overflow-wrap:anywhere;
+      }
+    }
+
+    @media(max-width:390px){
+      .env-category-strip.env-category-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+      }
+      #meenemen .pack-add-grid,
+      #meenemen .toolbar{
+        grid-template-columns:1fr !important;
+      }
+      #meenemen .toolbar > *{
+        grid-column:1 !important;
+      }
+      .today-choice-row{
+        grid-template-columns:1fr !important;
+      }
+    }
+
+</style>
 </head>
 <body>
 <div class="shell">
@@ -13296,6 +13653,81 @@ document.getElementById("saveChargeSession")?.addEventListener("click",saveCharg
   document.getElementById(id)?.addEventListener("input",updateChargeCalculation);
 });
 
+
+/* ===== v52: mobiele navigatie ===== */
+(function setupMobileNavigation(){
+  const isMobile=()=>window.matchMedia("(max-width:620px)").matches;
+  const nav=document.getElementById("mobileAppNav");
+  const sheet=document.getElementById("mobileMoreSheet");
+  const moreBtn=document.getElementById("mobileMoreBtn");
+
+  function markMobileActive(view){
+    if(!nav) return;
+    nav.querySelectorAll("[data-mobile-view]").forEach(btn=>{
+      btn.classList.toggle("active",btn.dataset.mobileView===view);
+    });
+    const moreViews=["hotels","kosten","momenten","reizen"];
+    moreBtn?.classList.toggle("active",moreViews.includes(view));
+  }
+
+  function openMobileView(view){
+    sheet.hidden=true;
+    showView(view);
+    markMobileActive(view);
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  document.querySelectorAll("[data-mobile-view]").forEach(btn=>{
+    btn.addEventListener("click",()=>openMobileView(btn.dataset.mobileView));
+  });
+
+  moreBtn?.addEventListener("click",()=>{sheet.hidden=false});
+  document.getElementById("mobileMoreClose")?.addEventListener("click",()=>{sheet.hidden=true});
+  sheet?.querySelector(".mobile-more-backdrop")?.addEventListener("click",()=>{sheet.hidden=true});
+
+  document.querySelectorAll(".legacy-nav [data-view]").forEach(btn=>{
+    btn.addEventListener("click",()=>markMobileActive(btn.dataset.view));
+  });
+
+  if(isMobile()){
+    const active=document.querySelector(".view.active")?.id || "reis";
+    markMobileActive(active);
+  }
+
+  window.addEventListener("resize",()=>{
+    if(!isMobile()) sheet.hidden=true;
+  });
+})();
+
 </script>
+
+  <!-- v52: echte mobiele navigatie -->
+  <nav class="mobile-app-nav" id="mobileAppNav" aria-label="Mobiele navigatie">
+    <button type="button" data-mobile-view="reis"><span>✣</span><b>Reis</b></button>
+    <button type="button" data-mobile-view="vandaag"><span>⌂</span><b>Vandaag</b></button>
+    <button type="button" data-mobile-view="omgeving"><span>🗺️</span><b>Omgeving</b></button>
+    <button type="button" data-mobile-view="meenemen"><span>🧳</span><b>Meenemen</b></button>
+    <button type="button" id="mobileMoreBtn"><span>☰</span><b>Meer</b></button>
+  </nav>
+
+  <div class="mobile-more-sheet" id="mobileMoreSheet" hidden>
+    <button class="mobile-more-backdrop" type="button" aria-label="Sluiten"></button>
+    <div class="mobile-more-panel">
+      <div class="mobile-more-head">
+        <div>
+          <small>MEER</small>
+          <strong>Vakantie-app</strong>
+        </div>
+        <button id="mobileMoreClose" type="button" aria-label="Sluiten">×</button>
+      </div>
+      <div class="mobile-more-grid">
+        <button type="button" data-mobile-view="hotels"><span>🏨</span><b>Hotels</b></button>
+        <button type="button" data-mobile-view="kosten"><span>€</span><b>Kosten</b></button>
+        <button type="button" data-mobile-view="momenten"><span>📷</span><b>Momenten</b></button>
+        <button type="button" data-mobile-view="reizen"><span>🧭</span><b>Reis beheren</b></button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
