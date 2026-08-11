@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="71">
+  <meta name="app-version" content="72">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6114,7 +6114,7 @@
         <div class="receipt-source-actions">
           <button id="takeReceiptPhoto" class="btn" type="button">📷 Foto maken</button>
           <button id="chooseReceiptFile" class="btn secondary" type="button">🖼️ Foto kiezen</button>
-          <button id="receiptUseGps" class="btn secondary" type="button">🗺️ Herken via kaart</button>
+          <button id="receiptUseGps" class="btn secondary" type="button">📍 Huidige locatie</button>
         </div>
 
         <div class="receipt-workspace">
@@ -6149,24 +6149,25 @@
               <label>Zaak / leverancier
                 <input id="receiptMerchant" placeholder="Naam winkel, restaurant of hotel">
               </label>
-              <label>Locatie (zelf invullen of automatisch)
-                <input id="receiptLocation" placeholder="Naam, plaats of adres">
+              <label>Locatie
+                <input id="receiptLocation" placeholder="Plaats of adres">
               </label>
 
-              <label>Categorie (kies of typ zelf)
-                <input id="receiptCategory" list="receiptCategoryOptions" placeholder="Bijv. souvenirs">
-                <datalist id="receiptCategoryOptions">
-                  <option value="hotel" label="Hotel"></option>
-                  <option value="restaurant" label="Restaurant"></option>
-                  <option value="groceries" label="Boodschappen"></option>
-                  <option value="charging" label="Laden"></option>
-                  <option value="fuel" label="Brandstof"></option>
-                  <option value="parking" label="Parkeren"></option>
-                  <option value="toll" label="Tol"></option>
-                  <option value="activity" label="Activiteit"></option>
-                  <option value="dogs" label="Honden"></option>
-                  <option value="other" label="Overig"></option>
-                </datalist>
+              <label>Categorie
+                <select id="receiptCategory">
+                  <option value="hotel">Hotel</option>
+                  <option value="restaurant">Restaurant</option>
+                  <option value="groceries">Boodschappen</option>
+                  <option value="charging">Laden</option>
+                  <option value="fuel">Brandstof</option>
+                  <option value="parking">Parkeren</option>
+                  <option value="toll">Tol</option>
+                  <option value="activity">Activiteit</option>
+                  <option value="dogs">Honden</option>
+                  <option value="other">Overig</option>
+                  <option value="__custom__">＋ Categorie toevoegen…</option>
+                </select>
+                <input id="receiptCustomCategory" placeholder="Naam van nieuwe categorie" hidden>
               </label>
               <label>Locatie / stop
                 <select id="receiptStop">
@@ -6431,7 +6432,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v71</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v72</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6439,11 +6440,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=71" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=72" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v71</strong><br>
-          Bij een gescande bon kun je zelf een categorie en locatie invullen. De locatie kan ook automatisch via de kaart en huidige positie worden herkend. Alle bestaande functies zijn behouden.
+          <strong>Wijzigingen in v72</strong><br>
+          De vaste categorielijst bij een gescande bon is hersteld en bevat nu de extra keuze ‘Categorie toevoegen’. De locatievelden zijn ongewijzigd gebleven.
         </div>
       </div>
     </div>
@@ -6777,7 +6778,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||71;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||72;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -9464,6 +9465,25 @@ let receiptPreviewUrl=null;
 let receiptOcrWorker=null;
 let receiptLastParsed=null;
 
+function receiptCategoryValue(){
+  const select=document.getElementById("receiptCategory");
+  const custom=document.getElementById("receiptCustomCategory");
+  return select?.value==="__custom__"
+    ? custom?.value.trim() || "other"
+    : select?.value || "other";
+}
+
+function setReceiptCategoryChoice(value="other"){
+  const select=document.getElementById("receiptCategory");
+  const custom=document.getElementById("receiptCustomCategory");
+  if(!select || !custom) return;
+
+  const known=[...select.options].some(option=>option.value===value && value!=="__custom__");
+  select.value=known ? value : "__custom__";
+  custom.hidden=known;
+  custom.value=known ? "" : value;
+}
+
 function setReceiptStatus(message,progress=null){
   const status=document.getElementById("receiptOcrStatus");
   const bar=document.getElementById("receiptProgressBar");
@@ -9504,8 +9524,7 @@ function resetReceiptScanner(clearLocation=true){
   const stop=document.getElementById("receiptStop");
   if(stop) stop.value="";
 
-  const category=document.getElementById("receiptCategory");
-  if(category) category.value="other";
+  setReceiptCategoryChoice("other");
 
   const payment=document.getElementById("receiptPayment");
   if(payment) payment.value="";
@@ -9769,7 +9788,7 @@ function fillReceiptReview(parsed){
   document.getElementById("receiptDate").value=parsed.date || dateOnlyLocal();
   document.getElementById("receiptMerchant").value=parsed.merchant || "";
   if(parsed.location) document.getElementById("receiptLocation").value=parsed.location;
-  document.getElementById("receiptCategory").value=parsed.category || "other";
+  setReceiptCategoryChoice(parsed.category || "other");
   document.getElementById("receiptStop").value=parsed.stop || "";
   document.getElementById("receiptPayment").value=parsed.payment || "";
   document.getElementById("receiptPaidBy").value=actorName();
@@ -9874,7 +9893,7 @@ async function detectReceiptGpsLocation(){
 
     const lat=pos.coords.latitude;
     const lon=pos.coords.longitude;
-    const category=document.getElementById("receiptCategory").value.trim().toLowerCase();
+    const category=receiptCategoryValue().trim().toLowerCase();
     const merchant=document.getElementById("receiptMerchant").value.trim().toLowerCase();
     const mapCategory={
       hotel:"hotel",
@@ -9984,7 +10003,7 @@ async function saveReceiptAsCost(){
       trip_id:currentTripId,
       stop_id:document.getElementById("receiptStop").value || null,
       amount_cents:amount,
-      category:document.getElementById("receiptCategory").value || "other",
+      category:receiptCategoryValue(),
       date,
       description:document.getElementById("receiptDescription").value.trim() || merchant || "Gescande bon",
       created_by:actorName(),
@@ -10051,6 +10070,15 @@ document.getElementById("chooseReceiptFile").onclick=()=>document.getElementById
 document.getElementById("rescanReceipt").onclick=()=>document.getElementById("receiptFileInput").click();
 document.getElementById("receiptUseGps").onclick=detectReceiptGpsLocation;
 document.getElementById("saveReceiptCost").onclick=saveReceiptAsCost;
+document.getElementById("receiptCategory").onchange=event=>{
+  const custom=document.getElementById("receiptCustomCategory");
+  const adding=event.target.value==="__custom__";
+  custom.hidden=!adding;
+  if(adding){
+    custom.value="";
+    custom.focus();
+  }
+};
 
 document.getElementById("receiptCameraInput").onchange=e=>{
   const file=e.target.files?.[0];
