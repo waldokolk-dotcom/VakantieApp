@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="73">
+  <meta name="app-version" content="74">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6282,7 +6282,9 @@
               <option value="activity">Activiteit</option>
               <option value="dogs">Honden</option>
               <option value="other">Overig</option>
+              <option value="__custom__">＋ Categorie toevoegen…</option>
             </select>
+            <input id="cCustomCategory" placeholder="Naam van nieuwe categorie" hidden>
           </label>
           <label>Locatie / stop
             <select id="cStop">
@@ -6290,7 +6292,10 @@
               <option value="baiersbronn">Baiersbronn</option>
               <option value="zuid-tirol">Zuid-Tirol</option>
               <option value="balderschwang">Balderschwang</option>
+              <option value="__custom_location__">＋ Locatie in tekst toevoegen…</option>
+              <option value="__detect_location__">📍 Kijk waar ik ben</option>
             </select>
+            <input id="cCustomLocation" placeholder="Typ plaats, winkel of adres" hidden>
           </label>
           <label class="full">Omschrijving<input id="cDescription" placeholder="Bijv. lunch, parkeren, boodschappen"></label>
           <label>Betaald door
@@ -6435,7 +6440,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v73</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v74</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6443,11 +6448,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=73" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=74" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v73</strong><br>
-          Bij ‘Locatie / stop’ van een gescande bon kun je nu een locatie in tekst toevoegen of automatisch laten bepalen waar je bent. De bestaande locaties blijven beschikbaar.
+          <strong>Wijzigingen in v74</strong><br>
+          Ook bij ‘Nieuwe kostenpost’ kun je zelf een categorie of locatie toevoegen en de locatie door je telefoon laten bepalen. De bestaande keuzes blijven beschikbaar.
         </div>
       </div>
     </div>
@@ -6781,7 +6786,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||73;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||74;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -8042,7 +8047,9 @@ function updateDynamicStopSelects(){
   const costStop=document.getElementById("cStop");
   if(costStop){
     const previous=costStop.value;
-    costStop.innerHTML=options;
+    costStop.innerHTML=options+
+      '<option value="__custom_location__">＋ Locatie in tekst toevoegen…</option>'+
+      '<option value="__detect_location__">📍 Kijk waar ik ben</option>';
     if([...costStop.options].some(o=>o.value===previous)) costStop.value=previous;
   }
 
@@ -9435,6 +9442,81 @@ document.addEventListener("click",(event)=>{
 
 document.getElementById("refreshCosts").onclick=loadCosts;
 
+function manualCostCategoryValue(){
+  const select=document.getElementById("cCategory");
+  const custom=document.getElementById("cCustomCategory");
+  return select.value==="__custom__" ? custom.value.trim() || "other" : select.value || "other";
+}
+
+function manualCostStopValue(){
+  const value=document.getElementById("cStop").value || "";
+  return value.startsWith("__") ? "" : value;
+}
+
+function resetManualCostExtras(){
+  const category=document.getElementById("cCustomCategory");
+  const location=document.getElementById("cCustomLocation");
+  category.value="";
+  category.hidden=true;
+  location.value="";
+  location.hidden=true;
+}
+
+async function detectManualCostLocation(){
+  const select=document.getElementById("cStop");
+  const custom=document.getElementById("cCustomLocation");
+  const msg=document.getElementById("costFormMsg");
+
+  msg.innerHTML='<div class="notice">📍 Je telefoon bepaalt de huidige locatie…</div>';
+
+  try{
+    const pos=await getCurrentPositionPromise({enableHighAccuracy:true,timeout:12000,maximumAge:60000});
+    const label=await reverseGeocodeLocation(pos.coords.latitude,pos.coords.longitude);
+    const inferred=inferReceiptStop("","",label);
+
+    if(inferred){
+      select.value=inferred;
+      custom.value="";
+      custom.hidden=true;
+      msg.innerHTML='<div class="notice"><span class="ok">✓ Huidige reislocatie herkend.</span></div>';
+    }else{
+      select.value="__custom_location__";
+      custom.value=label;
+      custom.hidden=false;
+      msg.innerHTML='<div class="notice"><span class="ok">✓ Locatie door je telefoon ingevuld.</span></div>';
+    }
+  }catch(err){
+    console.error(err);
+    select.value="";
+    custom.hidden=true;
+    msg.innerHTML='<div class="notice"><span class="error">Locatie kon niet worden bepaald. Kies ‘Locatie in tekst toevoegen’ om deze zelf in te vullen.</span></div>';
+  }
+}
+
+document.getElementById("cCategory").onchange=event=>{
+  const custom=document.getElementById("cCustomCategory");
+  const adding=event.target.value==="__custom__";
+  custom.hidden=!adding;
+  if(adding){ custom.value=""; custom.focus(); }
+};
+
+document.getElementById("cStop").onchange=async event=>{
+  const custom=document.getElementById("cCustomLocation");
+  if(event.target.value==="__custom_location__"){
+    custom.hidden=false;
+    custom.value="";
+    custom.focus();
+    return;
+  }
+  if(event.target.value==="__detect_location__"){
+    custom.hidden=true;
+    await detectManualCostLocation();
+    return;
+  }
+  custom.value="";
+  custom.hidden=true;
+};
+
 document.getElementById("saveCost").onclick=async()=>{
   applyActorUI();
   if(!client){ alert("Maak eerst verbinding met Supabase."); return; }
@@ -9444,12 +9526,13 @@ document.getElementById("saveCost").onclick=async()=>{
 
   const record={
     trip_id:currentTripId,
-    stop_id:document.getElementById("cStop").value || null,
+    stop_id:manualCostStopValue() || null,
     amount_cents:amount,
-    category:document.getElementById("cCategory").value,
+    category:manualCostCategoryValue(),
     date:document.getElementById("cDate").value || new Date().toISOString().slice(0,10),
     description:document.getElementById("cDescription").value.trim(),
     created_by:actorName(),
+    location:document.getElementById("cCustomLocation").value.trim(),
     paid_by:document.getElementById("cPaidBy").value,
     payment_method:document.getElementById("cPayment").value || null,
     updated_at:new Date().toISOString()
@@ -9461,6 +9544,9 @@ document.getElementById("saveCost").onclick=async()=>{
   document.getElementById("costFormMsg").innerHTML='<div class="notice"><span class="ok">✓ Kostenpost opgeslagen.</span></div>';
   document.getElementById("cAmount").value="";
   document.getElementById("cDescription").value="";
+  document.getElementById("cCategory").value="hotel";
+  document.getElementById("cStop").value="";
+  resetManualCostExtras();
   await loadCosts();
 };
 
