@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="82">
+  <meta name="app-version" content="83">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -4217,9 +4217,27 @@
     #kosten .form-grid input[type="checkbox"]{width:auto;min-width:auto}
     .cost-deposit-check{display:flex !important;flex-direction:row !important;align-items:center;gap:9px}
     .cost-deposit-check input{margin:0}
-    .cost-summary-line{display:block;margin-top:5px;font-size:11px;font-weight:850;color:#60776b}
+    .cost-summary-line{display:block;margin-top:8px;font-size:1.5rem;line-height:1.15;font-weight:850;color:#60776b}
     .cost-summary-line.deposit{color:#9a5b35}
     .cost-summary-line.remaining{color:#155f43}
+    .cost-category-totals{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+      gap:10px;
+      margin:0 0 16px;
+    }
+    .cost-category-total{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:11px 13px;
+      border-radius:14px;
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(215,208,190,.8);
+      font-weight:750;
+    }
+    .cost-category-total b{font-size:1rem;white-space:nowrap}
     .receipt-raw-details{
       margin-top:12px;
       border:1px solid #e5ddca;
@@ -6152,11 +6170,12 @@
         <div class="eyebrow">Kosten</div>
         <h2>Uitgaven</h2>
         <div class="kpis" style="margin:14px 0">
-          <div class="kpi">Totaal<b id="totalCosts">€ –</b><small id="depositCosts" class="cost-summary-line deposit">Aanbetalingen: € –</small><small id="remainingCosts" class="cost-summary-line remaining">Nog te betalen: € –</small></div>
+          <div class="kpi">Totale reissom<b id="totalCosts">€ –</b><small id="depositCosts" class="cost-summary-line deposit">Aanbetalingen eraf: € –</small><small id="remainingCosts" class="cost-summary-line remaining">Restant: € –</small></div>
           <div class="kpi">Regels<b id="costCount">–</b></div>
           <div class="kpi">Hotels<b id="hotelCosts">€ –</b></div>
           <div class="kpi">Laden<b id="chargingCosts">€ –</b><small id="chargingKwh">0 kWh</small></div>
         </div>
+        <div id="costCategoryTotals" class="cost-category-totals" aria-label="Totalen per kostencategorie"></div>
         <div class="toolbar">
           <button id="refreshCosts" class="btn secondary">Vernieuwen</button>
           <button id="chargeSessionBtn" class="btn">⚡ Laadbeurt toevoegen</button>
@@ -6211,7 +6230,7 @@
 
             <div class="form-grid receipt-form-grid">
               <label>Bedrag (€)
-                <input id="receiptAmount" inputmode="decimal" placeholder="18,42">
+                <input id="receiptAmount" inputmode="decimal" placeholder="Vul bedrag in">
               </label>
               <label>Datum
                 <input id="receiptDate" type="date">
@@ -6313,10 +6332,10 @@
 
         <div class="form-grid charge-form-grid">
           <label>Kosten (€)
-            <input id="chargeAmount" inputmode="decimal" placeholder="18,42">
+            <input id="chargeAmount" inputmode="decimal" placeholder="Vul kosten in">
           </label>
           <label>Geladen energie
-            <div class="charge-input-unit"><input id="chargeKwh" inputmode="decimal" placeholder="42,6"><span>kWh</span></div>
+            <div class="charge-input-unit"><input id="chargeKwh" inputmode="decimal" placeholder="Vul verbruik in"><span>kWh</span></div>
           </label>
           <label>Datum
             <input id="chargeDate" type="date">
@@ -6343,7 +6362,7 @@
       <div class="card span-5">
         <h2 id="costFormTitle">Nieuwe kostenpost</h2>
         <div class="form-grid">
-          <label>Bedrag (€)<input id="cAmount" inputmode="decimal" placeholder="12,50"></label>
+          <label>Bedrag (€)<input id="cAmount" inputmode="decimal" placeholder="Vul bedrag in"></label>
           <label>Datum<input id="cDate" type="date"></label>
           <label>Categorie
             <select id="cCategory">
@@ -6518,7 +6537,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v82</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v83</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6526,11 +6545,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=82" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=83" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v82</strong><br>
-          Bon scannen opent leeg met alleen de datum. Na het toevoegen van een bon worden uitsluitend de leesbare gegevens automatisch ingevuld.
+          <strong>Wijzigingen in v83</strong><br>
+          Lege bedragvelden tonen geen voorbeeldbedragen meer. Totale reissom, aanbetalingen en restant zijn even groot en alle kostencategorieën krijgen een eigen totaal.
         </div>
       </div>
     </div>
@@ -6859,7 +6878,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||82;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||83;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -9481,6 +9500,34 @@ function renderCosts(){
   document.getElementById("chargingKwh").textContent=
     chargingEnergy.toLocaleString("nl-NL",{maximumFractionDigits:1})+" kWh";
   document.getElementById("kpiCosts").textContent=euro(total);
+
+  const categoryLabels={
+    hotel:"Hotels",
+    restaurant:"Restaurants",
+    groceries:"Boodschappen",
+    charging:"Laden",
+    fuel:"Brandstof",
+    parking:"Parkeren",
+    toll:"Tol",
+    activity:"Activiteiten",
+    dogs:"Honden",
+    other:"Overig"
+  };
+  const categoryTotals=costData
+    .filter(row=>!isDepositCost(row))
+    .reduce((totals,row)=>{
+      const category=String(row.category||"other").trim() || "other";
+      totals[category]=(totals[category]||0)+(Number(row.amount_cents)||0);
+      return totals;
+    },{});
+  const categoryTotalsEl=document.getElementById("costCategoryTotals");
+  categoryTotalsEl.innerHTML=Object.entries(categoryTotals)
+    .filter(([,amount])=>amount!==0)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([category,amount])=>
+      `<div class="cost-category-total"><span>${esc(categoryLabels[category]||category)}</span><b>${euro(amount)}</b></div>`
+    ).join("") || '<div class="empty">Nog geen categorietotalen.</div>';
+
   updateHotelCostCards();
 
   const el=document.getElementById("costList");
