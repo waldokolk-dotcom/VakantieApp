@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="72">
+  <meta name="app-version" content="73">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6172,7 +6172,10 @@
               <label>Locatie / stop
                 <select id="receiptStop">
                   <option value="">Niet gekoppeld</option>
+                  <option value="__custom_location__">＋ Locatie in tekst toevoegen…</option>
+                  <option value="__detect_location__">📍 Kijk waar ik ben</option>
                 </select>
+                <input id="receiptCustomLocation" placeholder="Typ plaats, winkel of adres" hidden>
               </label>
 
               <label>Betaald door
@@ -6432,7 +6435,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v72</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v73</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6440,11 +6443,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=72" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=73" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v72</strong><br>
-          De vaste categorielijst bij een gescande bon is hersteld en bevat nu de extra keuze ‘Categorie toevoegen’. De locatievelden zijn ongewijzigd gebleven.
+          <strong>Wijzigingen in v73</strong><br>
+          Bij ‘Locatie / stop’ van een gescande bon kun je nu een locatie in tekst toevoegen of automatisch laten bepalen waar je bent. De bestaande locaties blijven beschikbaar.
         </div>
       </div>
     </div>
@@ -6778,7 +6781,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||72;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||73;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -8046,7 +8049,9 @@ function updateDynamicStopSelects(){
   const receiptStop=document.getElementById("receiptStop");
   if(receiptStop){
     const previous=receiptStop.value;
-    receiptStop.innerHTML=options;
+    receiptStop.innerHTML=options+
+      '<option value="__custom_location__">＋ Locatie in tekst toevoegen…</option>'+
+      '<option value="__detect_location__">📍 Kijk waar ik ben</option>';
     if([...receiptStop.options].some(o=>o.value===previous)) receiptStop.value=previous;
   }
 
@@ -9484,6 +9489,18 @@ function setReceiptCategoryChoice(value="other"){
   custom.value=known ? "" : value;
 }
 
+function receiptStopValue(){
+  const value=document.getElementById("receiptStop")?.value || "";
+  return value.startsWith("__") ? "" : value;
+}
+
+function resetReceiptCustomLocation(){
+  const custom=document.getElementById("receiptCustomLocation");
+  if(!custom) return;
+  custom.value="";
+  custom.hidden=true;
+}
+
 function setReceiptStatus(message,progress=null){
   const status=document.getElementById("receiptOcrStatus");
   const bar=document.getElementById("receiptProgressBar");
@@ -9523,6 +9540,7 @@ function resetReceiptScanner(clearLocation=true){
 
   const stop=document.getElementById("receiptStop");
   if(stop) stop.value="";
+  resetReceiptCustomLocation();
 
   setReceiptCategoryChoice("other");
 
@@ -9938,6 +9956,13 @@ async function detectReceiptGpsLocation(){
 
     if(inferred){
       document.getElementById("receiptStop").value=inferred;
+      resetReceiptCustomLocation();
+    }else{
+      const stop=document.getElementById("receiptStop");
+      const custom=document.getElementById("receiptCustomLocation");
+      stop.value="__custom_location__";
+      custom.hidden=false;
+      custom.value=label;
     }
 
     button.textContent=place ? "✓ Plek op kaart herkend" : "✓ Locatie ingevuld";
@@ -10001,13 +10026,13 @@ async function saveReceiptAsCost(){
 
     const record={
       trip_id:currentTripId,
-      stop_id:document.getElementById("receiptStop").value || null,
+      stop_id:receiptStopValue() || null,
       amount_cents:amount,
       category:receiptCategoryValue(),
       date,
       description:document.getElementById("receiptDescription").value.trim() || merchant || "Gescande bon",
       created_by:actorName(),
-      location:document.getElementById("receiptLocation").value.trim() || merchant || "",
+      location:document.getElementById("receiptCustomLocation").value.trim() || document.getElementById("receiptLocation").value.trim() || merchant || "",
       kwh:0,
       paid_by:document.getElementById("receiptPaidBy").value || actorName(),
       payment_method:document.getElementById("receiptPayment").value || null,
@@ -10078,6 +10103,24 @@ document.getElementById("receiptCategory").onchange=event=>{
     custom.value="";
     custom.focus();
   }
+};
+document.getElementById("receiptStop").onchange=async event=>{
+  const custom=document.getElementById("receiptCustomLocation");
+  if(event.target.value==="__custom_location__"){
+    custom.hidden=false;
+    custom.value=document.getElementById("receiptLocation").value.trim();
+    custom.focus();
+    return;
+  }
+  if(event.target.value==="__detect_location__"){
+    custom.hidden=true;
+    await detectReceiptGpsLocation();
+    return;
+  }
+  resetReceiptCustomLocation();
+};
+document.getElementById("receiptCustomLocation").oninput=event=>{
+  document.getElementById("receiptLocation").value=event.target.value;
 };
 
 document.getElementById("receiptCameraInput").onchange=e=>{
