@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="85">
+  <meta name="app-version" content="86">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -4217,27 +4217,59 @@
     #kosten .form-grid input[type="checkbox"]{width:auto;min-width:auto}
     .cost-deposit-check{display:flex !important;flex-direction:row !important;align-items:center;gap:9px}
     .cost-deposit-check input{margin:0}
-    .cost-summary-line{display:block;margin-top:8px;font-size:1.5rem;line-height:1.15;font-weight:850;color:#60776b}
+    .cost-overview{
+      display:grid;
+      grid-template-columns:minmax(280px,.8fr) minmax(360px,1.35fr);
+      gap:16px;
+      margin:14px 0 18px;
+    }
+    .cost-grand-total,
+    .cost-breakdown-panel{
+      padding:20px;
+      border-radius:22px;
+      background:linear-gradient(145deg,rgba(247,250,230,.94),rgba(255,248,217,.9));
+      border:1px solid rgba(225,216,183,.75);
+      box-shadow:0 10px 26px rgba(41,71,57,.08);
+    }
+    .cost-grand-total > span,
+    .cost-breakdown-head > span{font-size:1.05rem;color:#315948;font-weight:750}
+    .cost-grand-total b,
+    .cost-summary-line{
+      display:block;
+      margin-top:9px;
+      font-size:1.65rem;
+      line-height:1.15;
+      font-weight:900;
+    }
     .cost-summary-line.deposit{color:#9a5b35}
     .cost-summary-line.remaining{color:#155f43}
+    .cost-breakdown-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+    .cost-breakdown-head h3{margin:0;font-size:1.45rem;color:#154b3b}
+    .cost-count-badge{padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.7);font-size:.9rem;font-weight:850;color:#315948}
     .cost-category-totals{
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+      grid-template-columns:repeat(2,minmax(0,1fr));
       gap:10px;
-      margin:0 0 16px;
+      margin:0;
     }
     .cost-category-total{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding:11px 13px;
-      border-radius:14px;
+      display:block;
+      padding:13px 14px;
+      border-radius:16px;
       background:rgba(255,255,255,.72);
       border:1px solid rgba(215,208,190,.8);
       font-weight:750;
     }
-    .cost-category-total b{font-size:1rem;white-space:nowrap}
+    .cost-category-total span{display:block;font-size:1rem;color:#496b5d}
+    .cost-category-total b{display:block;margin-top:4px;font-size:1.3rem;white-space:nowrap;color:#154b3b}
+    .cost-category-total small{display:block;margin-top:3px;color:#60776b;font-weight:750}
+    @media(max-width:820px){
+      .cost-overview{grid-template-columns:1fr}
+    }
+    @media(max-width:520px){
+      .cost-category-totals{grid-template-columns:1fr}
+      .cost-grand-total b,.cost-summary-line{font-size:1.45rem}
+    }
     .receipt-raw-details{
       margin-top:12px;
       border:1px solid #e5ddca;
@@ -6194,13 +6226,21 @@
       <div class="card span-7">
         <div class="eyebrow">Kosten</div>
         <h2>Uitgaven</h2>
-        <div class="kpis" style="margin:14px 0">
-          <div class="kpi">Totale reissom<b id="totalCosts">€ –</b><small id="depositCosts" class="cost-summary-line deposit">Aanbetalingen eraf: € –</small><small id="remainingCosts" class="cost-summary-line remaining">Restant: € –</small></div>
-          <div class="kpi">Regels<b id="costCount">–</b></div>
-          <div class="kpi">Hotels<b id="hotelCosts">€ –</b></div>
-          <div class="kpi">Laden<b id="chargingCosts">€ –</b><small id="chargingKwh">0 kWh</small></div>
+        <div class="cost-overview">
+          <div class="cost-grand-total">
+            <span>Totale reissom</span>
+            <b id="totalCosts">€ –</b>
+            <span id="depositCosts" class="cost-summary-line deposit">Aanbetalingen eraf: € –</span>
+            <span id="remainingCosts" class="cost-summary-line remaining">Restant: € –</span>
+          </div>
+          <div class="cost-breakdown-panel">
+            <div class="cost-breakdown-head">
+              <h3>Deeltotalen</h3>
+              <span class="cost-count-badge"><b id="costCount">–</b> kostenregels</span>
+            </div>
+            <div id="costCategoryTotals" class="cost-category-totals" aria-label="Totalen per kostencategorie"></div>
+          </div>
         </div>
-        <div id="costCategoryTotals" class="cost-category-totals" aria-label="Totalen per kostencategorie"></div>
         <div class="toolbar">
           <button id="refreshCosts" class="btn secondary">Vernieuwen</button>
           <button id="chargeSessionBtn" class="btn">⚡ Laadbeurt toevoegen</button>
@@ -6562,7 +6602,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v85</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v86</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6570,11 +6610,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=85" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=86" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v85</strong><br>
-          De Italiaanse tekst “Qui sono a casa” staat direct onder de Duitse tekst in dezelfde sierlijke stijl.
+          <strong>Wijzigingen in v86</strong><br>
+          Het kostenoverzicht heeft links grote hoofdsommen en rechts overzichtelijke deeltotalen per kostencategorie.
         </div>
       </div>
     </div>
@@ -6903,7 +6943,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||85;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||86;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -9511,19 +9551,13 @@ function renderCosts(){
   const deposits=costData.filter(isDepositCost).reduce((s,x)=>s+(Number(x.amount_cents)||0),0);
   const total=costData.filter(x=>!isDepositCost(x)).reduce((s,x)=>s+(Number(x.amount_cents)||0),0);
   const remaining=Math.max(0,total-deposits);
-  const hotel=costData.filter(x=>x.category==="hotel" && !isDepositCost(x)).reduce((s,x)=>s+(Number(x.amount_cents)||0),0);
   const chargingRows=costData.filter(x=>x.category==="charging" && !isDepositCost(x));
-  const chargingTotal=chargingRows.reduce((s,x)=>s+(Number(x.amount_cents)||0),0);
   const chargingEnergy=chargingRows.reduce((s,x)=>s+(Number(x.kwh)||0),0);
 
   document.getElementById("totalCosts").textContent=euro(total);
   document.getElementById("depositCosts").textContent="Aanbetalingen eraf: − "+euro(deposits);
   document.getElementById("remainingCosts").textContent="Nog te betalen: "+euro(remaining);
   document.getElementById("costCount").textContent=costData.length;
-  document.getElementById("hotelCosts").textContent=euro(hotel);
-  document.getElementById("chargingCosts").textContent=euro(chargingTotal);
-  document.getElementById("chargingKwh").textContent=
-    chargingEnergy.toLocaleString("nl-NL",{maximumFractionDigits:1})+" kWh";
   document.getElementById("kpiCosts").textContent=euro(total);
 
   const categoryLabels={
@@ -9550,7 +9584,7 @@ function renderCosts(){
     .filter(([,amount])=>amount!==0)
     .sort((a,b)=>b[1]-a[1])
     .map(([category,amount])=>
-      `<div class="cost-category-total"><span>${esc(categoryLabels[category]||category)}</span><b>${euro(amount)}</b></div>`
+      `<div class="cost-category-total"><span>${esc(categoryLabels[category]||category)}</span><b>${euro(amount)}</b>${category==="charging" ? `<small>${chargingEnergy.toLocaleString("nl-NL",{maximumFractionDigits:1})} kWh</small>` : ""}</div>`
     ).join("") || '<div class="empty">Nog geen categorietotalen.</div>';
 
   updateHotelCostCards();
