@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="87">
+  <meta name="app-version" content="88">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6317,7 +6317,6 @@
                   <option value="restaurant">Restaurant</option>
                   <option value="groceries">Boodschappen</option>
                   <option value="charging">Laden</option>
-                  <option value="fuel">Brandstof</option>
                   <option value="parking">Parkeren</option>
                   <option value="toll">Tol</option>
                   <option value="activity">Activiteit</option>
@@ -6438,7 +6437,6 @@
               <option value="restaurant">Restaurant</option>
               <option value="groceries">Boodschappen</option>
               <option value="charging">Laden</option>
-              <option value="fuel">Brandstof</option>
               <option value="parking">Parkeren</option>
               <option value="toll">Tol</option>
               <option value="activity">Activiteit</option>
@@ -6604,7 +6602,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v87</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v88</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6612,11 +6610,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=87" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=88" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v87</strong><br>
-          Alle kostencategorieën staan compact onder elkaar bij de deeltotalen en zelf ingevulde locaties verschijnen correct in het kostenoverzicht.
+          <strong>Wijzigingen in v88</strong><br>
+          Brandstof is verwijderd en zelf toegevoegde kostencategorieën blijven voortaan beschikbaar in beide categoriekeuzes.
         </div>
       </div>
     </div>
@@ -6945,7 +6943,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||87;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||88;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -9294,11 +9292,37 @@ document.getElementById("addPackItem").onclick=async()=>{
 });
 document.getElementById("refreshPacking").onclick=loadPacking;
 
+function updateSavedCostCategoryOptions(){
+  const standard=new Set(["hotel","restaurant","groceries","charging","parking","toll","activity","dogs","other"]);
+  const saved=[...new Set(
+    costData
+      .map(row=>String(row.category||"").trim())
+      .filter(category=>category && category!=="fuel" && !category.startsWith("__") && !standard.has(category))
+  )].sort((a,b)=>a.localeCompare(b,"nl"));
+
+  ["cCategory","receiptCategory"].forEach(id=>{
+    const select=document.getElementById(id);
+    if(!select) return;
+    const current=select.value;
+    select.querySelectorAll('option[data-saved-custom="true"]').forEach(option=>option.remove());
+    const addOption=[...select.options].find(option=>option.value==="__custom__");
+    saved.forEach(category=>{
+      const option=document.createElement("option");
+      option.value=category;
+      option.textContent=category;
+      option.dataset.savedCustom="true";
+      select.insertBefore(option,addOption||null);
+    });
+    if([...select.options].some(option=>option.value===current)) select.value=current;
+  });
+}
+
 async function loadCosts(){
   if(!client) return;
   const {data,error}=await client.from("costs").select("*").eq("trip_id",currentTripId).order("date",{ascending:false}).order("created_at",{ascending:false});
   if(error){ document.getElementById("costList").innerHTML='<div class="empty">'+esc(error.message)+'</div>'; return; }
   costData=data||[];
+  updateSavedCostCategoryOptions();
   renderCosts();
 }
 
@@ -9567,14 +9591,13 @@ function renderCosts(){
     restaurant:"Restaurants",
     groceries:"Boodschappen",
     charging:"Laden",
-    fuel:"Brandstof",
     parking:"Parkeren",
     toll:"Tol",
     activity:"Activiteiten",
     dogs:"Honden",
     other:"Overig"
   };
-  const categoryOrder=["hotel","restaurant","groceries","charging","fuel","parking","toll","activity","dogs","other"];
+  const categoryOrder=["hotel","restaurant","groceries","charging","parking","toll","activity","dogs","other"];
   const categoryTotals=costData
     .filter(row=>!isDepositCost(row))
     .reduce((totals,row)=>{
@@ -9584,7 +9607,7 @@ function renderCosts(){
     },{});
   const categoryTotalsEl=document.getElementById("costCategoryTotals");
   const customCategories=Object.keys(categoryTotals)
-    .filter(category=>!categoryOrder.includes(category))
+    .filter(category=>category!=="fuel" && !categoryOrder.includes(category))
     .sort((a,b)=>(categoryLabels[a]||a).localeCompare(categoryLabels[b]||b,"nl"));
   categoryTotalsEl.innerHTML=[...categoryOrder,...customCategories]
     .map(category=>[category,categoryTotals[category]||0])
