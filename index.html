@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="83">
+  <meta name="app-version" content="84">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -5400,6 +5400,23 @@
       text-shadow:0 3px 5px rgba(0,0,0,.82),0 8px 24px rgba(4,42,34,.72),0 0 2px rgba(0,0,0,.95);
     }
     .shell{position:relative;z-index:1}
+    .mountain-motto-italian{
+      position:fixed;
+      top:46%;
+      right:4%;
+      z-index:0;
+      max-width:48vw;
+      transform:rotate(-2deg);
+      pointer-events:none;
+      color:rgba(255,255,255,.98);
+      font-family:"Segoe Script","Snell Roundhand","Apple Chancery","Brush Script MT",cursive;
+      font-size:clamp(38px,5vw,72px);
+      font-weight:700;
+      line-height:1.08;
+      text-align:center;
+      white-space:nowrap;
+      text-shadow:0 3px 5px rgba(0,0,0,.82),0 8px 24px rgba(4,42,34,.72),0 0 2px rgba(0,0,0,.95);
+    }
     @media(max-width:620px){
       .mountain-motto{
         top:94px;
@@ -5408,11 +5425,19 @@
         font-size:clamp(38px,12vw,62px);
         white-space:normal;
       }
+      .mountain-motto-italian{
+        top:72%;
+        right:3%;
+        max-width:94vw;
+        font-size:clamp(32px,10vw,50px);
+        white-space:normal;
+      }
     }
 </style>
 </head>
 <body>
 <div class="mountain-motto" aria-hidden="true">Do bin i dahoam</div>
+<div class="mountain-motto-italian" aria-hidden="true">Qui sono a casa</div>
 <div class="shell">
   <header class="legacy-header">
     <div class="legacy-brand">
@@ -6537,7 +6562,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v83</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v84</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6545,11 +6570,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=83" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=84" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v83</strong><br>
-          Lege bedragvelden tonen geen voorbeeldbedragen meer. Totale reissom, aanbetalingen en restant zijn even groot en alle kostencategorieën krijgen een eigen totaal.
+          <strong>Wijzigingen in v84</strong><br>
+          De Italiaanse tekst “Qui sono a casa” staat sierlijk in het vrije deel van het berglandschap.
         </div>
       </div>
     </div>
@@ -6878,7 +6903,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||83;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||84;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
