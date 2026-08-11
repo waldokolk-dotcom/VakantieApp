@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="76">
+  <meta name="app-version" content="77">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -4278,6 +4278,18 @@
       font-weight:900;
       cursor:pointer;
     }
+    .cost-delete-btn{
+      margin-top:6px;
+      margin-left:4px;
+      border:0;
+      border-radius:9px;
+      background:#f6eaea;
+      color:#a44444;
+      padding:6px 8px;
+      font-size:9px;
+      font-weight:900;
+      cursor:pointer;
+    }
     @media(max-width:900px){
       .receipt-workspace{grid-template-columns:1fr}
       .receipt-preview-empty{min-height:220px}
@@ -6219,7 +6231,9 @@
                   <option>Contant</option>
                   <option>App</option>
                   <option>Laadpas</option>
+                  <option value="__custom_payment__">＋ Betaalmethode toevoegen…</option>
                 </select>
+                <input id="receiptCustomPayment" placeholder="Naam van betaalmethode" hidden>
               </label>
 
               <label class="full">Omschrijving / notitie
@@ -6301,6 +6315,7 @@
           <label>Datum<input id="cDate" type="date"></label>
           <label>Categorie
             <select id="cCategory">
+              <option value="">Kies categorie</option>
               <option value="hotel">Hotel</option>
               <option value="restaurant">Restaurant</option>
               <option value="groceries">Boodschappen</option>
@@ -6328,10 +6343,11 @@
           </label>
           <label class="full">Omschrijving<input id="cDescription" placeholder="Bijv. lunch, parkeren, boodschappen"></label>
           <label>Betaald door
-            <select id="cPaidBy"><option>Waldo</option><option>Brigitte</option><option>Samen</option></select>
+            <select id="cPaidBy"><option value="">Kies wie betaalde</option><option>Waldo</option><option>Brigitte</option><option>Samen</option></select>
           </label>
           <label>Betaalmethode
-            <select id="cPayment"><option value="">Onbekend</option><option>Pin</option><option>Creditcard</option><option>Contant</option></select>
+            <select id="cPayment"><option value="">Kies betaalmethode</option><option>Pin</option><option>Creditcard</option><option>Contant</option><option value="__custom_payment__">＋ Betaalmethode toevoegen…</option></select>
+            <input id="cCustomPayment" placeholder="Naam van betaalmethode" hidden>
           </label>
           <label class="full cost-deposit-check"><input id="cIsDeposit" type="checkbox"> Dit is een aanbetaling</label>
           <div class="full"><button id="saveCost" class="btn">Opslaan</button> <button id="cancelCostEdit" class="btn secondary" type="button" hidden>Annuleren</button></div>
@@ -6470,7 +6486,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v76</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v77</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6478,11 +6494,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=76" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=77" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v76</strong><br>
-          Kostenposten kunnen worden aangepast en als aanbetaling worden gemarkeerd. Aanbetalingen staan apart onder het totaal en worden afgetrokken van ‘Nog te betalen’.
+          <strong>Wijzigingen in v77</strong><br>
+          Nieuwe kostenregels starten volledig leeg, betaalmethoden kunnen zelf worden toegevoegd en kostenposten kunnen na bevestiging worden gewist.
         </div>
       </div>
     </div>
@@ -6512,11 +6528,6 @@ function applyActorUI(){
   document.querySelectorAll("[data-profile]").forEach(btn=>{
     btn.classList.toggle("active",btn.dataset.profile===actor);
   });
-
-  const paidBy=document.getElementById("cPaidBy");
-  if(paidBy && [...paidBy.options].some(o=>o.value===actor || o.text===actor)){
-    paidBy.value=actor;
-  }
 
   const memoryActor=document.getElementById("memoryActorName");
   if(memoryActor) memoryActor.textContent=actor;
@@ -6816,7 +6827,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||76;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||77;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -9479,6 +9490,7 @@ function renderCosts(){
         ${euro(row.amount_cents)}
         ${row.receipt_path ? `<button class="cost-receipt-btn" type="button" data-receipt-path="${esc(row.receipt_path)}">🧾 Bon</button>` : ""}
         <button class="cost-edit-btn" type="button" data-edit-cost="${esc(row.id)}">✏️ Wijzigen</button>
+        <button class="cost-delete-btn" type="button" data-delete-cost="${esc(row.id)}">🗑️ Wissen</button>
       </div>
     </div>`;
   }).join("");
@@ -9486,6 +9498,12 @@ function renderCosts(){
 
 document.getElementById("clearCostFilter")?.addEventListener("click",clearCostStopFilter);
 document.addEventListener("click",(event)=>{
+  const deleteBtn=event.target.closest?.("[data-delete-cost]");
+  if(deleteBtn){
+    event.preventDefault();
+    deleteCost(deleteBtn.dataset.deleteCost);
+    return;
+  }
   const editBtn=event.target.closest?.("[data-edit-cost]");
   if(editBtn){
     event.preventDefault();
@@ -9502,15 +9520,40 @@ document.getElementById("refreshCosts").onclick=loadCosts;
 
 let editingCostId=null;
 
+async function deleteCost(id){
+  const row=costData.find(item=>String(item.id)===String(id));
+  if(!row || !client) return;
+
+  const label=visibleCostDescription(row.description)||"deze kostenpost";
+  if(!confirm(`Weet je zeker dat je “${label}” wilt wissen? Dit kan niet ongedaan worden gemaakt.`)) return;
+
+  const {error}=await client.from("costs").delete().eq("id",row.id);
+  if(error){
+    alert("Wissen mislukt: "+error.message);
+    return;
+  }
+
+  if(row.receipt_path){
+    const {error:storageError}=await client.storage.from("vakantie-media").remove([row.receipt_path]);
+    if(storageError) console.warn("Bonafbeelding kon niet worden verwijderd:",storageError);
+  }
+
+  if(String(editingCostId)===String(row.id)) resetCostEditor();
+  await loadCosts();
+}
+
 function resetCostEditor(){
   editingCostId=null;
   document.getElementById("costFormTitle").textContent="Nieuwe kostenpost";
   document.getElementById("saveCost").textContent="Opslaan";
   document.getElementById("cancelCostEdit").hidden=true;
   document.getElementById("cAmount").value="";
+  document.getElementById("cDate").value="";
   document.getElementById("cDescription").value="";
-  document.getElementById("cCategory").value="hotel";
+  document.getElementById("cCategory").value="";
   document.getElementById("cStop").value="";
+  document.getElementById("cPaidBy").value="";
+  document.getElementById("cPayment").value="";
   document.getElementById("cIsDeposit").checked=false;
   resetManualCostExtras();
 }
@@ -9529,7 +9572,6 @@ function startEditCost(id){
   document.getElementById("cDate").value=row.date || dateOnlyLocal();
   document.getElementById("cDescription").value=visibleCostDescription(row.description);
   document.getElementById("cPaidBy").value=row.paid_by || actorName();
-  document.getElementById("cPayment").value=row.payment_method || "";
   document.getElementById("cIsDeposit").checked=isDepositCost(row);
 
   const category=document.getElementById("cCategory");
@@ -9538,6 +9580,13 @@ function startEditCost(id){
   category.value=knownCategory ? row.category : "__custom__";
   customCategory.hidden=knownCategory;
   customCategory.value=knownCategory ? "" : row.category || "";
+
+  const payment=document.getElementById("cPayment");
+  const customPayment=document.getElementById("cCustomPayment");
+  const knownPayment=!row.payment_method || [...payment.options].some(option=>option.value===row.payment_method && option.value!=="__custom_payment__");
+  payment.value=knownPayment ? row.payment_method || "" : "__custom_payment__";
+  customPayment.hidden=knownPayment;
+  customPayment.value=knownPayment ? "" : row.payment_method || "";
 
   const stop=document.getElementById("cStop");
   const customLocation=document.getElementById("cCustomLocation");
@@ -9570,6 +9619,12 @@ function manualCostCategoryValue(){
   return select.value==="__custom__" ? custom.value.trim() || "other" : select.value || "other";
 }
 
+function manualCostPaymentValue(){
+  const select=document.getElementById("cPayment");
+  const custom=document.getElementById("cCustomPayment");
+  return select.value==="__custom_payment__" ? custom.value.trim() || null : select.value || null;
+}
+
 function manualCostStopValue(){
   const value=document.getElementById("cStop").value || "";
   return value.startsWith("__") ? "" : value;
@@ -9578,10 +9633,13 @@ function manualCostStopValue(){
 function resetManualCostExtras(){
   const category=document.getElementById("cCustomCategory");
   const location=document.getElementById("cCustomLocation");
+  const payment=document.getElementById("cCustomPayment");
   category.value="";
   category.hidden=true;
   location.value="";
   location.hidden=true;
+  payment.value="";
+  payment.hidden=true;
 }
 
 async function detectManualCostLocation(){
@@ -9622,6 +9680,13 @@ document.getElementById("cCategory").onchange=event=>{
   if(adding){ custom.value=""; custom.focus(); }
 };
 
+document.getElementById("cPayment").onchange=event=>{
+  const custom=document.getElementById("cCustomPayment");
+  const adding=event.target.value==="__custom_payment__";
+  custom.hidden=!adding;
+  if(adding){ custom.value=""; custom.focus(); }
+};
+
 document.getElementById("cStop").onchange=async event=>{
   const custom=document.getElementById("cCustomLocation");
   if(event.target.value==="__custom_location__"){
@@ -9656,7 +9721,7 @@ document.getElementById("saveCost").onclick=async()=>{
     description:storedCostDescription(description,document.getElementById("cIsDeposit").checked),
     location:document.getElementById("cCustomLocation").value.trim(),
     paid_by:document.getElementById("cPaidBy").value,
-    payment_method:document.getElementById("cPayment").value || null,
+    payment_method:manualCostPaymentValue(),
     updated_at:new Date().toISOString()
   };
 
@@ -9686,6 +9751,12 @@ function receiptCategoryValue(){
   return select?.value==="__custom__"
     ? custom?.value.trim() || "other"
     : select?.value || "other";
+}
+
+function receiptPaymentValue(){
+  const select=document.getElementById("receiptPayment");
+  const custom=document.getElementById("receiptCustomPayment");
+  return select?.value==="__custom_payment__" ? custom?.value.trim() || null : select?.value || null;
 }
 
 function setReceiptCategoryChoice(value="other"){
@@ -9756,6 +9827,8 @@ function resetReceiptScanner(clearLocation=true){
 
   const payment=document.getElementById("receiptPayment");
   if(payment) payment.value="";
+  const customPayment=document.getElementById("receiptCustomPayment");
+  if(customPayment){ customPayment.value=""; customPayment.hidden=true; }
 
   const deposit=document.getElementById("receiptIsDeposit");
   if(deposit) deposit.checked=false;
@@ -10021,7 +10094,12 @@ function fillReceiptReview(parsed){
   if(parsed.location) document.getElementById("receiptLocation").value=parsed.location;
   setReceiptCategoryChoice(parsed.category || "other");
   document.getElementById("receiptStop").value=parsed.stop || "";
-  document.getElementById("receiptPayment").value=parsed.payment || "";
+  const payment=document.getElementById("receiptPayment");
+  const customPayment=document.getElementById("receiptCustomPayment");
+  const knownPayment=!parsed.payment || [...payment.options].some(option=>option.value===parsed.payment && option.value!=="__custom_payment__");
+  payment.value=knownPayment ? parsed.payment || "" : "__custom_payment__";
+  customPayment.hidden=knownPayment;
+  customPayment.value=knownPayment ? "" : parsed.payment || "";
   document.getElementById("receiptPaidBy").value=actorName();
   document.getElementById("receiptDescription").value=parsed.merchant || "";
   document.getElementById("receiptRawText").value=parsed.text || "";
@@ -10251,7 +10329,7 @@ async function saveReceiptAsCost(){
       location:document.getElementById("receiptCustomLocation").value.trim() || document.getElementById("receiptLocation").value.trim() || merchant || "",
       kwh:0,
       paid_by:document.getElementById("receiptPaidBy").value || actorName(),
-      payment_method:document.getElementById("receiptPayment").value || null,
+      payment_method:receiptPaymentValue(),
       receipt_path:receiptPath,
       updated_at:new Date().toISOString()
     };
@@ -10319,6 +10397,12 @@ document.getElementById("receiptCategory").onchange=event=>{
     custom.value="";
     custom.focus();
   }
+};
+document.getElementById("receiptPayment").onchange=event=>{
+  const custom=document.getElementById("receiptCustomPayment");
+  const adding=event.target.value==="__custom_payment__";
+  custom.hidden=!adding;
+  if(adding){ custom.value=""; custom.focus(); }
 };
 document.getElementById("receiptStop").onchange=async event=>{
   const custom=document.getElementById("receiptCustomLocation");
@@ -10466,7 +10550,7 @@ function subscribeRealtime(){
 
 document.getElementById("toggleAllPacking")?.addEventListener("click",toggleAllPackingCategories);
 
-document.getElementById("cDate").value=new Date().toISOString().slice(0,10);
+resetCostEditor();
 
 tripCatalog={"vakantie-2026":{meta:DEFAULT_TRIP_2026,stops:DEFAULT_STOPS_2026,metaRow:null}};
 renderTripManager();
