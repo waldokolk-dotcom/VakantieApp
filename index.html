@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="74">
+  <meta name="app-version" content="75">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -4204,6 +4204,16 @@
       min-width:0;
       box-sizing:border-box;
     }
+    #kosten .form-grid{min-width:0}
+    #kosten .form-grid > label{min-width:0;max-width:100%}
+    #kosten .form-grid input,
+    #kosten .form-grid select,
+    #kosten .form-grid textarea{
+      width:100%;
+      min-width:0;
+      max-width:100%;
+      box-sizing:border-box;
+    }
     .receipt-raw-details{
       margin-top:12px;
       border:1px solid #e5ddca;
@@ -6440,7 +6450,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v74</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v75</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6448,11 +6458,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=74" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=75" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v74</strong><br>
-          Ook bij ‘Nieuwe kostenpost’ kun je zelf een categorie of locatie toevoegen en de locatie door je telefoon laten bepalen. De bestaande keuzes blijven beschikbaar.
+          <strong>Wijzigingen in v75</strong><br>
+          De invoervelden bij Kosten blijven nu ook op smalle schermen volledig binnen hun kaart. De inhoud en werking van v74 zijn behouden.
         </div>
       </div>
     </div>
@@ -6786,7 +6796,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||74;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||75;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
