@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="75">
+  <meta name="app-version" content="76">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -4214,6 +4214,12 @@
       max-width:100%;
       box-sizing:border-box;
     }
+    #kosten .form-grid input[type="checkbox"]{width:auto;min-width:auto}
+    .cost-deposit-check{display:flex !important;flex-direction:row !important;align-items:center;gap:9px}
+    .cost-deposit-check input{margin:0}
+    .cost-summary-line{display:block;margin-top:5px;font-size:11px;font-weight:850;color:#60776b}
+    .cost-summary-line.deposit{color:#9a5b35}
+    .cost-summary-line.remaining{color:#155f43}
     .receipt-raw-details{
       margin-top:12px;
       border:1px solid #e5ddca;
@@ -4255,6 +4261,18 @@
       border-radius:9px;
       background:#eef5e9;
       color:#176147;
+      padding:6px 8px;
+      font-size:9px;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .cost-edit-btn{
+      margin-top:6px;
+      margin-left:4px;
+      border:0;
+      border-radius:9px;
+      background:#edf0e8;
+      color:#315948;
       padding:6px 8px;
       font-size:9px;
       font-weight:900;
@@ -6091,7 +6109,7 @@
         <div class="eyebrow">Kosten</div>
         <h2>Uitgaven</h2>
         <div class="kpis" style="margin:14px 0">
-          <div class="kpi">Totaal<b id="totalCosts">€ –</b></div>
+          <div class="kpi">Totaal<b id="totalCosts">€ –</b><small id="depositCosts" class="cost-summary-line deposit">Aanbetalingen: € –</small><small id="remainingCosts" class="cost-summary-line remaining">Nog te betalen: € –</small></div>
           <div class="kpi">Regels<b id="costCount">–</b></div>
           <div class="kpi">Hotels<b id="hotelCosts">€ –</b></div>
           <div class="kpi">Laden<b id="chargingCosts">€ –</b><small id="chargingKwh">0 kWh</small></div>
@@ -6207,6 +6225,7 @@
               <label class="full">Omschrijving / notitie
                 <input id="receiptDescription" placeholder="Bijv. diner, boodschappen of laadbeurt">
               </label>
+              <label class="full cost-deposit-check"><input id="receiptIsDeposit" type="checkbox"> Dit is een aanbetaling</label>
             </div>
 
             <details class="receipt-raw-details">
@@ -6276,7 +6295,7 @@
       </div>
 
       <div class="card span-5">
-        <h2>Nieuwe kostenpost</h2>
+        <h2 id="costFormTitle">Nieuwe kostenpost</h2>
         <div class="form-grid">
           <label>Bedrag (€)<input id="cAmount" inputmode="decimal" placeholder="12,50"></label>
           <label>Datum<input id="cDate" type="date"></label>
@@ -6314,7 +6333,8 @@
           <label>Betaalmethode
             <select id="cPayment"><option value="">Onbekend</option><option>Pin</option><option>Creditcard</option><option>Contant</option></select>
           </label>
-          <div class="full"><button id="saveCost" class="btn">Opslaan</button></div>
+          <label class="full cost-deposit-check"><input id="cIsDeposit" type="checkbox"> Dit is een aanbetaling</label>
+          <div class="full"><button id="saveCost" class="btn">Opslaan</button> <button id="cancelCostEdit" class="btn secondary" type="button" hidden>Annuleren</button></div>
         </div>
         <div id="costFormMsg"></div>
       </div>
@@ -6450,7 +6470,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v75</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v76</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6458,11 +6478,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=75" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=76" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v75</strong><br>
-          De invoervelden bij Kosten blijven nu ook op smalle schermen volledig binnen hun kaart. De inhoud en werking van v74 zijn behouden.
+          <strong>Wijzigingen in v76</strong><br>
+          Kostenposten kunnen worden aangepast en als aanbetaling worden gemarkeerd. Aanbetalingen staan apart onder het totaal en worden afgetrokken van ‘Nog te betalen’.
         </div>
       </div>
     </div>
@@ -6796,7 +6816,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||75;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||76;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7293,9 +7313,25 @@ function hotelServiceFor(stop){
   };
 }
 
+const COST_DEPOSIT_PREFIX="[AANBETALING] ";
+
+function isDepositCost(row){
+  return String(row?.description||"").startsWith(COST_DEPOSIT_PREFIX);
+}
+
+function visibleCostDescription(value){
+  const text=String(value||"");
+  return text.startsWith(COST_DEPOSIT_PREFIX) ? text.slice(COST_DEPOSIT_PREFIX.length) : text;
+}
+
+function storedCostDescription(value,isDeposit){
+  const clean=visibleCostDescription(value).trim();
+  return (isDeposit ? COST_DEPOSIT_PREFIX : "")+(clean || "Kostenpost");
+}
+
 function hotelCostTotal(stopId){
   return costData
-    .filter(row=>row.stop_id===stopId)
+    .filter(row=>row.stop_id===stopId && !isDepositCost(row))
     .reduce((sum,row)=>sum+(Number(row.amount_cents)||0),0);
 }
 
@@ -9385,13 +9421,17 @@ function updateCostFilterBanner(){
 }
 
 function renderCosts(){
-  const total=costData.reduce((s,x)=>s+(Number(x.amount_cents)||0),0);
-  const hotel=costData.filter(x=>x.category==="hotel").reduce((s,x)=>s+(Number(x.amount_cents)||0),0);
-  const chargingRows=costData.filter(x=>x.category==="charging");
+  const deposits=costData.filter(isDepositCost).reduce((s,x)=>s+(Number(x.amount_cents)||0),0);
+  const total=costData.filter(x=>!isDepositCost(x)).reduce((s,x)=>s+(Number(x.amount_cents)||0),0);
+  const remaining=Math.max(0,total-deposits);
+  const hotel=costData.filter(x=>x.category==="hotel" && !isDepositCost(x)).reduce((s,x)=>s+(Number(x.amount_cents)||0),0);
+  const chargingRows=costData.filter(x=>x.category==="charging" && !isDepositCost(x));
   const chargingTotal=chargingRows.reduce((s,x)=>s+(Number(x.amount_cents)||0),0);
   const chargingEnergy=chargingRows.reduce((s,x)=>s+(Number(x.kwh)||0),0);
 
   document.getElementById("totalCosts").textContent=euro(total);
+  document.getElementById("depositCosts").textContent="Aanbetalingen eraf: − "+euro(deposits);
+  document.getElementById("remainingCosts").textContent="Nog te betalen: "+euro(remaining);
   document.getElementById("costCount").textContent=costData.length;
   document.getElementById("hotelCosts").textContent=euro(hotel);
   document.getElementById("chargingCosts").textContent=euro(chargingTotal);
@@ -9416,6 +9456,7 @@ function renderCosts(){
 
   el.innerHTML=visibleCosts.map(row=>{
     const charging=row.category==="charging";
+    const deposit=isDepositCost(row);
     const kwh=Number(row.kwh)||0;
     const unit=charging && kwh>0 ? (Number(row.amount_cents||0)/100)/kwh : 0;
 
@@ -9430,13 +9471,14 @@ function renderCosts(){
     return `<div class="row ${charging?"cost-charge-row":""}">
       <div>${charging?"⚡":"💶"}</div>
       <div>
-        <div class="row-title">${esc(row.description||"Kostenpost")}</div>
+        <div class="row-title">${deposit?"💳 Aanbetaling · ":""}${esc(visibleCostDescription(row.description)||"Kostenpost")}</div>
         <div class="row-meta">${esc(row.date||"")} · ${esc(row.stop_id||"niet gekoppeld")} · ${charging?"laden":esc(row.category||"other")}</div>
         ${chargeMeta}
       </div>
       <div class="amount">
         ${euro(row.amount_cents)}
         ${row.receipt_path ? `<button class="cost-receipt-btn" type="button" data-receipt-path="${esc(row.receipt_path)}">🧾 Bon</button>` : ""}
+        <button class="cost-edit-btn" type="button" data-edit-cost="${esc(row.id)}">✏️ Wijzigen</button>
       </div>
     </div>`;
   }).join("");
@@ -9444,6 +9486,12 @@ function renderCosts(){
 
 document.getElementById("clearCostFilter")?.addEventListener("click",clearCostStopFilter);
 document.addEventListener("click",(event)=>{
+  const editBtn=event.target.closest?.("[data-edit-cost]");
+  if(editBtn){
+    event.preventDefault();
+    startEditCost(editBtn.dataset.editCost);
+    return;
+  }
   const btn=event.target.closest?.("[data-receipt-path]");
   if(!btn) return;
   event.preventDefault();
@@ -9451,6 +9499,70 @@ document.addEventListener("click",(event)=>{
 });
 
 document.getElementById("refreshCosts").onclick=loadCosts;
+
+let editingCostId=null;
+
+function resetCostEditor(){
+  editingCostId=null;
+  document.getElementById("costFormTitle").textContent="Nieuwe kostenpost";
+  document.getElementById("saveCost").textContent="Opslaan";
+  document.getElementById("cancelCostEdit").hidden=true;
+  document.getElementById("cAmount").value="";
+  document.getElementById("cDescription").value="";
+  document.getElementById("cCategory").value="hotel";
+  document.getElementById("cStop").value="";
+  document.getElementById("cIsDeposit").checked=false;
+  resetManualCostExtras();
+}
+
+function startEditCost(id){
+  const row=costData.find(item=>String(item.id)===String(id));
+  if(!row) return;
+
+  editingCostId=row.id;
+  updateDynamicStopSelects();
+
+  document.getElementById("costFormTitle").textContent="Kostenpost wijzigen";
+  document.getElementById("saveCost").textContent="Wijzigingen opslaan";
+  document.getElementById("cancelCostEdit").hidden=false;
+  document.getElementById("cAmount").value=(Number(row.amount_cents||0)/100).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById("cDate").value=row.date || dateOnlyLocal();
+  document.getElementById("cDescription").value=visibleCostDescription(row.description);
+  document.getElementById("cPaidBy").value=row.paid_by || actorName();
+  document.getElementById("cPayment").value=row.payment_method || "";
+  document.getElementById("cIsDeposit").checked=isDepositCost(row);
+
+  const category=document.getElementById("cCategory");
+  const customCategory=document.getElementById("cCustomCategory");
+  const knownCategory=[...category.options].some(option=>option.value===row.category && !String(row.category||"").startsWith("__"));
+  category.value=knownCategory ? row.category : "__custom__";
+  customCategory.hidden=knownCategory;
+  customCategory.value=knownCategory ? "" : row.category || "";
+
+  const stop=document.getElementById("cStop");
+  const customLocation=document.getElementById("cCustomLocation");
+  if(row.stop_id && [...stop.options].some(option=>option.value===row.stop_id)){
+    stop.value=row.stop_id;
+    customLocation.hidden=true;
+    customLocation.value="";
+  }else if(row.location){
+    stop.value="__custom_location__";
+    customLocation.hidden=false;
+    customLocation.value=row.location;
+  }else{
+    stop.value="";
+    customLocation.hidden=true;
+    customLocation.value="";
+  }
+
+  document.getElementById("costFormMsg").innerHTML='<div class="notice">Pas de velden aan en kies ‘Wijzigingen opslaan’.</div>';
+  document.getElementById("costFormTitle").scrollIntoView({behavior:"smooth",block:"center"});
+}
+
+document.getElementById("cancelCostEdit").onclick=()=>{
+  resetCostEditor();
+  document.getElementById("costFormMsg").innerHTML="";
+};
 
 function manualCostCategoryValue(){
   const select=document.getElementById("cCategory");
@@ -9534,29 +9646,31 @@ document.getElementById("saveCost").onclick=async()=>{
   const amount=Math.round(Number(raw)*100);
   if(!amount || amount<0){ document.getElementById("costFormMsg").innerHTML='<div class="notice">Vul een geldig bedrag in.</div>'; return; }
 
+  const description=document.getElementById("cDescription").value.trim();
   const record={
     trip_id:currentTripId,
     stop_id:manualCostStopValue() || null,
     amount_cents:amount,
     category:manualCostCategoryValue(),
     date:document.getElementById("cDate").value || new Date().toISOString().slice(0,10),
-    description:document.getElementById("cDescription").value.trim(),
-    created_by:actorName(),
+    description:storedCostDescription(description,document.getElementById("cIsDeposit").checked),
     location:document.getElementById("cCustomLocation").value.trim(),
     paid_by:document.getElementById("cPaidBy").value,
     payment_method:document.getElementById("cPayment").value || null,
     updated_at:new Date().toISOString()
   };
 
-  const {error}=await client.from("costs").insert(record);
+  let error=null;
+  if(editingCostId){
+    ({error}=await client.from("costs").update(record).eq("id",editingCostId));
+  }else{
+    record.created_by=actorName();
+    ({error}=await client.from("costs").insert(record));
+  }
   if(error){ document.getElementById("costFormMsg").innerHTML='<div class="notice"><span class="error">'+esc(error.message)+'</span></div>'; return; }
 
   document.getElementById("costFormMsg").innerHTML='<div class="notice"><span class="ok">✓ Kostenpost opgeslagen.</span></div>';
-  document.getElementById("cAmount").value="";
-  document.getElementById("cDescription").value="";
-  document.getElementById("cCategory").value="hotel";
-  document.getElementById("cStop").value="";
-  resetManualCostExtras();
+  resetCostEditor();
   await loadCosts();
 };
 
@@ -9642,6 +9756,9 @@ function resetReceiptScanner(clearLocation=true){
 
   const payment=document.getElementById("receiptPayment");
   if(payment) payment.value="";
+
+  const deposit=document.getElementById("receiptIsDeposit");
+  if(deposit) deposit.checked=false;
 
   const paidBy=document.getElementById("receiptPaidBy");
   if(paidBy) paidBy.value=actorName();
@@ -10126,7 +10243,10 @@ async function saveReceiptAsCost(){
       amount_cents:amount,
       category:receiptCategoryValue(),
       date,
-      description:document.getElementById("receiptDescription").value.trim() || merchant || "Gescande bon",
+      description:storedCostDescription(
+        document.getElementById("receiptDescription").value.trim() || merchant || "Gescande bon",
+        document.getElementById("receiptIsDeposit").checked
+      ),
       created_by:actorName(),
       location:document.getElementById("receiptCustomLocation").value.trim() || document.getElementById("receiptLocation").value.trim() || merchant || "",
       kwh:0,
@@ -10454,7 +10574,7 @@ function updateHotelCostCards(){
 
   ["baiersbronn","zuid-tirol","balderschwang"].forEach(stop=>{
     const total = costData
-      .filter(x=>x.stop_id===stop)
+      .filter(x=>x.stop_id===stop && !isDepositCost(x))
       .reduce((sum,x)=>sum+(Number(x.amount_cents)||0),0);
 
     const el=document.querySelector(`[data-hotel-cost="${stop}"]`);
