@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="67">
+  <meta name="app-version" content="70">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -5301,6 +5301,26 @@
       .technical-actions{flex-direction:column}
       .technical-actions .btn{width:100%;justify-content:center;text-align:center}
     }
+    .hotel-booking-included{margin-top:14px;border:1px solid #d8e6d5;border-radius:20px;padding:18px;background:linear-gradient(135deg,rgba(244,251,239,.97),rgba(255,253,247,.97))}
+    .hotel-booking-included-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
+    .hotel-booking-included-head h4{margin:0;color:#145f43;font-size:17px}
+    .hotel-booking-included-head p{margin:5px 0 0;color:#6a7a71;font-size:12px}
+    .hotel-booking-badge{flex:0 0 auto;padding:7px 10px;border-radius:999px;background:#176c4b;color:white;font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+    .hotel-booking-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .hotel-booking-group{border:1px solid #e3e8da;background:rgba(255,255,255,.78);border-radius:15px;padding:13px}
+    .hotel-booking-group h5{margin:0 0 9px;color:#184f3b;font-size:13px}
+    .hotel-booking-list{margin:0;padding:0;list-style:none;display:grid;gap:7px}
+    .hotel-booking-list li{position:relative;padding-left:18px;color:#4f665a;font-size:11px;line-height:1.35}
+    .hotel-booking-list li::before{content:"✓";position:absolute;left:0;top:0;color:#168151;font-weight:900}
+    .hotel-booking-halfboard-item strong{display:block;margin-bottom:4px;color:#765814}
+    @media(max-width:760px){
+      .hotel-booking-included{padding:15px;border-radius:17px}
+      .hotel-booking-included-head{display:block}
+      .hotel-booking-badge{display:inline-block;margin-top:9px}
+      .hotel-booking-grid{grid-template-columns:1fr}
+      .hotel-booking-group{padding:12px}
+      .hotel-booking-list li{font-size:12px}
+    }
 </style>
 </head>
 <body>
@@ -5762,7 +5782,7 @@
     <div class="hotels-tab-page">
       <div class="hotels-tab-head">
         <div>
-          <div class="legacy-kicker">VERBLIJVEN VAN DEZE REIS</div>
+          <div class="legacy-kicker">VERBLIJFPLAATSEN VAN DEZE REIS</div>
           <h2>Hotels</h2>
           <p id="hotelsTabIntro">Alle accommodaties van de geselecteerde reis, met data, adres, route en hotelinformatie.</p>
         </div>
@@ -6410,19 +6430,19 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v67</strong></div>
-          <div class="technical-item"><small>Publicatiedatum</small><strong>10 augustus 2026</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v70</strong></div>
+          <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
         </div>
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=67" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=70" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v67</strong><br>
-          Alle extra pagina-achtergrondlagen verwijderd. Alleen de bestaande foto met bergen en meer blijft zichtbaar. Alle reisgegevens en bestaande functies zijn behouden.
+          <strong>Wijzigingen in v70</strong><br>
+          Bij Torghele’s Wald + Fluh is het overzicht van inbegrepen voorzieningen toegevoegd. De definitieve v69 en alle bestaande functies zijn behouden.
         </div>
       </div>
     </div>
@@ -6756,8 +6776,9 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    status.textContent=online>66 ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
-    status.className=online>66 ? "technical-warn" : "technical-ok";
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||70;
+    status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
+    status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
     status.textContent="Kon online versie niet controleren";
     status.className="technical-error";
@@ -7651,7 +7672,7 @@ function renderHotelsTab(){
   const stops=tripStops();
 
   if(intro){
-    intro.textContent=`${meta.name}: ${stops.length} verblijf${stops.length===1?"":"ven"} met praktische informatie, openingstijden, kosten en kamerdata.`;
+    intro.textContent=`${meta.name}: ${stops.length} hotel${stops.length===1?"":"s"} met praktische informatie, openingstijden, kosten en kamerdetails.`;
   }
 
   if(!stops.length){
@@ -7717,6 +7738,133 @@ function renderHotelsTab(){
             </div>
           </section>
         </div>
+
+        ${stop.id==="zuid-tirol" ? `
+        <section class="hotel-booking-included">
+          <div class="hotel-booking-included-head">
+            <div>
+              <h4>🎁 Inbegrepen in jullie reservering</h4>
+              <p>Hotel Emmy – five elements · overzicht van inbegrepen voorzieningen</p>
+            </div>
+            <span class="hotel-booking-badge">Inbegrepen</span>
+          </div>
+          <div class="hotel-booking-grid">
+            <div class="hotel-booking-group">
+              <h5>🥐 Eten</h5>
+              <ul class="hotel-booking-list">
+                <li>Uitgebreid ontbijtbuffet</li>
+                <li class="hotel-booking-halfboard-item"><strong>Bij halfpension inbegrepen</strong>Dagelijks buffet met salades, groenten, voorgerechten, vers fruit en kaas</li>
+                <li>4-gangenavondmenu met Zuid-Tiroolse, Italiaanse en internationale gerechten</li>
+              </ul>
+            </div>
+            <div class="hotel-booking-group">
+              <h5>🧖 Wellness &amp; spa</h5>
+              <ul class="hotel-booking-list">
+                <li>Verwarmd panoramisch binnen-/buitenzwembad met massagejets en whirlpool</li>
+                <li>Sauna/relaxruimte met Finse sauna, infraroodligbedden, Kneipp-pad, belevingsdouche, stoombad, relaxruimte, waterbedden en theehoek (16+)</li>
+                <li>Family SPA met biosauna, Rasulbad Vulcania, hooibedden en theehoek</li>
+                <li>Wellnesstas met handdoeken en badjassen voor volwassenen</li>
+                <li>Kinderbadjassen bij de receptie</li>
+              </ul>
+            </div>
+            <div class="hotel-booking-group">
+              <h5>🚙 Extra’s &amp; praktisch</h5>
+              <ul class="hotel-booking-list">
+                <li>Kinderspeelkamer, gaming room, kleine buitenspeeltuin en trampoline</li>
+                <li>Ondergrondse garage</li>
+                <li>Gratis wifi</li>
+                <li>Südtirol Guest Pass</li>
+                <li>20% greenfeekorting</li>
+              </ul>
+            </div>
+          </div>
+        </section>` : stop.id==="baiersbronn" ? `
+        <section class="hotel-booking-included">
+          <div class="hotel-booking-included-head">
+            <div>
+              <h4>🎁 Inbegrepen in jullie reservering</h4>
+              <p>Hotel Forsthaus Auerhahn · overzicht van inbegrepen voorzieningen</p>
+            </div>
+            <span class="hotel-booking-badge">Inbegrepen</span>
+          </div>
+          <div class="hotel-booking-grid">
+            <div class="hotel-booking-group">
+              <h5>🍽️ Eten</h5>
+              <ul class="hotel-booking-list">
+                <li><strong>¾-verwöhnpension</strong></li>
+                <li>Uitgebreid ontbijtbuffet</li>
+                <li>Lunch-/middag-vitaliteitsbuffet</li>
+                <li>Meer-gangenavondmenu of buffet</li>
+                <li>Begint met het middagbuffet op de aankomstdag en eindigt met het ontbijt op de vertrekdag</li>
+              </ul>
+            </div>
+            <div class="hotel-booking-group">
+              <h5>🧖 Wellness &amp; spa</h5>
+              <ul class="hotel-booking-list">
+                <li>Verwarmd binnen- en buitenzwembad, familiezwembad en whirlpools</li>
+                <li>Verschillende sauna’s</li>
+                <li>Panorama-relaxruimtes, relaxruimtes van alpendennenhout en waterbedden</li>
+                <li>Fitnessruimte met moderne apparatuur</li>
+                <li>Badjassen, wellnesstas, badhanddoeken en slippers</li>
+                <li>Theestation en koffie voor vroege zwemmers</li>
+              </ul>
+            </div>
+            <div class="hotel-booking-group">
+              <h5>🥾 Activiteiten &amp; extra’s</h5>
+              <ul class="hotel-booking-list">
+                <li>Dagelijkse wandeltransfers naar de startpunten</li>
+                <li>Twee begeleide wandelingen per week</li>
+                <li>Muziekavonden en deelname aan het activiteitenprogramma</li>
+                <li>Gratis gebruik van fietsen</li>
+                <li>Gratis gebruik van wandeluitrusting: wandelstokken, rugzakken en regenkleding</li>
+                <li>Welkomstdrankje</li>
+                <li>Plat water uit de Grander-waterfonteinen in het restaurant en wellnessgedeelte</li>
+              </ul>
+            </div>
+          </div>
+        </section>` : stop.id==="balderschwang" ? `
+        <section class="hotel-booking-included">
+          <div class="hotel-booking-included-head">
+            <div>
+              <h4>🎁 Inbegrepen in jullie reservering</h4>
+              <p>Torghele’s Wald + Fluh · overzicht van inbegrepen voorzieningen</p>
+            </div>
+            <span class="hotel-booking-badge">Inbegrepen</span>
+          </div>
+          <div class="hotel-booking-grid">
+            <div class="hotel-booking-group">
+              <h5>🍽️ Eten</h5>
+              <ul class="hotel-booking-list">
+                <li><strong>3/4-verwöhnpension</strong></li>
+                <li>Uitgebreid en uitgebalanceerd ontbijtbuffet van 07.30 tot 10.30 uur</li>
+                <li>Vitaal middagbuffet met gezonde, lichte tussendoortjes</li>
+                <li>Gevarieerd 5-gangenavondmenu</li>
+                <li>Alle inbegrepen voorzieningen gelden van 13.00 uur op de aankomstdag tot 13.00 uur op de vertrekdag</li>
+              </ul>
+            </div>
+            <div class="hotel-booking-group">
+              <h5>🧖 Wellness &amp; spa</h5>
+              <ul class="hotel-booking-list">
+                <li>Infinitypool, binnenzwembad en bergbronvijver</li>
+                <li>Adults Only Spa met verschillende sauna’s en relaxruimtes met uitzicht op Wald + Fluh</li>
+                <li>Family Spa met textielsauna’s en thermium</li>
+                <li>Ruime wellnesstuin</li>
+                <li>Activiteitenruimte</li>
+              </ul>
+            </div>
+            <div class="hotel-booking-group">
+              <h5>🥾 Activiteiten &amp; praktisch</h5>
+              <ul class="hotel-booking-list">
+                <li>Gratis gebruik van wandelstokken, wandelrugzak en paraplu</li>
+                <li>Wekelijks activiteitenprogramma met pilates en verschillende sauna-opgietingen</li>
+                <li>Allgäu-Walser-Pass met korting bij bergbanen en attracties en gratis gebruik van de lokale bus</li>
+                <li>Wandelroutes starten direct bij het hotel</li>
+                <li>Gratis parkeerplaats bij het hotel</li>
+                <li>Ski- en fietsenkelder</li>
+              </ul>
+            </div>
+          </div>
+        </section>` : ""}
 
         <details class="hotel-room-block" open>
           <summary>Onze kamer</summary>
