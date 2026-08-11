@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="80">
+  <meta name="app-version" content="81">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6174,7 +6174,7 @@
           <div>
             <div class="eyebrow">Bonherkenning</div>
             <h2>Bon scannen</h2>
-            <p class="section-intro">Maak een foto of kies een bon. De app leest de bon, vult de gegevens zo goed mogelijk in en laat je alles controleren vóór opslaan.</p>
+            <p class="section-intro">Maak een foto of kies een bon. De datum wordt alvast ingevuld; de overige gegevens vul je zelf in.</p>
           </div>
           <button id="closeReceiptScanner" class="planner-close" type="button" title="Sluiten">×</button>
         </div>
@@ -6204,7 +6204,7 @@
             <div class="receipt-review-title">
               <div>
                 <div class="eyebrow">Controleren vóór opslaan</div>
-                <h3>Herkende gegevens</h3>
+                <h3>Bongegevens</h3>
               </div>
               <span id="receiptConfidence" class="receipt-confidence">Nog niet gescand</span>
             </div>
@@ -6274,7 +6274,7 @@
               <label class="full cost-deposit-check"><input id="receiptIsDeposit" type="checkbox"> Dit is een aanbetaling</label>
             </div>
 
-            <details class="receipt-raw-details">
+            <details class="receipt-raw-details" hidden>
               <summary>OCR-tekst bekijken</summary>
               <textarea id="receiptRawText" rows="7" readonly placeholder="Na het scannen staat hier de gelezen tekst."></textarea>
             </details>
@@ -6518,7 +6518,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v80</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v81</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6526,11 +6526,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=80" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=81" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v80</strong><br>
-          Een nieuwe bonscan begint schoon met alleen de datum ingevuld; oude OCR-resultaten en oude bonvoorbeelden kunnen niet meer terugkomen en het bedrag blijft handmatig invoerbaar.
+          <strong>Wijzigingen in v81</strong><br>
+          Een nieuwe bonfoto vult geen velden meer automatisch in. Alleen de datum staat klaar; bedrag en alle overige gegevens kunnen handmatig worden ingevuld.
         </div>
       </div>
     </div>
@@ -6859,7 +6859,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||80;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||81;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -10177,7 +10177,6 @@ async function scanReceiptFile(file){
   if(!file) return;
 
   resetReceiptScanner(true);
-  const scanGeneration=receiptScanGeneration;
   receiptSelectedFile=file;
 
   if(receiptPreviewUrl) URL.revokeObjectURL(receiptPreviewUrl);
@@ -10190,34 +10189,14 @@ async function scanReceiptFile(file){
   empty.hidden=true;
 
   document.getElementById("saveReceiptCost").disabled=true;
-  document.getElementById("rescanReceipt").disabled=true;
+  document.getElementById("rescanReceipt").disabled=false;
   document.getElementById("receiptFormMsg").innerHTML="";
 
-  try{
-    setReceiptStatus("Bon voorbereiden…",0.02);
-    const worker=await getReceiptOcrWorker();
-    const result=await worker.recognize(file);
-
-    if(scanGeneration!==receiptScanGeneration || receiptSelectedFile!==file) return;
-
-    const raw=result?.data?.text || "";
-    const parsed=parseReceiptOcr(raw);
-    fillReceiptReview(parsed);
-
-    setReceiptStatus(
-      parsed.confidence>=75
-        ? "✓ Bon gelezen. Controleer de velden en sla daarna op."
-        : "Bon gelezen. Controleer de velden extra goed vóór opslaan.",
-      1
-    );
-  }catch(err){
-    console.error(err);
-    setReceiptStatus("Bonherkenning mislukt: "+err.message,0);
-    document.getElementById("receiptRawText").value="";
-    document.getElementById("rescanReceipt").disabled=false;
-    document.getElementById("receiptFormMsg").innerHTML=
-      '<div class="notice"><span class="error">'+esc(err.message)+'</span></div>';
-  }
+  const confidence=document.getElementById("receiptConfidence");
+  confidence.textContent="Klaar voor invoer";
+  confidence.className="receipt-confidence good";
+  setReceiptStatus("✓ Bon gekozen. Vul het bedrag en de overige gegevens zelf in.",1);
+  document.getElementById("receiptAmount").focus();
 }
 
 async function detectReceiptGpsLocation(){
