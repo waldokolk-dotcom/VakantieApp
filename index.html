@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="77">
+  <meta name="app-version" content="78">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -5361,9 +5361,39 @@
       .hotel-booking-group{padding:12px}
       .hotel-booking-list li{font-size:12px}
     }
+    /* ===== v78: sierlijke tekst over het berglandschap ===== */
+    .mountain-motto{
+      position:fixed;
+      top:112px;
+      left:50%;
+      z-index:0;
+      width:max-content;
+      max-width:94vw;
+      transform:translateX(-50%) rotate(-2deg);
+      pointer-events:none;
+      color:rgba(255,255,255,.98);
+      font-family:"Segoe Script","Snell Roundhand","Apple Chancery","Brush Script MT",cursive;
+      font-size:clamp(46px,7.5vw,104px);
+      font-weight:700;
+      line-height:1.05;
+      letter-spacing:.01em;
+      text-align:center;
+      white-space:nowrap;
+      text-shadow:0 3px 5px rgba(0,0,0,.82),0 8px 24px rgba(4,42,34,.72),0 0 2px rgba(0,0,0,.95);
+    }
+    .shell{position:relative;z-index:1}
+    @media(max-width:620px){
+      .mountain-motto{
+        top:94px;
+        width:94vw;
+        font-size:clamp(38px,12vw,62px);
+        white-space:normal;
+      }
+    }
 </style>
 </head>
 <body>
+<div class="mountain-motto" aria-hidden="true">Do bin i dahoam</div>
 <div class="shell">
   <header class="legacy-header">
     <div class="legacy-brand">
@@ -6486,7 +6516,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v77</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v78</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6494,11 +6524,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=77" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=78" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v77</strong><br>
-          Nieuwe kostenregels starten volledig leeg, betaalmethoden kunnen zelf worden toegevoegd en kostenposten kunnen na bevestiging worden gewist.
+          <strong>Wijzigingen in v78</strong><br>
+          De tekst “Do bin i dahoam” staat groot en sierlijk over het berglandschap.
         </div>
       </div>
     </div>
@@ -6827,7 +6857,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||77;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||78;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
