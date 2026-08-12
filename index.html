@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="101">
+  <meta name="app-version" content="102">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6498,7 +6498,7 @@
             </label>
             <label>Voor wie?
               <select id="newPackOwner">
-                <option>Brigitte</option><option>Chloë</option><option>Sterre</option><option>Samen</option><option value="__custom_owner__">Zelf invullen</option>
+                <option>Brigitte</option><option>Waldo</option><option>Chloë</option><option>Sterre</option><option>Samen</option><option value="__custom_owner__">Zelf invullen</option>
               </select>
               <input id="newPackCustomOwner" placeholder="Vul zelf een naam of groep in" hidden>
             </label>
@@ -6529,7 +6529,7 @@
 
         <div class="toolbar">
           <input id="packingSearch" placeholder="Zoeken in paklijst…">
-          <select id="packingOwner"><option value="">Iedereen</option><option>Brigitte</option><option>Chloë</option><option>Sterre</option></select>
+          <select id="packingOwner"><option value="">Iedereen</option><option>Brigitte</option><option>Waldo</option><option>Chloë</option><option>Sterre</option><option>Samen</option></select>
           <select id="packingStatus"><option value="">Alle statussen</option><option value="todo">Nog doen</option><option value="ready">Klaar</option><option value="packed">Ingepakt</option></select>
           <button id="toggleAllPacking" class="btn secondary" type="button">▾ Alles uitvouwen</button>
           <button id="refreshPacking" class="btn secondary">Vernieuwen</button>
@@ -6623,7 +6623,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v101</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v102</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6631,11 +6631,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=101" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=102" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v101</strong><br>
-          Bij 'Voor wie?' kan nu ook Samen of Zelf invullen worden gekozen, voor zowel nieuwe als bestaande meeneem-items.
+          <strong>Wijzigingen in v102</strong><br>
+          Waldo is toegevoegd als vaste keuze bij 'Voor wie?' en aan het filter van de paklijst.
         </div>
       </div>
     </div>
@@ -6964,7 +6964,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||101;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||102;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -9382,7 +9382,7 @@ async function editPackingItem(id){
   document.getElementById("newPackName").value=item.name||"";
   document.getElementById("newPackCategory").value=item.category||"Overig";
   const currentOwner=packingOwnerName(item.owner)||"Brigitte";
-  const standardOwners=["Brigitte","Chloë","Sterre","Samen"];
+  const standardOwners=["Brigitte","Waldo","Chloë","Sterre","Samen"];
   document.getElementById("newPackOwner").value=standardOwners.includes(currentOwner)?currentOwner:"__custom_owner__";
   document.getElementById("newPackCustomOwner").value=standardOwners.includes(currentOwner)?"":currentOwner;
   document.getElementById("newPackCustomOwner").hidden=standardOwners.includes(currentOwner);
