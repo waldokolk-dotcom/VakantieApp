@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="104">
+  <meta name="app-version" content="105">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6623,7 +6623,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v104</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v105</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6631,11 +6631,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=104" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=105" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v104</strong><br>
-          'Bestemd voor' wordt uitsluitend per subitem gekozen via een namenmenu met vrije invoer; het dubbele veld bij het hoofditem is verwijderd.
+          <strong>Wijzigingen in v105</strong><br>
+          De dubbele regel 'Bestemd voor' is ook uit het hoofditemoverzicht verwijderd en staat uitsluitend nog in de subitems.
         </div>
       </div>
     </div>
@@ -6964,7 +6964,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||104;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||105;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -9128,7 +9128,6 @@ function renderPacking(){
         <div class="pack-main">
           <div class="pack-name">${esc(item.name)}${isAutomaticChecklistItem(item)?'<span class="auto-pack-badge" title="Automatisch toegevoegd op basis van officiële reisregels">Automatisch toegevoegd</span>':""}</div>
           <div class="pack-meta">Regelt: ${metaParts.map(esc).join(" · ")}</div>
-          <div class="pack-meta">Bestemd voor: ${esc([...new Set(details.subItems.map(sub=>String(sub.label||"").trim()).filter(Boolean))].join(", ")||"niet ingevuld")}</div>
           <div class="pack-item-total" data-pack-main-result="${esc(item.id)}">${esc(resultText)}</div>
           <div class="pack-updated">↻ Laatst aangepast door ${esc(item.updated_by||"onbekend")}${item.updated_at ? " · "+esc(formatUpdated(item.updated_at)) : ""}</div>
         </div>
@@ -9301,9 +9300,6 @@ packingListEl.addEventListener("change",async event=>{
     const calculation=packingCalculationResult(details);
     const resultText=packingResultText(calculation,item.name);
     const row=recipient.closest("[data-pack-row]");
-    const destinations=[...new Set(details.subItems.map(sub=>String(sub.label||"").trim()).filter(Boolean))].join(", ")||"niet ingevuld";
-    const metaRows=row?.querySelectorAll(".pack-meta");
-    if(metaRows?.[1]) metaRows[1].textContent=`Bestemd voor: ${destinations}`;
     const resultEl=row?.querySelector("[data-pack-result]");
     const summaryResult=row?.querySelector(".pack-extra summary span");
     const mainResult=row?.querySelector("[data-pack-main-result]");
@@ -9343,15 +9339,10 @@ packingListEl.addEventListener("input",event=>{
   const resultEl=panel?.querySelector("[data-pack-result]");
   const summaryResult=panel?.querySelector("summary span");
   const mainResult=panel?.closest("[data-pack-row]")?.querySelector("[data-pack-main-result]");
-  const destinationMeta=panel?.closest("[data-pack-row]")?.querySelectorAll(".pack-meta")?.[1];
   if(resultEl) resultEl.textContent=resultText;
   if(summaryResult) summaryResult.textContent=resultText;
   if(mainResult){
     mainResult.textContent=resultText;
-  }
-  if(destinationMeta){
-    const destinations=[...new Set(details.subItems.map(sub=>String(sub.label||"").trim()).filter(Boolean))].join(", ")||"niet ingevuld";
-    destinationMeta.textContent=`Bestemd voor: ${destinations}`;
   }
   schedulePackingDetailsSave();
 });
