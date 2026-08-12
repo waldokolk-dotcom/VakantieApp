@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="90">
+  <meta name="app-version" content="91">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6618,7 +6618,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v90</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v91</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6626,11 +6626,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=90" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=91" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v90</strong><br>
-          Ieder paklijstitem kan meerdere subitems bevatten, elk met een eigen naam, hoeveelheid, frequentie, eenheid en totaal.
+          <strong>Wijzigingen in v91</strong><br>
+          Een nieuw subitem opent volledig leeg en het hoofditem blijft geopend op dezelfde schermpositie.
         </div>
       </div>
     </div>
@@ -6959,7 +6959,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||90;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||91;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -8666,7 +8666,7 @@ function packingDetailsFor(item){
   details.unit=["stuks","kg","gram"].includes(details.unit) ? details.unit : "stuks";
   if(!Array.isArray(details.subItems) || !details.subItems.length){
     details.subItems=[{
-      label:packingOwnerName(item.owner),
+      label:"",
       unitAmount:details.unitAmount||0,
       timesPerDay:details.timesPerDay||0,
       unit:details.unit,
@@ -8677,16 +8677,27 @@ function packingDetailsFor(item){
     label:String(sub?.label||"").trim(),
     unitAmount:Math.max(0,Number(sub?.unitAmount)||0),
     timesPerDay:Math.max(0,Number(sub?.timesPerDay)||0),
-    unit:["stuks","kg","gram"].includes(sub?.unit) ? sub.unit : "stuks",
-    days:Math.max(1,Number(sub?.days)||packingTripDays())
+    unit:sub?.unit==="" ? "" : (["stuks","kg","gram"].includes(sub?.unit) ? sub.unit : "stuks"),
+    days:sub?.days==="" || sub?.days===null ? "" : Math.max(0,Number(sub?.days)||0)
   }));
   return details;
+}
+
+const openPackingExtraIds=new Set();
+
+function rememberOpenPackingExtras(){
+  openPackingExtraIds.clear();
+  document.querySelectorAll('[data-pack-row] .pack-extra[open]').forEach(details=>{
+    const id=details.closest('[data-pack-row]')?.dataset.packRow;
+    if(id) openPackingExtraIds.add(id);
+  });
 }
 
 function packingCalculationResult(details){
   const totals={};
   (details.subItems||[]).forEach(sub=>{
-    const unit=["stuks","kg","gram"].includes(sub.unit) ? sub.unit : "stuks";
+    if(!["stuks","kg","gram"].includes(sub.unit)) return;
+    const unit=sub.unit;
     const total=(Math.max(0,Number(sub.unitAmount)||0))*(Math.max(0,Number(sub.timesPerDay)||0))*(Math.max(0,Number(sub.days)||0));
     totals[unit]=(totals[unit]||0)+total;
   });
@@ -9068,7 +9079,7 @@ function renderPacking(){
             <label>Naam / voor wie<input data-pack-sub-detail="label" data-pack-id="${esc(item.id)}" data-sub-index="${index}" value="${esc(sub.label)}" placeholder="Bijv. Chloë"></label>
             <label>Eenheid per keer<input data-pack-sub-detail="unitAmount" data-pack-id="${esc(item.id)}" data-sub-index="${index}" type="number" min="0" step="0.01" value="${esc(sub.unitAmount)}"></label>
             <label>Keren per dag<input data-pack-sub-detail="timesPerDay" data-pack-id="${esc(item.id)}" data-sub-index="${index}" type="number" min="0" step="0.25" value="${esc(sub.timesPerDay)}"></label>
-            <label>Soort eenheid<select data-pack-sub-detail="unit" data-pack-id="${esc(item.id)}" data-sub-index="${index}"><option value="stuks" ${sub.unit==="stuks"?"selected":""}>Aantal/stuks</option><option value="kg" ${sub.unit==="kg"?"selected":""}>Kilogram (kg)</option><option value="gram" ${sub.unit==="gram"?"selected":""}>Gram</option></select></label>
+            <label>Soort eenheid<select data-pack-sub-detail="unit" data-pack-id="${esc(item.id)}" data-sub-index="${index}"><option value="" ${sub.unit===""?"selected":""}>Kies eenheid</option><option value="stuks" ${sub.unit==="stuks"?"selected":""}>Aantal/stuks</option><option value="kg" ${sub.unit==="kg"?"selected":""}>Kilogram (kg)</option><option value="gram" ${sub.unit==="gram"?"selected":""}>Gram</option></select></label>
             <label>Aantal dagen<input data-pack-sub-detail="days" data-pack-id="${esc(item.id)}" data-sub-index="${index}" type="number" min="1" step="1" value="${esc(sub.days)}"></label>
           </div>
         </div>`).join("");
@@ -9099,7 +9110,7 @@ function renderPacking(){
           <button class="icon-btn" data-edit="${esc(item.id)}" title="Wijzigen">✎</button>
           <button class="icon-btn" data-delete="${esc(item.id)}" title="Verwijderen">×</button>
         </div>
-        <details class="pack-extra">
+        <details class="pack-extra" ${openPackingExtraIds.has(String(item.id))?"open":""}>
           <summary>Opmerking & berekening <span>${esc(resultText)}</span></summary>
           <div class="pack-extra-body">
             <label class="pack-note-label">Vrije opmerking
@@ -9176,11 +9187,19 @@ packingListEl.addEventListener("click",async event=>{
     const id=button.dataset.addPackSubitem;
     const item=packingData.find(entry=>entry.id===id);
     if(!item) return;
+    rememberOpenPackingExtras();
+    openPackingExtraIds.add(String(id));
+    const row=button.closest('[data-pack-row]');
+    const rowTop=row?.getBoundingClientRect().top||0;
     const details=packingDetailsFor(item);
-    details.subItems.push({label:"",unitAmount:0,timesPerDay:0,unit:"stuks",days:packingTripDays()});
+    details.subItems.push({label:"",unitAmount:"",timesPerDay:"",unit:"",days:""});
     packingDetails[id]=details;
     await persistPackingDetails();
     renderPacking();
+    const newRow=document.querySelector(`[data-pack-row="${CSS.escape(String(id))}"]`);
+    if(newRow) window.scrollBy(0,newRow.getBoundingClientRect().top-rowTop);
+    const newSubitem=newRow?.querySelector('.pack-subitem:last-child input[data-pack-sub-detail="label"]');
+    newSubitem?.focus({preventScroll:true});
     return;
   }
   if(button.dataset.removePackSubitem){
@@ -9188,6 +9207,8 @@ packingListEl.addEventListener("click",async event=>{
     const id=button.dataset.removePackSubitem;
     const item=packingData.find(entry=>entry.id===id);
     if(!item) return;
+    rememberOpenPackingExtras();
+    openPackingExtraIds.add(String(id));
     const details=packingDetailsFor(item);
     const index=Number(button.dataset.subIndex);
     if(details.subItems.length>1 && Number.isInteger(index)) details.subItems.splice(index,1);
