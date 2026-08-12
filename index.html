@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="96">
+  <meta name="app-version" content="97">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6619,7 +6619,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v96</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v97</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6627,11 +6627,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=96" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=97" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v96</strong><br>
-          Bij soort eenheid kan nu ook Euro (€) worden gekozen; het totaal wordt als Nederlands eurobedrag weergegeven.
+          <strong>Wijzigingen in v97</strong><br>
+          Bij soort eenheid zijn Euro (€) en 'Zelf kiezen' beschikbaar; met 'Zelf kiezen' kan iedere eigen eenheid worden ingevoerd.
         </div>
       </div>
     </div>
@@ -6960,7 +6960,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||96;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||97;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -8673,19 +8673,20 @@ function packingDetailsFor(item){
       timesPerDay:details.timesPerDay,
       unit:details.unit,
       days:details.days||packingTripDays()
-    } : {label:"",unitAmount:"",timesPerDay:"",unit:"",days:""}];
+    } : {label:"",unitAmount:"",timesPerDay:"",unit:"",customUnit:"",days:""}];
   }
   details.subItems=details.subItems.map(sub=>{
     const label=String(sub?.label||"").trim();
     const unitAmount=sub?.unitAmount==="" || sub?.unitAmount===null ? "" : Math.max(0,Number(sub?.unitAmount)||0);
     const timesPerDay=sub?.timesPerDay==="" || sub?.timesPerDay===null ? "" : Math.max(0,Number(sub?.timesPerDay)||0);
     const unused=!label && !(Number(unitAmount)>0) && !(Number(timesPerDay)>0);
-    if(unused) return {label:"",unitAmount:"",timesPerDay:"",unit:"",days:""};
+    if(unused) return {label:"",unitAmount:"",timesPerDay:"",unit:"",customUnit:"",days:""};
     return {
       label,
       unitAmount,
       timesPerDay,
-      unit:sub?.unit==="" ? "" : (["stuks","kg","gram","euro"].includes(sub?.unit) ? sub.unit : "stuks"),
+      unit:sub?.unit==="" ? "" : (["stuks","kg","gram","euro","custom"].includes(sub?.unit) ? sub.unit : "stuks"),
+      customUnit:String(sub?.customUnit||"").trim(),
       days:sub?.days==="" || sub?.days===null ? "" : Math.max(0,Number(sub?.days)||0)
     };
   });
@@ -8707,7 +8708,8 @@ function packingCalculationResult(details){
   (details.subItems||[]).forEach(sub=>{
     const amount=Math.max(0,Number(sub.unitAmount)||0);
     if(!(amount>0)) return;
-    const unit=["stuks","kg","gram","euro"].includes(sub.unit) ? sub.unit : "stuks";
+    const unit=sub.unit==="custom" ? `custom:${String(sub.customUnit||"").trim()}` : (["stuks","kg","gram","euro"].includes(sub.unit) ? sub.unit : "stuks");
+    if(unit==="custom:") return;
     const timesPerDay=Math.max(0,Number(sub.timesPerDay)||0);
     const days=Math.max(0,Number(sub.days)||0);
     const total=amount*(timesPerDay>0 ? timesPerDay : 1)*(days>0 ? days : 1);
@@ -8717,6 +8719,7 @@ function packingCalculationResult(details){
 }
 
 function packingUnitLabel(unit,total){
+  if(unit.startsWith("custom:")) return unit.slice(7);
   if(unit==="kg") return "kg";
   if(unit==="gram") return "gram";
   if(unit==="euro") return "euro";
@@ -9098,7 +9101,8 @@ function renderPacking(){
             <label>Naam / voor wie<input data-pack-sub-detail="label" data-pack-id="${esc(item.id)}" data-sub-index="${index}" value="${esc(sub.label)}"></label>
             <label>Aantal / eenheid per keer<input data-pack-sub-detail="unitAmount" data-pack-id="${esc(item.id)}" data-sub-index="${index}" type="number" min="0" step="0.01" value="${esc(sub.unitAmount)}"></label>
             <label>Keren per dag (optioneel)<input data-pack-sub-detail="timesPerDay" data-pack-id="${esc(item.id)}" data-sub-index="${index}" type="number" min="0" step="0.25" value="${esc(sub.timesPerDay)}"></label>
-            <label>Soort eenheid<select data-pack-sub-detail="unit" data-pack-id="${esc(item.id)}" data-sub-index="${index}"><option value="" ${sub.unit===""?"selected":""}>Kies eenheid</option><option value="stuks" ${sub.unit==="stuks"?"selected":""}>Aantal/stuks</option><option value="kg" ${sub.unit==="kg"?"selected":""}>Kilogram (kg)</option><option value="gram" ${sub.unit==="gram"?"selected":""}>Gram</option><option value="euro" ${sub.unit==="euro"?"selected":""}>Euro (€)</option></select></label>
+            <label>Soort eenheid<select data-pack-sub-detail="unit" data-pack-id="${esc(item.id)}" data-sub-index="${index}"><option value="" ${sub.unit===""?"selected":""}>Kies eenheid</option><option value="stuks" ${sub.unit==="stuks"?"selected":""}>Aantal/stuks</option><option value="kg" ${sub.unit==="kg"?"selected":""}>Kilogram (kg)</option><option value="gram" ${sub.unit==="gram"?"selected":""}>Gram</option><option value="euro" ${sub.unit==="euro"?"selected":""}>Euro (€)</option><option value="custom" ${sub.unit==="custom"?"selected":""}>Zelf kiezen</option></select></label>
+            <label data-custom-unit-wrap ${sub.unit==="custom"?"":"hidden"}>Eigen eenheid<input data-pack-sub-detail="customUnit" data-pack-id="${esc(item.id)}" data-sub-index="${index}" value="${esc(sub.customUnit||"")}" placeholder="Bijv. liter of ml"></label>
             <label>Aantal dagen (optioneel)<input data-pack-sub-detail="days" data-pack-id="${esc(item.id)}" data-sub-index="${index}" type="number" min="1" step="1" value="${esc(sub.days)}"></label>
           </div>
         </div>`).join("");
@@ -9212,7 +9216,7 @@ packingListEl.addEventListener("click",async event=>{
     const row=button.closest('[data-pack-row]');
     const rowTop=row?.getBoundingClientRect().top||0;
     const details=packingDetailsFor(item);
-    details.subItems.push({label:"",unitAmount:"",timesPerDay:"",unit:"",days:""});
+    details.subItems.push({label:"",unitAmount:"",timesPerDay:"",unit:"",customUnit:"",days:""});
     packingDetails[id]=details;
     await persistPackingDetails();
     renderPacking();
@@ -9279,7 +9283,11 @@ packingListEl.addEventListener("input",event=>{
   if(subField){
     const index=Number(input.dataset.subIndex);
     if(!details.subItems[index]) return;
-    details.subItems[index][subField]=(subField==="label" || subField==="unit") ? input.value : (input.value==="" ? "" : Math.max(0,Number(input.value)||0));
+    details.subItems[index][subField]=(subField==="label" || subField==="unit" || subField==="customUnit") ? input.value : (input.value==="" ? "" : Math.max(0,Number(input.value)||0));
+    if(subField==="unit"){
+      const wrap=input.closest(".pack-subitem")?.querySelector("[data-custom-unit-wrap]");
+      if(wrap) wrap.hidden=input.value!=="custom";
+    }
   }else{
     const field=input.dataset.packDetail;
     details[field]=field==="note" ? input.value : Math.max(0,Number(input.value)||0);
