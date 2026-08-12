@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="102">
+  <meta name="app-version" content="103">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6496,11 +6496,14 @@
             <label>Categorie
               <input id="newPackCategory" list="packingCategories" placeholder="Auto">
             </label>
-            <label>Voor wie?
+            <label>Wie regelt dit?
               <select id="newPackOwner">
                 <option>Brigitte</option><option>Waldo</option><option>Chloë</option><option>Sterre</option><option>Samen</option><option value="__custom_owner__">Zelf invullen</option>
               </select>
               <input id="newPackCustomOwner" placeholder="Vul zelf een naam of groep in" hidden>
+            </label>
+            <label>Bestemd voor
+              <input id="newPackRecipients" placeholder="Bijv. Chloë, Sterre of de honden">
             </label>
             <label>Eenheid per keer
               <input id="newPackUnitAmount" type="number" min="0" step="0.01" placeholder="Bijv. 150">
@@ -6623,7 +6626,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v102</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v103</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6631,11 +6634,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=102" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=103" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v102</strong><br>
-          Waldo is toegevoegd als vaste keuze bij 'Voor wie?' en aan het filter van de paklijst.
+          <strong>Wijzigingen in v103</strong><br>
+          'Wie regelt dit?' en 'Bestemd voor' zijn gescheiden voor nieuwe en bestaande meeneem-items en worden apart getoond en opgeslagen.
         </div>
       </div>
     </div>
@@ -6964,7 +6967,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||102;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||103;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -8695,6 +8698,9 @@ function packingDetailsFor(item){
       autoDays:Boolean(sub?.autoDays)
     };
   });
+  if(!saved.recipientsSeparated && details.subItems.length===1 && details.subItems[0].label===packingOwnerName(item.owner)){
+    details.subItems[0].label="";
+  }
   return details;
 }
 
@@ -9103,7 +9109,7 @@ function renderPacking(){
         <div class="pack-subitem">
           <div class="pack-subitem-head"><strong>Subitem ${index+1}</strong>${details.subItems.length>1 ? `<button type="button" class="pack-subitem-remove" data-remove-pack-subitem="${esc(item.id)}" data-sub-index="${index}">Verwijderen</button>` : ""}</div>
           <div class="pack-calc-grid">
-            <label>Naam / voor wie<input data-pack-sub-detail="label" data-pack-id="${esc(item.id)}" data-sub-index="${index}" value="${esc(sub.label)}"></label>
+            <label>Bestemd voor<input data-pack-sub-detail="label" data-pack-id="${esc(item.id)}" data-sub-index="${index}" value="${esc(sub.label)}"></label>
             <label>Aantal / eenheid per keer<input data-pack-sub-detail="unitAmount" data-pack-id="${esc(item.id)}" data-sub-index="${index}" type="number" min="0" step="0.01" value="${esc(sub.unitAmount)}"></label>
             <label>Keren per dag (optioneel)<input data-pack-sub-detail="timesPerDay" data-pack-id="${esc(item.id)}" data-sub-index="${index}" type="number" min="0" step="0.25" value="${esc(sub.timesPerDay)}"></label>
             <label>Soort eenheid<select data-pack-sub-detail="unit" data-pack-id="${esc(item.id)}" data-sub-index="${index}"><option value="" ${sub.unit===""?"selected":""}>Kies eenheid</option><option value="stuks" ${sub.unit==="stuks"?"selected":""}>Aantal/stuks</option><option value="kg" ${sub.unit==="kg"?"selected":""}>Kilogram (kg)</option><option value="gram" ${sub.unit==="gram"?"selected":""}>Gram</option><option value="euro" ${sub.unit==="euro"?"selected":""}>Euro (€)</option><option value="custom" ${sub.unit==="custom"?"selected":""}>Zelf kiezen</option></select></label>
@@ -9119,7 +9125,8 @@ function renderPacking(){
 
         <div class="pack-main">
           <div class="pack-name">${esc(item.name)}${isAutomaticChecklistItem(item)?'<span class="auto-pack-badge" title="Automatisch toegevoegd op basis van officiële reisregels">Automatisch toegevoegd</span>':""}</div>
-          <div class="pack-meta">${metaParts.map(esc).join(" · ")}</div>
+          <div class="pack-meta">Regelt: ${metaParts.map(esc).join(" · ")}</div>
+          <div class="pack-meta">Bestemd voor: ${esc([...new Set(details.subItems.map(sub=>String(sub.label||"").trim()).filter(Boolean))].join(", ")||"niet ingevuld")}</div>
           <div class="pack-item-total" data-pack-main-result="${esc(item.id)}">${esc(resultText)}</div>
           <div class="pack-updated">↻ Laatst aangepast door ${esc(item.updated_by||"onbekend")}${item.updated_at ? " · "+esc(formatUpdated(item.updated_at)) : ""}</div>
         </div>
@@ -9365,6 +9372,7 @@ function resetPackingForm(){
   document.getElementById("newPackOwner").value="Brigitte";
   document.getElementById("newPackCustomOwner").value="";
   document.getElementById("newPackCustomOwner").hidden=true;
+  document.getElementById("newPackRecipients").value="";
   document.getElementById("newPackUnitAmount").value="";
   document.getElementById("newPackTimesPerDay").value="";
   document.getElementById("newPackUnit").value="";
@@ -9386,6 +9394,7 @@ async function editPackingItem(id){
   document.getElementById("newPackOwner").value=standardOwners.includes(currentOwner)?currentOwner:"__custom_owner__";
   document.getElementById("newPackCustomOwner").value=standardOwners.includes(currentOwner)?"":currentOwner;
   document.getElementById("newPackCustomOwner").hidden=standardOwners.includes(currentOwner);
+  document.getElementById("newPackRecipients").value=first.label||"";
   document.getElementById("newPackUnitAmount").value=first.unitAmount??"";
   document.getElementById("newPackTimesPerDay").value=first.timesPerDay??"";
   document.getElementById("newPackUnit").value=["stuks","kg","gram","euro"].includes(first.unit)?first.unit:"";
@@ -9415,6 +9424,7 @@ document.getElementById("addPackItem").onclick=async()=>{
   const category=canonicalPackingCategory(document.getElementById("newPackCategory").value.trim()||"Overig");
   const ownerChoice=document.getElementById("newPackOwner").value;
   const owner=ownerChoice==="__custom_owner__" ? document.getElementById("newPackCustomOwner").value.trim() : ownerChoice;
+  const recipients=document.getElementById("newPackRecipients").value.trim();
   const quantity=1;
   const unitAmount=Math.max(0,Number(document.getElementById("newPackUnitAmount").value)||0);
   const timesPerDay=Math.max(0,Number(document.getElementById("newPackTimesPerDay").value)||0);
@@ -9427,7 +9437,7 @@ document.getElementById("addPackItem").onclick=async()=>{
     return;
   }
   if(!owner){
-    msg.innerHTML='<div class="notice">Vul bij “Voor wie?” een naam of groep in.</div>';
+    msg.innerHTML='<div class="notice">Vul bij “Wie regelt dit?” een naam of groep in.</div>';
     return;
   }
 
@@ -9442,8 +9452,10 @@ document.getElementById("addPackItem").onclick=async()=>{
       ...first,
       unitAmount:document.getElementById("newPackUnitAmount").value===""?"":unitAmount,
       timesPerDay:document.getElementById("newPackTimesPerDay").value===""?"":timesPerDay,
-      unit:finalUnit
+      unit:finalUnit,
+      label:recipients
     };
+    details.recipientsSeparated=true;
     packingDetails[id]=details;
     await persistPackingDetails();
     await savePackingPatch(id,{name,category,owner,due_date:due});
@@ -9470,7 +9482,8 @@ document.getElementById("addPackItem").onclick=async()=>{
   await ensurePackingDetailsDatabase();
   packingDetails[id]={
     note:"",
-    subItems:[{label:owner,unitAmount,timesPerDay,unit,days:packingTripDays()}]
+    recipientsSeparated:true,
+    subItems:[{label:recipients,unitAmount,timesPerDay,unit,days:packingTripDays()}]
   };
   await persistPackingDetails();
   await rememberPackingItemIcon(name,category);
