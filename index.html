@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="97">
+  <meta name="app-version" content="98">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6619,7 +6619,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v97</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v98</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6627,11 +6627,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=97" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=98" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v97</strong><br>
-          Bij soort eenheid zijn Euro (€) en 'Zelf kiezen' beschikbaar; met 'Zelf kiezen' kan iedere eigen eenheid worden ingevoerd.
+          <strong>Wijzigingen in v98</strong><br>
+          Eurototalen tonen alleen decimalen wanneer er daadwerkelijk centen zijn, bijvoorbeeld € 500 of € 500,50.
         </div>
       </div>
     </div>
@@ -6960,7 +6960,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||97;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||98;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -8731,7 +8731,7 @@ function packingResultText(calculation,itemName=""){
   const parts=Object.entries(calculation.totals||{})
     .filter(([,total])=>total>0)
     .map(([unit,total])=>{
-      if(unit==="euro") return `${total.toLocaleString("nl-NL",{style:"currency",currency:"EUR"})}${itemLabel ? ` ${itemLabel}` : ""}`;
+      if(unit==="euro") return `${total.toLocaleString("nl-NL",{style:"currency",currency:"EUR",minimumFractionDigits:0,maximumFractionDigits:2})}${itemLabel ? ` ${itemLabel}` : ""}`;
       const amount=total.toLocaleString("nl-NL",{maximumFractionDigits:2});
       if(unit==="stuks" && itemLabel) return `${amount} ${itemLabel}`;
       return `${amount} ${packingUnitLabel(unit,total)}${itemLabel ? ` ${itemLabel}` : ""}`;
