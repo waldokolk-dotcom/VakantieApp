@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="106">
+  <meta name="app-version" content="107">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6502,6 +6502,12 @@
               </select>
               <input id="newPackCustomOwner" placeholder="Vul zelf een naam of groep in" hidden>
             </label>
+            <label>Voor wie is het item?
+              <select id="newPackRecipient">
+                <option value="">Kies naam</option><option>Waldo</option><option>Brigitte</option><option>Chloë</option><option>Sterre</option><option>Samen</option><option value="__custom_recipient__">Zelf invullen</option>
+              </select>
+              <input id="newPackCustomRecipient" placeholder="Vul zelf een naam of groep in" hidden>
+            </label>
             <label>Uiterlijk
               <input id="newPackDue" type="date">
             </label>
@@ -6608,7 +6614,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v106</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v107</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6616,11 +6622,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=106" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=107" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v106</strong><br>
-          Aantal, keren per dag en soort eenheid zijn verwijderd uit het hoofdformulier en worden uitsluitend per subitem ingevuld.
+          <strong>Wijzigingen in v107</strong><br>
+          Het hoofdformulier bevat een namenmenu 'Voor wie is het item?'; deze keuze wordt opgeslagen in het eerste subitem bij nieuwe en bestaande items.
         </div>
       </div>
     </div>
@@ -6949,7 +6955,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||106;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||107;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -9384,6 +9390,9 @@ function resetPackingForm(){
   document.getElementById("newPackOwner").value="Brigitte";
   document.getElementById("newPackCustomOwner").value="";
   document.getElementById("newPackCustomOwner").hidden=true;
+  document.getElementById("newPackRecipient").value="";
+  document.getElementById("newPackCustomRecipient").value="";
+  document.getElementById("newPackCustomRecipient").hidden=true;
   document.getElementById("newPackDue").value="";
   document.getElementById("addPackItem").textContent="Toevoegen";
   document.getElementById("cancelPackEdit").hidden=true;
@@ -9392,6 +9401,8 @@ function resetPackingForm(){
 async function editPackingItem(id){
   const item=packingData.find(x=>x.id===id);
   if(!item) return;
+  const details=packingDetailsFor(item);
+  const firstRecipient=String(details.subItems[0]?.label||"").trim();
   editingPackingId=id;
   document.getElementById("newPackName").value=item.name||"";
   document.getElementById("newPackCategory").value=item.category||"Overig";
@@ -9400,6 +9411,10 @@ async function editPackingItem(id){
   document.getElementById("newPackOwner").value=standardOwners.includes(currentOwner)?currentOwner:"__custom_owner__";
   document.getElementById("newPackCustomOwner").value=standardOwners.includes(currentOwner)?"":currentOwner;
   document.getElementById("newPackCustomOwner").hidden=standardOwners.includes(currentOwner);
+  const standardRecipients=["Waldo","Brigitte","Chloë","Sterre","Samen"];
+  document.getElementById("newPackRecipient").value=!firstRecipient?"":(standardRecipients.includes(firstRecipient)?firstRecipient:"__custom_recipient__");
+  document.getElementById("newPackCustomRecipient").value=firstRecipient && !standardRecipients.includes(firstRecipient)?firstRecipient:"";
+  document.getElementById("newPackCustomRecipient").hidden=!firstRecipient || standardRecipients.includes(firstRecipient);
   document.getElementById("newPackDue").value=item.due_date||"";
   document.getElementById("addPackItem").textContent="Wijzigingen opslaan";
   document.getElementById("cancelPackEdit").hidden=false;
@@ -9426,6 +9441,8 @@ document.getElementById("addPackItem").onclick=async()=>{
   const category=canonicalPackingCategory(document.getElementById("newPackCategory").value.trim()||"Overig");
   const ownerChoice=document.getElementById("newPackOwner").value;
   const owner=ownerChoice==="__custom_owner__" ? document.getElementById("newPackCustomOwner").value.trim() : ownerChoice;
+  const recipientChoice=document.getElementById("newPackRecipient").value;
+  const recipient=recipientChoice==="__custom_recipient__" ? document.getElementById("newPackCustomRecipient").value.trim() : recipientChoice;
   const quantity=1;
   const due=document.getElementById("newPackDue").value||null;
   const msg=document.getElementById("packFormMsg");
@@ -9438,11 +9455,21 @@ document.getElementById("addPackItem").onclick=async()=>{
     msg.innerHTML='<div class="notice">Vul bij “Wie regelt dit?” een naam of groep in.</div>';
     return;
   }
+  if(!recipient){
+    msg.innerHTML='<div class="notice">Kies of vul in voor wie het item bestemd is.</div>';
+    return;
+  }
 
   if(editingPackingId){
     const id=editingPackingId;
     const item=packingData.find(entry=>entry.id===id);
     if(!item) return;
+    const details=packingDetailsFor(item);
+    if(!details.subItems.length) details.subItems=[{label:"",unitAmount:"",timesPerDay:"",unit:"",customUnit:"",days:packingTripDays(),autoDays:true}];
+    details.subItems[0].label=recipient;
+    details.recipientsSeparated=true;
+    packingDetails[id]=details;
+    await persistPackingDetails();
     await savePackingPatch(id,{name,category,owner,due_date:due});
     await rememberPackingItemIcon(name,category);
     msg.innerHTML='<div class="notice"><span class="ok">✓ Meeneem-item gewijzigd.</span></div>';
@@ -9468,7 +9495,7 @@ document.getElementById("addPackItem").onclick=async()=>{
   packingDetails[id]={
     note:"",
     recipientsSeparated:true,
-    subItems:[{label:"",unitAmount:"",timesPerDay:"",unit:"",customUnit:"",days:packingTripDays(),autoDays:true}]
+    subItems:[{label:recipient,unitAmount:"",timesPerDay:"",unit:"",customUnit:"",days:packingTripDays(),autoDays:true}]
   };
   await persistPackingDetails();
   await rememberPackingItemIcon(name,category);
@@ -9486,6 +9513,12 @@ document.getElementById("cancelPackEdit").onclick=()=>{
 document.getElementById("newPackOwner").addEventListener("change",event=>{
   const custom=document.getElementById("newPackCustomOwner");
   custom.hidden=event.target.value!=="__custom_owner__";
+  if(!custom.hidden) custom.focus();
+});
+
+document.getElementById("newPackRecipient").addEventListener("change",event=>{
+  const custom=document.getElementById("newPackCustomRecipient");
+  custom.hidden=event.target.value!=="__custom_recipient__";
   if(!custom.hidden) custom.focus();
 });
 
