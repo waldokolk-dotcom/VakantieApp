@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="92">
+  <meta name="app-version" content="93">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -172,6 +172,7 @@
     .pack-add-subitem{justify-self:start;border:0;border-radius:10px;padding:9px 12px;background:#e7f2e5;color:#1d6745;font-weight:900;cursor:pointer}
     .pack-calc-result{padding:9px 11px;border-radius:10px;background:#eaf5e7;color:#1d6745;font-size:.82rem;font-weight:900}
     .pack-meta{font-size:.78rem;color:var(--muted);margin-top:5px}
+    .pack-item-total{display:inline-block;margin-top:6px;padding:5px 9px;border-radius:999px;background:#eaf5e7;color:#1d6745;font-size:.78rem;font-weight:900}
     .pack-updated{font-size:.7rem;color:#53806a;margin-top:4px;font-weight:700}
     .pack-due{
       background:#faf8f0;border:1px solid #e7dfcf;border-radius:12px;padding:7px 9px;
@@ -6618,7 +6619,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v92</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v93</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6626,11 +6627,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=92" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=93" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v92</strong><br>
-          Een nieuw subitem opent volledig leeg, het hoofditem blijft op dezelfde schermpositie en ieder item toont zijn totaal met de bijbehorende eenheid.
+          <strong>Wijzigingen in v93</strong><br>
+          Ongebruikte subitemvelden zijn volledig blanco en ingevulde itemtotalen staan zichtbaar in de hoofdregel met hun eenheid.
         </div>
       </div>
     </div>
@@ -6959,7 +6960,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||92;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||93;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -8665,21 +8666,29 @@ function packingDetailsFor(item){
   }
   details.unit=["stuks","kg","gram"].includes(details.unit) ? details.unit : "stuks";
   if(!Array.isArray(details.subItems) || !details.subItems.length){
-    details.subItems=[{
+    const hasProposal=(Number(details.unitAmount)||0)>0 && (Number(details.timesPerDay)||0)>0;
+    details.subItems=[hasProposal ? {
       label:"",
-      unitAmount:details.unitAmount||0,
-      timesPerDay:details.timesPerDay||0,
+      unitAmount:details.unitAmount,
+      timesPerDay:details.timesPerDay,
       unit:details.unit,
       days:details.days||packingTripDays()
-    }];
+    } : {label:"",unitAmount:"",timesPerDay:"",unit:"",days:""}];
   }
-  details.subItems=details.subItems.map(sub=>({
-    label:String(sub?.label||"").trim(),
-    unitAmount:Math.max(0,Number(sub?.unitAmount)||0),
-    timesPerDay:Math.max(0,Number(sub?.timesPerDay)||0),
-    unit:sub?.unit==="" ? "" : (["stuks","kg","gram"].includes(sub?.unit) ? sub.unit : "stuks"),
-    days:sub?.days==="" || sub?.days===null ? "" : Math.max(0,Number(sub?.days)||0)
-  }));
+  details.subItems=details.subItems.map(sub=>{
+    const label=String(sub?.label||"").trim();
+    const unitAmount=sub?.unitAmount==="" || sub?.unitAmount===null ? "" : Math.max(0,Number(sub?.unitAmount)||0);
+    const timesPerDay=sub?.timesPerDay==="" || sub?.timesPerDay===null ? "" : Math.max(0,Number(sub?.timesPerDay)||0);
+    const unused=!label && !(Number(unitAmount)>0) && !(Number(timesPerDay)>0);
+    if(unused) return {label:"",unitAmount:"",timesPerDay:"",unit:"",days:""};
+    return {
+      label,
+      unitAmount,
+      timesPerDay,
+      unit:sub?.unit==="" ? "" : (["stuks","kg","gram"].includes(sub?.unit) ? sub.unit : "stuks"),
+      days:sub?.days==="" || sub?.days===null ? "" : Math.max(0,Number(sub?.days)||0)
+    };
+  });
   return details;
 }
 
@@ -9081,7 +9090,7 @@ function renderPacking(){
         <div class="pack-subitem">
           <div class="pack-subitem-head"><strong>Subitem ${index+1}</strong>${details.subItems.length>1 ? `<button type="button" class="pack-subitem-remove" data-remove-pack-subitem="${esc(item.id)}" data-sub-index="${index}">Verwijderen</button>` : ""}</div>
           <div class="pack-calc-grid">
-            <label>Naam / voor wie<input data-pack-sub-detail="label" data-pack-id="${esc(item.id)}" data-sub-index="${index}" value="${esc(sub.label)}" placeholder="Bijv. Chloë"></label>
+            <label>Naam / voor wie<input data-pack-sub-detail="label" data-pack-id="${esc(item.id)}" data-sub-index="${index}" value="${esc(sub.label)}"></label>
             <label>Eenheid per keer<input data-pack-sub-detail="unitAmount" data-pack-id="${esc(item.id)}" data-sub-index="${index}" type="number" min="0" step="0.01" value="${esc(sub.unitAmount)}"></label>
             <label>Keren per dag<input data-pack-sub-detail="timesPerDay" data-pack-id="${esc(item.id)}" data-sub-index="${index}" type="number" min="0" step="0.25" value="${esc(sub.timesPerDay)}"></label>
             <label>Soort eenheid<select data-pack-sub-detail="unit" data-pack-id="${esc(item.id)}" data-sub-index="${index}"><option value="" ${sub.unit===""?"selected":""}>Kies eenheid</option><option value="stuks" ${sub.unit==="stuks"?"selected":""}>Aantal/stuks</option><option value="kg" ${sub.unit==="kg"?"selected":""}>Kilogram (kg)</option><option value="gram" ${sub.unit==="gram"?"selected":""}>Gram</option></select></label>
@@ -9097,6 +9106,7 @@ function renderPacking(){
         <div class="pack-main">
           <div class="pack-name">${esc(item.name)}${isAutomaticChecklistItem(item)?'<span class="auto-pack-badge" title="Automatisch toegevoegd op basis van officiële reisregels">Automatisch toegevoegd</span>':""}</div>
           <div class="pack-meta">${metaParts.map(esc).join(" · ")}</div>
+          <div class="pack-item-total" data-pack-main-result="${esc(item.id)}" ${calculation.total>0 ? "" : 'hidden'}>${calculation.total>0 ? esc(resultText) : ""}</div>
           <div class="pack-updated">↻ Laatst aangepast door ${esc(item.updated_by||"onbekend")}${item.updated_at ? " · "+esc(formatUpdated(item.updated_at)) : ""}</div>
         </div>
 
@@ -9264,7 +9274,7 @@ packingListEl.addEventListener("input",event=>{
   if(subField){
     const index=Number(input.dataset.subIndex);
     if(!details.subItems[index]) return;
-    details.subItems[index][subField]=(subField==="label" || subField==="unit") ? input.value : Math.max(0,Number(input.value)||0);
+    details.subItems[index][subField]=(subField==="label" || subField==="unit") ? input.value : (input.value==="" ? "" : Math.max(0,Number(input.value)||0));
   }else{
     const field=input.dataset.packDetail;
     details[field]=field==="note" ? input.value : Math.max(0,Number(input.value)||0);
@@ -9276,8 +9286,13 @@ packingListEl.addEventListener("input",event=>{
   const panel=input.closest(".pack-extra");
   const resultEl=panel?.querySelector("[data-pack-result]");
   const summaryResult=panel?.querySelector("summary span");
+  const mainResult=panel?.closest("[data-pack-row]")?.querySelector("[data-pack-main-result]");
   if(resultEl) resultEl.textContent=resultText;
   if(summaryResult) summaryResult.textContent=calculation.total>0 ? resultText : "";
+  if(mainResult){
+    mainResult.textContent=calculation.total>0 ? resultText : "";
+    mainResult.hidden=!(calculation.total>0);
+  }
   schedulePackingDetailsSave();
 });
 
