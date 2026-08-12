@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="88">
+  <meta name="app-version" content="89">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -163,7 +163,7 @@
     .pack-note-label,.pack-calc-grid label{font-size:.72rem;font-weight:850;color:#4d6358}
     .pack-note-label textarea{width:100%;min-height:64px;resize:vertical;margin-top:5px;padding:9px;border:1px solid #ddd5c5;border-radius:10px}
     .pack-calc-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
-    .pack-calc-grid input{width:100%;margin-top:5px;padding:8px;border:1px solid #ddd5c5;border-radius:9px}
+    .pack-calc-grid input,.pack-calc-grid select{width:100%;margin-top:5px;padding:8px;border:1px solid #ddd5c5;border-radius:9px;background:#fff;color:var(--ink)}
     .pack-calc-result{padding:9px 11px;border-radius:10px;background:#eaf5e7;color:#1d6745;font-size:.82rem;font-weight:900}
     .pack-meta{font-size:.78rem;color:var(--muted);margin-top:5px}
     .pack-updated{font-size:.7rem;color:#53806a;margin-top:4px;font-weight:700}
@@ -6494,8 +6494,18 @@
                 <option>Brigitte</option><option>Chloë</option><option>Sterre</option>
               </select>
             </label>
-            <label>Aantal
-              <input id="newPackQty" type="number" min="1" value="1">
+            <label>Eenheid per keer
+              <input id="newPackUnitAmount" type="number" min="0" step="0.01" placeholder="Bijv. 150">
+            </label>
+            <label>Keren per dag
+              <input id="newPackTimesPerDay" type="number" min="0" step="0.25" placeholder="Bijv. 2">
+            </label>
+            <label>Soort eenheid
+              <select id="newPackUnit">
+                <option value="stuks">Aantal/stuks</option>
+                <option value="kg">Kilogram (kg)</option>
+                <option value="gram">Gram</option>
+              </select>
             </label>
             <label>Uiterlijk
               <input id="newPackDue" type="date">
@@ -6602,7 +6612,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v88</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v89</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6610,11 +6620,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=88" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=89" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v88</strong><br>
-          Brandstof is verwijderd en zelf toegevoegde kostencategorieën blijven voortaan beschikbaar in beide categoriekeuzes.
+          <strong>Wijzigingen in v89</strong><br>
+          Paklijstregels ondersteunen hoeveelheid per keer, keren per dag en eenheden in stuks, kilogram of gram, met een totaal in dezelfde eenheid.
         </div>
       </div>
     </div>
@@ -6943,7 +6953,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||88;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||89;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -8635,22 +8645,40 @@ function packingTripDays(){
 
 function defaultPackingCalculation(item){
   const name=String(item?.name||"").toLowerCase();
-  if(name.includes("luier")) return {dayQty:4,nightQty:1,days:packingTripDays(),packSize:21,note:""};
-  if(name.includes("paracetamol")) return {dayQty:4,nightQty:0,days:packingTripDays(),packSize:0,note:""};
-  return {dayQty:0,nightQty:0,days:packingTripDays(),packSize:0,note:""};
+  if(name.includes("luier")) return {unitAmount:5,timesPerDay:1,unit:"stuks",days:packingTripDays(),note:""};
+  if(name.includes("paracetamol")) return {unitAmount:4,timesPerDay:1,unit:"stuks",days:packingTripDays(),note:""};
+  return {unitAmount:0,timesPerDay:0,unit:"stuks",days:packingTripDays(),note:""};
 }
 
 function packingDetailsFor(item){
-  return {...defaultPackingCalculation(item),...(packingDetails[item.id]||{})};
+  const saved=packingDetails[item.id]||{};
+  const details={...defaultPackingCalculation(item),...saved};
+  if(saved.unitAmount===undefined && (saved.dayQty!==undefined || saved.nightQty!==undefined)){
+    details.unitAmount=(Number(saved.dayQty)||0)+(Number(saved.nightQty)||0);
+    details.timesPerDay=1;
+  }
+  details.unit=["stuks","kg","gram"].includes(details.unit) ? details.unit : "stuks";
+  return details;
 }
 
 function packingCalculationResult(details){
-  const perDay=(Number(details.dayQty)||0)+(Number(details.nightQty)||0);
+  const unitAmount=Math.max(0,Number(details.unitAmount)||0);
+  const timesPerDay=Math.max(0,Number(details.timesPerDay)||0);
   const days=Math.max(0,Number(details.days)||0);
-  const total=perDay*days;
-  const packSize=Math.max(0,Number(details.packSize)||0);
-  const packs=packSize>0 && total>0 ? Math.ceil(total/packSize) : null;
-  return {total,packs};
+  const total=unitAmount*timesPerDay*days;
+  return {total,unit:details.unit||"stuks"};
+}
+
+function packingUnitLabel(unit,total){
+  if(unit==="kg") return "kg";
+  if(unit==="gram") return "gram";
+  return Number(total)===1 ? "stuk" : "stuks";
+}
+
+function packingResultText(calculation){
+  if(!(calculation.total>0)) return "Vul hoeveelheid en keren per dag in";
+  const amount=calculation.total.toLocaleString("nl-NL",{maximumFractionDigits:2});
+  return `${amount} ${packingUnitLabel(calculation.unit,calculation.total)} totaal`;
 }
 
 async function ensurePackingDetailsDatabase(){
@@ -9003,13 +9031,11 @@ function renderPacking(){
     const rows=items.map(item=>{
       const packed=item.status==="packed";
       const ready=item.status==="ready";
-      const metaParts=[packingOwnerName(item.owner), `aantal ${item.quantity||1}`].filter(Boolean);
+      const metaParts=[packingOwnerName(item.owner)].filter(Boolean);
       const itemIcon=packingItemIcon(item.name,item.category);
       const details=packingDetailsFor(item);
       const calculation=packingCalculationResult(details);
-      const resultText=calculation.total>0
-        ? `${calculation.total.toLocaleString("nl-NL")} totaal${calculation.packs ? ` · ${calculation.packs} pak${calculation.packs===1?"":"ken"}` : ""}`
-        : "Vul een aantal per dag in";
+      const resultText=packingResultText(calculation);
 
       return `<div class="pack-item ${packed?"packed":""}" data-pack-row="${esc(item.id)}">
         <button class="status-btn ${packed?"packed":ready?"ready":""}" data-cycle="${esc(item.id)}" title="Volgende status">${packed?"✓":ready?"•":"○"}</button>
@@ -9044,10 +9070,10 @@ function renderPacking(){
               <textarea data-pack-detail="note" data-pack-id="${esc(item.id)}" placeholder="Bijv. merk, maat of aandachtspunt">${esc(details.note||"")}</textarea>
             </label>
             <div class="pack-calc-grid">
-              <label>Overdag / per dag<input data-pack-detail="dayQty" data-pack-id="${esc(item.id)}" type="number" min="0" step="0.25" value="${esc(details.dayQty)}"></label>
-              <label>Extra per nacht<input data-pack-detail="nightQty" data-pack-id="${esc(item.id)}" type="number" min="0" step="0.25" value="${esc(details.nightQty)}"></label>
+              <label>Eenheid per keer<input data-pack-detail="unitAmount" data-pack-id="${esc(item.id)}" type="number" min="0" step="0.01" value="${esc(details.unitAmount)}"></label>
+              <label>Keren per dag<input data-pack-detail="timesPerDay" data-pack-id="${esc(item.id)}" type="number" min="0" step="0.25" value="${esc(details.timesPerDay)}"></label>
+              <label>Soort eenheid<select data-pack-detail="unit" data-pack-id="${esc(item.id)}"><option value="stuks" ${details.unit==="stuks"?"selected":""}>Aantal/stuks</option><option value="kg" ${details.unit==="kg"?"selected":""}>Kilogram (kg)</option><option value="gram" ${details.unit==="gram"?"selected":""}>Gram</option></select></label>
               <label>Aantal dagen<input data-pack-detail="days" data-pack-id="${esc(item.id)}" type="number" min="1" step="1" value="${esc(details.days)}"></label>
-              <label>Per verpakking<input data-pack-detail="packSize" data-pack-id="${esc(item.id)}" type="number" min="0" step="1" value="${esc(details.packSize)}" placeholder="optioneel"></label>
             </div>
             <div class="pack-calc-result" data-pack-result="${esc(item.id)}">${esc(resultText)}</div>
           </div>
@@ -9139,6 +9165,8 @@ packingListEl.addEventListener("click",async event=>{
 packingListEl.addEventListener("change",async event=>{
   const input=event.target.closest("[data-due]");
   if(input) await updatePackingDue(input.dataset.due,input.value);
+  const detail=event.target.closest('select[data-pack-detail]');
+  if(detail) detail.dispatchEvent(new Event("input",{bubbles:true}));
 });
 
 packingListEl.addEventListener("input",event=>{
@@ -9150,13 +9178,11 @@ packingListEl.addEventListener("input",event=>{
 
   const details=packingDetailsFor(item);
   const field=input.dataset.packDetail;
-  details[field]=field==="note" ? input.value : Math.max(0,Number(input.value)||0);
+  details[field]=(field==="note" || field==="unit") ? input.value : Math.max(0,Number(input.value)||0);
   packingDetails[id]=details;
 
   const calculation=packingCalculationResult(details);
-  const resultText=calculation.total>0
-    ? `${calculation.total} nodig${calculation.packs ? ` · ${calculation.packs} ${calculation.packs===1?"pak":"pakken"}` : ""}`
-    : "Vul aantallen in om te berekenen";
+  const resultText=packingResultText(calculation);
   const panel=input.closest(".pack-extra");
   const resultEl=panel?.querySelector("[data-pack-result]");
   const summaryResult=panel?.querySelector("summary span");
@@ -9256,7 +9282,10 @@ document.getElementById("addPackItem").onclick=async()=>{
   const name=document.getElementById("newPackName").value.trim();
   const category=canonicalPackingCategory(document.getElementById("newPackCategory").value.trim()||"Overig");
   const owner=document.getElementById("newPackOwner").value;
-  const quantity=Math.max(1,parseInt(document.getElementById("newPackQty").value,10)||1);
+  const quantity=1;
+  const unitAmount=Math.max(0,Number(document.getElementById("newPackUnitAmount").value)||0);
+  const timesPerDay=Math.max(0,Number(document.getElementById("newPackTimesPerDay").value)||0);
+  const unit=document.getElementById("newPackUnit").value;
   const due=document.getElementById("newPackDue").value||null;
   const msg=document.getElementById("packFormMsg");
 
@@ -9278,11 +9307,16 @@ document.getElementById("addPackItem").onclick=async()=>{
     return;
   }
 
+  await ensurePackingDetailsDatabase();
+  packingDetails[id]={unitAmount,timesPerDay,unit,days:packingTripDays(),note:""};
+  await persistPackingDetails();
   await rememberPackingItemIcon(name,category);
 
   msg.innerHTML='<div class="notice"><span class="ok">✓ Toegevoegd aan de paklijst met passend icoon.</span></div>';
   document.getElementById("newPackName").value="";
-  document.getElementById("newPackQty").value="1";
+  document.getElementById("newPackUnitAmount").value="";
+  document.getElementById("newPackTimesPerDay").value="";
+  document.getElementById("newPackUnit").value="stuks";
   document.getElementById("newPackDue").value="";
   await loadPacking();
 };
