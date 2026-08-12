@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="100">
+  <meta name="app-version" content="101">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6498,8 +6498,9 @@
             </label>
             <label>Voor wie?
               <select id="newPackOwner">
-                <option>Brigitte</option><option>Chloë</option><option>Sterre</option>
+                <option>Brigitte</option><option>Chloë</option><option>Sterre</option><option>Samen</option><option value="__custom_owner__">Zelf invullen</option>
               </select>
+              <input id="newPackCustomOwner" placeholder="Vul zelf een naam of groep in" hidden>
             </label>
             <label>Eenheid per keer
               <input id="newPackUnitAmount" type="number" min="0" step="0.01" placeholder="Bijv. 150">
@@ -6622,7 +6623,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v100</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v101</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6630,11 +6631,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=100" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=101" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v100</strong><br>
-          Bestaande meeneem-items worden via gewone keuze- en invoervelden gewijzigd, inclusief naam, categorie, persoon, aantal, eenheid en datum.
+          <strong>Wijzigingen in v101</strong><br>
+          Bij 'Voor wie?' kan nu ook Samen of Zelf invullen worden gekozen, voor zowel nieuwe als bestaande meeneem-items.
         </div>
       </div>
     </div>
@@ -6963,7 +6964,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||100;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||101;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -8606,7 +8607,7 @@ function statusLabel(status){
 
 function packingOwnerName(owner){
   const value=String(owner||"").trim();
-  return ["Brigitte","Chloë","Sterre"].includes(value) ? value : "Brigitte";
+  return value||"Brigitte";
 }
 
 function formatUpdated(iso){
@@ -9362,6 +9363,8 @@ function resetPackingForm(){
   document.getElementById("newPackName").value="";
   document.getElementById("newPackCategory").value="";
   document.getElementById("newPackOwner").value="Brigitte";
+  document.getElementById("newPackCustomOwner").value="";
+  document.getElementById("newPackCustomOwner").hidden=true;
   document.getElementById("newPackUnitAmount").value="";
   document.getElementById("newPackTimesPerDay").value="";
   document.getElementById("newPackUnit").value="";
@@ -9378,7 +9381,11 @@ async function editPackingItem(id){
   editingPackingId=id;
   document.getElementById("newPackName").value=item.name||"";
   document.getElementById("newPackCategory").value=item.category||"Overig";
-  document.getElementById("newPackOwner").value=packingOwnerName(item.owner)||"Brigitte";
+  const currentOwner=packingOwnerName(item.owner)||"Brigitte";
+  const standardOwners=["Brigitte","Chloë","Sterre","Samen"];
+  document.getElementById("newPackOwner").value=standardOwners.includes(currentOwner)?currentOwner:"__custom_owner__";
+  document.getElementById("newPackCustomOwner").value=standardOwners.includes(currentOwner)?"":currentOwner;
+  document.getElementById("newPackCustomOwner").hidden=standardOwners.includes(currentOwner);
   document.getElementById("newPackUnitAmount").value=first.unitAmount??"";
   document.getElementById("newPackTimesPerDay").value=first.timesPerDay??"";
   document.getElementById("newPackUnit").value=["stuks","kg","gram","euro"].includes(first.unit)?first.unit:"";
@@ -9406,7 +9413,8 @@ document.getElementById("addPackItem").onclick=async()=>{
 
   const name=document.getElementById("newPackName").value.trim();
   const category=canonicalPackingCategory(document.getElementById("newPackCategory").value.trim()||"Overig");
-  const owner=document.getElementById("newPackOwner").value;
+  const ownerChoice=document.getElementById("newPackOwner").value;
+  const owner=ownerChoice==="__custom_owner__" ? document.getElementById("newPackCustomOwner").value.trim() : ownerChoice;
   const quantity=1;
   const unitAmount=Math.max(0,Number(document.getElementById("newPackUnitAmount").value)||0);
   const timesPerDay=Math.max(0,Number(document.getElementById("newPackTimesPerDay").value)||0);
@@ -9416,6 +9424,10 @@ document.getElementById("addPackItem").onclick=async()=>{
 
   if(!name){
     msg.innerHTML='<div class="notice">Vul eerst in wat je wilt meenemen.</div>';
+    return;
+  }
+  if(!owner){
+    msg.innerHTML='<div class="notice">Vul bij “Voor wie?” een naam of groep in.</div>';
     return;
   }
 
@@ -9472,6 +9484,12 @@ document.getElementById("cancelPackEdit").onclick=()=>{
   resetPackingForm();
   document.getElementById("packFormMsg").innerHTML="";
 };
+
+document.getElementById("newPackOwner").addEventListener("change",event=>{
+  const custom=document.getElementById("newPackCustomOwner");
+  custom.hidden=event.target.value!=="__custom_owner__";
+  if(!custom.hidden) custom.focus();
+});
 
 ["packingSearch","packingOwner","packingStatus"].forEach(id=>{
   document.getElementById(id).addEventListener(id==="packingSearch"?"input":"change",renderPacking);
