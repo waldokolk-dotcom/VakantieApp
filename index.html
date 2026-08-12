@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="105">
+  <meta name="app-version" content="106">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6502,21 +6502,6 @@
               </select>
               <input id="newPackCustomOwner" placeholder="Vul zelf een naam of groep in" hidden>
             </label>
-            <label>Eenheid per keer
-              <input id="newPackUnitAmount" type="number" min="0" step="0.01" placeholder="Bijv. 150">
-            </label>
-            <label>Keren per dag
-              <input id="newPackTimesPerDay" type="number" min="0" step="0.25" placeholder="Bijv. 2">
-            </label>
-            <label>Soort eenheid
-              <select id="newPackUnit">
-                <option value="">Kies eenheid</option>
-                <option value="stuks">Aantal/stuks</option>
-                <option value="kg">Kilogram (kg)</option>
-                <option value="gram">Gram</option>
-                <option value="euro">Euro (€)</option>
-              </select>
-            </label>
             <label>Uiterlijk
               <input id="newPackDue" type="date">
             </label>
@@ -6623,7 +6608,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v105</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v106</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6631,11 +6616,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=105" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=106" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v105</strong><br>
-          De dubbele regel 'Bestemd voor' is ook uit het hoofditemoverzicht verwijderd en staat uitsluitend nog in de subitems.
+          <strong>Wijzigingen in v106</strong><br>
+          Aantal, keren per dag en soort eenheid zijn verwijderd uit het hoofdformulier en worden uitsluitend per subitem ingevuld.
         </div>
       </div>
     </div>
@@ -6964,7 +6949,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||105;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||106;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -9399,9 +9384,6 @@ function resetPackingForm(){
   document.getElementById("newPackOwner").value="Brigitte";
   document.getElementById("newPackCustomOwner").value="";
   document.getElementById("newPackCustomOwner").hidden=true;
-  document.getElementById("newPackUnitAmount").value="";
-  document.getElementById("newPackTimesPerDay").value="";
-  document.getElementById("newPackUnit").value="";
   document.getElementById("newPackDue").value="";
   document.getElementById("addPackItem").textContent="Toevoegen";
   document.getElementById("cancelPackEdit").hidden=true;
@@ -9410,8 +9392,6 @@ function resetPackingForm(){
 async function editPackingItem(id){
   const item=packingData.find(x=>x.id===id);
   if(!item) return;
-  const details=packingDetailsFor(item);
-  const first=details.subItems[0]||{};
   editingPackingId=id;
   document.getElementById("newPackName").value=item.name||"";
   document.getElementById("newPackCategory").value=item.category||"Overig";
@@ -9420,9 +9400,6 @@ async function editPackingItem(id){
   document.getElementById("newPackOwner").value=standardOwners.includes(currentOwner)?currentOwner:"__custom_owner__";
   document.getElementById("newPackCustomOwner").value=standardOwners.includes(currentOwner)?"":currentOwner;
   document.getElementById("newPackCustomOwner").hidden=standardOwners.includes(currentOwner);
-  document.getElementById("newPackUnitAmount").value=first.unitAmount??"";
-  document.getElementById("newPackTimesPerDay").value=first.timesPerDay??"";
-  document.getElementById("newPackUnit").value=["stuks","kg","gram","euro"].includes(first.unit)?first.unit:"";
   document.getElementById("newPackDue").value=item.due_date||"";
   document.getElementById("addPackItem").textContent="Wijzigingen opslaan";
   document.getElementById("cancelPackEdit").hidden=false;
@@ -9450,9 +9427,6 @@ document.getElementById("addPackItem").onclick=async()=>{
   const ownerChoice=document.getElementById("newPackOwner").value;
   const owner=ownerChoice==="__custom_owner__" ? document.getElementById("newPackCustomOwner").value.trim() : ownerChoice;
   const quantity=1;
-  const unitAmount=Math.max(0,Number(document.getElementById("newPackUnitAmount").value)||0);
-  const timesPerDay=Math.max(0,Number(document.getElementById("newPackTimesPerDay").value)||0);
-  const unit=document.getElementById("newPackUnit").value;
   const due=document.getElementById("newPackDue").value||null;
   const msg=document.getElementById("packFormMsg");
 
@@ -9469,18 +9443,6 @@ document.getElementById("addPackItem").onclick=async()=>{
     const id=editingPackingId;
     const item=packingData.find(entry=>entry.id===id);
     if(!item) return;
-    const finalUnit=["stuks","kg","gram","euro"].includes(unit)?unit:"";
-    const details=packingDetailsFor(item);
-    const first=details.subItems[0]||{};
-    details.subItems[0]={
-      ...first,
-      unitAmount:document.getElementById("newPackUnitAmount").value===""?"":unitAmount,
-      timesPerDay:document.getElementById("newPackTimesPerDay").value===""?"":timesPerDay,
-      unit:finalUnit
-    };
-    details.recipientsSeparated=true;
-    packingDetails[id]=details;
-    await persistPackingDetails();
     await savePackingPatch(id,{name,category,owner,due_date:due});
     await rememberPackingItemIcon(name,category);
     msg.innerHTML='<div class="notice"><span class="ok">✓ Meeneem-item gewijzigd.</span></div>';
@@ -9506,7 +9468,7 @@ document.getElementById("addPackItem").onclick=async()=>{
   packingDetails[id]={
     note:"",
     recipientsSeparated:true,
-    subItems:[{label:"",unitAmount,timesPerDay,unit,days:packingTripDays()}]
+    subItems:[{label:"",unitAmount:"",timesPerDay:"",unit:"",customUnit:"",days:packingTripDays(),autoDays:true}]
   };
   await persistPackingDetails();
   await rememberPackingItemIcon(name,category);
