@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="113">
+  <meta name="app-version" content="115">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=62">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=62">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=115">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=115">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -6570,8 +6570,9 @@
             </div>
             <div class="packing-voice">
               <input id="packingQuickInput" class="packing-quick-input" type="search" enterkeyhint="search" autocomplete="off" placeholder="Tik hier en gebruik 🎤 op het toetsenbord" aria-label="Spreek of typ wat is ingepakt">
+              <button id="packingVoiceStart" class="btn secondary" type="button">🎙️ Luister nu</button>
               <button id="packingQuickFind" class="btn" type="button">Zoek genoemde items</button>
-              <div id="packingVoiceResult" class="packing-voice-result" aria-live="polite">1. Tik in het witte vak. 2. Tik op 🎤 van het toetsenbord. 3. Noem meerdere spullen. 4. Tik op Zoek genoemde items.</div>
+              <div id="packingVoiceResult" class="packing-voice-result" aria-live="polite">Zeg bijvoorbeeld ‘autosleutels aantal twee, klaar’. Werkt Luister nu niet op je iPhone? Tik dan in het witte vak, gebruik 🎤 op het toetsenbord en tik op Zoek genoemde items.</div>
               <div id="packingVoiceChoices" class="packing-voice-choices"></div>
               <button id="packingQuickPackAll" class="btn packing-mode-packed" type="button" hidden>✓ Alles afvinken</button>
               <button id="packingQuickUndoAll" class="btn secondary" type="button" disabled>↶ Ongedaan maken</button>
@@ -6673,18 +6674,20 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v113</strong></div>
-          <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v115</strong></div>
+          <div class="technical-item"><small>Publicatiedatum</small><strong>16 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
         </div>
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=113" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=115" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v113</strong><br>
+          <strong>Wijzigingen in v115</strong><br>
+          Je kunt nu aantallen dicteren, bijvoorbeeld ‘autosleutels aantal twee, klaar’. Het totaal verschijnt direct bij het artikel. Met ‘correctie, aantal moet drie zijn’ wijzig je het laatst genoemde artikel; met ‘zet autosleutels terug’ maak je het afvinken ongedaan.<br><br>
+          <strong>Eerdere wijzigingen in v113</strong><br>
           De dicteerinvoer staat direct bovenaan, krijgt automatisch focus en heeft korte stappen. Ongedaan maken blijft zichtbaar en de pakmodus gebruikt een heldere achtergrond.<br><br>
           <strong>Eerdere wijzigingen in v112</strong><br>
           Gevonden items kunnen nu per stuk of met meerdere tegelijk ongedaan worden gemaakt. Open en al ingepakte treffers krijgen ieder hun passende actieknop.<br><br>
@@ -7029,7 +7032,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||113;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||115;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -9468,6 +9471,53 @@ let packingModeIndex=0;
 let packingRecognition=null;
 let packingQuickPendingIds=[];
 let packingQuickUndoIds=[];
+let packingQuickLastIds=[];
+let packingQuickQuantities=new Map();
+
+function packingSpokenNumber(value){
+  const raw=normalizePackingSearch(value).replace(/\s+/g," ").trim();
+  const numeric=raw.match(/\d+(?:[,.]\d+)?/);
+  if(numeric) return Math.max(0,Number(numeric[0].replace(",","."))||0);
+  const direct={nul:0,een:1,eén:1,twee:2,drie:3,vier:4,vijf:5,zes:6,zeven:7,acht:8,negen:9,tien:10,elf:11,twaalf:12,dertien:13,veertien:14,vijftien:15,zestien:16,zeventien:17,achttien:18,negentien:19,twintig:20,dertig:30,veertig:40,vijftig:50,zestig:60,zeventig:70,tachtig:80,negentig:90,honderd:100};
+  if(Object.prototype.hasOwnProperty.call(direct,raw)) return direct[raw];
+  const compact=raw.replace(/\s+/g,"");
+  const compound=compact.match(/^(een|eén|twee|drie|vier|vijf|zes|zeven|acht|negen)en(twintig|dertig|veertig|vijftig|zestig|zeventig|tachtig|negentig)$/);
+  if(compound) return direct[compound[1]]+direct[compound[2]];
+  return null;
+}
+
+function packingQuantityCommand(text){
+  const normalized=normalizePackingSearch(text);
+  const numberWords="(?:\\d+(?:[,.]\\d+)?|nul|een|eén|twee|drie|vier|vijf|zes|zeven|acht|negen|tien|elf|twaalf|dertien|veertien|vijftien|zestien|zeventien|achttien|negentien|twintig|dertig|veertig|vijftig|zestig|zeventig|tachtig|negentig|honderd|(?:een|eén|twee|drie|vier|vijf|zes|zeven|acht|negen)\\s*en\\s*(?:twintig|dertig|veertig|vijftig|zestig|zeventig|tachtig|negentig))";
+  const patterns=[
+    new RegExp(`\\b(?:aantal|hoeveelheid|totaal)\\s*(?:moet|wordt|is|naar)?\\s*(?:op)?\\s*(${numberWords})\\s*(?:zijn)?\\b`,"i"),
+    new RegExp(`\\b(${numberWords})\\s*(?:stuks?|exemplaren?)\\b`,"i"),
+    new RegExp(`^\\s*(${numberWords})\\s+`,"i")
+  ];
+  for(const pattern of patterns){
+    const match=normalized.match(pattern);
+    if(!match) continue;
+    const quantity=packingSpokenNumber(match[1]);
+    if(quantity===null) continue;
+    return {quantity,cleaned:normalized.replace(match[0]," ").replace(/\s+/g," ").trim()};
+  }
+  return {quantity:null,cleaned:normalized};
+}
+
+function packingCommandQuery(text){
+  return normalizePackingSearch(text)
+    .replace(/\b(stop|correctie|corrigeer|herstel|sorry|nee|toch|maar|en|dan|zet|maak|doe|haal|artikel|item|die|dat|deze|terug|ongedaan|niet|moet|wordt|is|zijn|op|naar|aantal|hoeveelheid|totaal|stuks?|exemplaren?|check|checken|gecheckt|gedaan|klaar|gepakt|ingepakt|afgevinkt|afvinken)\b/g," ")
+    .replace(/\b\d+(?:[,.]\d+)?\b/g," ")
+    .replace(/\s+/g," ").trim();
+}
+
+function setPackingSpokenTotal(item,quantity){
+  if(quantity===null || quantity===undefined) return;
+  const details=packingDetailsFor(item);
+  details.subItems=[{label:"",unitAmount:quantity,timesPerDay:"",unit:"stuks",customUnit:"",days:""}];
+  details.recipientsSeparated=false;
+  packingDetails[item.id]=details;
+}
 
 function packingModeBuildItems(){
   const owner=document.getElementById("packingOwner").value;
@@ -9564,7 +9614,7 @@ function startPackingVoice(){
   const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
   const result=document.getElementById("packingVoiceResult");
   if(!Recognition){
-    result.textContent="Spraakherkenning wordt niet ondersteund op dit toestel. De grote knoppen blijven wel werken.";
+    result.textContent="De knop Luister nu wordt op dit toestel niet ondersteund. Tik in het witte vak en gebruik de 🎤 van het telefoontoetsenbord; dat werkt wel met dezelfde opdrachten.";
     return;
   }
   packingRecognition?.abort?.();
@@ -9576,7 +9626,8 @@ function startPackingVoice(){
   document.getElementById("packingVoiceChoices").innerHTML="";
   packingRecognition.onresult=async event=>{
     const transcript=event.results[0][0].transcript.trim();
-    await showPackingVoiceChoices(packingVoiceMatches(transcript),transcript);
+    document.getElementById("packingQuickInput").value=transcript;
+    await findPackingQuick();
   };
   packingRecognition.onerror=()=>{ result.textContent="Ik kon je niet goed verstaan. Probeer het nog eens."; };
   packingRecognition.start();
@@ -9591,6 +9642,7 @@ async function findPackingQuick(){
   const undoAll=document.getElementById("packingQuickUndoAll");
   packingQuickPendingIds=[];
   packingQuickUndoIds=[];
+  packingQuickQuantities=new Map();
   choices.innerHTML="";
   packAll.hidden=true;
   undoAll.disabled=true;
@@ -9600,7 +9652,41 @@ async function findPackingQuick(){
     return;
   }
 
-  const normalizedSpoken=normalizePackingSearch(spoken);
+  const normalizedCommand=normalizePackingSearch(spoken);
+  const quantityCommand=packingQuantityCommand(spoken);
+  const isUndo=/\b(zet|maak|doe|haal)\b.*\b(terug|ongedaan)\b|\b(niet gepakt|toch niet|vinkje weg)\b/.test(normalizedCommand);
+  const isCorrection=/\b(correctie|corrigeer|herstel|sorry|nee)\b/.test(normalizedCommand) || (/\baantal\b/.test(normalizedCommand) && /\b(moet|wordt|naar)\b/.test(normalizedCommand));
+  const isComplete=/\b(check|checken|gecheckt|gedaan|klaar|gepakt|ingepakt|afgevinkt|afvinken)\b/.test(normalizedCommand);
+  const commandQuery=packingCommandQuery(quantityCommand.cleaned);
+
+  if(isUndo){
+    const matches=commandQuery ? packingVoiceMatches(commandQuery,true) : packingData.filter(item=>packingQuickLastIds.includes(String(item.id)) && item.status==="packed");
+    if(!matches.length){
+      result.textContent="Ik weet niet welk ingepakt artikel je wilt terugzetten. Noem bijvoorbeeld: zet autosleutels terug.";
+      return;
+    }
+    packingQuickLastIds=matches.map(item=>String(item.id));
+    await updateQuickMatches(packingQuickLastIds,"todo");
+    input.value="";
+    return;
+  }
+
+  if(isCorrection && quantityCommand.quantity!==null){
+    const matches=commandQuery ? [...packingVoiceMatches(commandQuery,false),...packingVoiceMatches(commandQuery,true)] : packingData.filter(item=>packingQuickLastIds.includes(String(item.id)));
+    const unique=[...new Map(matches.map(item=>[String(item.id),item])).values()];
+    if(!unique.length){
+      result.textContent="Ik weet niet bij welk artikel dit aantal hoort. Zeg bijvoorbeeld: correctie autosleutels aantal twee.";
+      return;
+    }
+    const quantities=new Map(unique.map(item=>[String(item.id),quantityCommand.quantity]));
+    packingQuickLastIds=unique.map(item=>String(item.id));
+    const saved=await updateQuickMatches(packingQuickLastIds,null,quantities);
+    if(saved) result.textContent=`✓ Correctie opgeslagen: ${unique.map(item=>item.name).join(", ")} — totaal ${quantityCommand.quantity}.`;
+    input.value="";
+    return;
+  }
+
+  const normalizedSpoken=normalizePackingSearch(quantityCommand.cleaned);
   const foundOpen=new Map();
   const foundPacked=new Map();
   packingData.forEach(item=>{
@@ -9610,8 +9696,10 @@ async function findPackingQuick(){
     }
   });
   spoken.split(/[,;.]+|\s+en\s+|\s+plus\s+|\s+ook\s+/i).map(part=>part.trim()).filter(Boolean).forEach(part=>{
-    packingVoiceMatches(part,false).forEach(item=>foundOpen.set(String(item.id),item));
-    packingVoiceMatches(part,true).forEach(item=>foundPacked.set(String(item.id),item));
+    const clause=packingQuantityCommand(part);
+    const query=packingCommandQuery(clause.cleaned)||clause.cleaned;
+    packingVoiceMatches(query,false).forEach(item=>{ foundOpen.set(String(item.id),item); if(clause.quantity!==null) packingQuickQuantities.set(String(item.id),clause.quantity); });
+    packingVoiceMatches(query,true).forEach(item=>{ foundPacked.set(String(item.id),item); if(clause.quantity!==null) packingQuickQuantities.set(String(item.id),clause.quantity); });
   });
   if(!foundOpen.size && !foundPacked.size){
     packingVoiceMatches(spoken,false).forEach(item=>foundOpen.set(String(item.id),item));
@@ -9626,9 +9714,17 @@ async function findPackingQuick(){
   }
   packingQuickPendingIds=openMatches.map(item=>String(item.id));
   packingQuickUndoIds=packedMatches.map(item=>String(item.id));
+  packingQuickLastIds=[...packingQuickPendingIds,...packingQuickUndoIds];
+
+  if(isComplete && openMatches.length){
+    const saved=await updateQuickMatches(packingQuickPendingIds,"packed",packingQuickQuantities);
+    if(saved) result.textContent=`✓ ${openMatches.map(item=>item.name).join(", ")} ${openMatches.length===1?"is":"zijn"} ingepakt${packingQuickQuantities.size?"; het genoemde aantal is opgeslagen":""}.`;
+    input.value="";
+    return;
+  }
   result.textContent=`${openMatches.length+packedMatches.length} ${(openMatches.length+packedMatches.length)===1?"item gevonden":"items gevonden"}. Tik op één item of gebruik een knop voor meerdere tegelijk.`;
   choices.innerHTML=[
-    ...openMatches.map(item=>`<button class="btn secondary" type="button" data-quick-item-id="${esc(item.id)}" data-quick-status="packed">✓ ${esc(item.name)} afvinken</button>`),
+    ...openMatches.map(item=>`<button class="btn secondary" type="button" data-quick-item-id="${esc(item.id)}" data-quick-status="packed"${packingQuickQuantities.has(String(item.id))?` data-quick-quantity="${packingQuickQuantities.get(String(item.id))}"`:""}>✓ ${esc(item.name)} afvinken${packingQuickQuantities.has(String(item.id))?` · aantal ${packingQuickQuantities.get(String(item.id))}`:""}</button>`),
     ...packedMatches.map(item=>`<button class="btn secondary" type="button" data-quick-item-id="${esc(item.id)}" data-quick-status="todo">↶ ${esc(item.name)} ongedaan</button>`)
   ].join("");
   packAll.hidden=!openMatches.length;
@@ -9636,19 +9732,33 @@ async function findPackingQuick(){
   input.value="";
 }
 
-async function updateQuickMatches(ids,status){
+async function updateQuickMatches(ids,status,quantities=new Map()){
   if(!ids.length) return;
   const result=document.getElementById("packingVoiceResult");
   const selected=packingData.filter(item=>ids.includes(String(item.id)));
   const previous=selected.map(item=>({item,status:item.status,updated_at:item.updated_at,updated_by:item.updated_by}));
-  const patch={status,updated_at:new Date().toISOString(),updated_by:actorName()};
+  const patch=status ? {status,updated_at:new Date().toISOString(),updated_by:actorName()} : null;
   try{
     await ensureSupabaseReady();
-    selected.forEach(item=>Object.assign(item,patch));
+    selected.forEach(item=>{
+      if(patch) Object.assign(item,patch);
+      if(quantities.has(String(item.id))) setPackingSpokenTotal(item,quantities.get(String(item.id)));
+    });
     renderPacking();
-    const {error}=await client.from("packing").update(patch).in("id",selected.map(item=>item.id));
-    if(error) throw error;
-    result.textContent=status==="packed" ? `✓ ${selected.length} ${selected.length===1?"item is":"items zijn"} afgevinkt.` : `↶ ${selected.length} ${selected.length===1?"item is":"items zijn"} teruggezet naar Nog doen.`;
+    if(patch){
+      const {error}=await client.from("packing").update(patch).in("id",selected.map(item=>item.id));
+      if(error) throw error;
+    }
+    if(quantities.size){
+      try{
+        await persistPackingDetails();
+      }catch(error){
+        result.textContent="De status is opgeslagen, maar het aantal nog niet. Probeer de aantalsopdracht nog één keer.";
+        console.error(error);
+        return false;
+      }
+    }
+    result.textContent=status==="packed" ? `✓ ${selected.length} ${selected.length===1?"item is":"items zijn"} afgevinkt.` : status==="todo" ? `↶ ${selected.length} ${selected.length===1?"item is":"items zijn"} teruggezet naar Nog doen.` : `✓ Aantal opgeslagen.`;
     packingQuickPendingIds=[];
     packingQuickUndoIds=[];
     document.getElementById("packingVoiceChoices").innerHTML="";
@@ -9656,19 +9766,23 @@ async function updateQuickMatches(ids,status){
     document.getElementById("packingQuickUndoAll").disabled=true;
     packingModeBuildItems();
     renderPackingMode();
+    return true;
   }catch(error){
     previous.forEach(old=>Object.assign(old.item,{status:old.status,updated_at:old.updated_at,updated_by:old.updated_by}));
     renderPacking();
     result.textContent="Opslaan lukte niet. Probeer het nog een keer.";
+    return false;
   }
 }
 
 async function packAllQuickMatches(){
-  await updateQuickMatches([...packingQuickPendingIds],"packed");
+  packingQuickLastIds=[...packingQuickPendingIds];
+  await updateQuickMatches(packingQuickLastIds,"packed",packingQuickQuantities);
 }
 
 async function undoAllQuickMatches(){
-  await updateQuickMatches([...packingQuickUndoIds],"todo");
+  packingQuickLastIds=[...packingQuickUndoIds];
+  await updateQuickMatches(packingQuickLastIds,"todo");
 }
 
 async function cyclePacking(id){
@@ -9851,6 +9965,7 @@ document.getElementById("packingModePrevious").onclick=()=>{
   renderPackingMode();
 };
 document.getElementById("packingQuickFind").onclick=findPackingQuick;
+document.getElementById("packingVoiceStart").onclick=startPackingVoice;
 document.getElementById("packingQuickPackAll").onclick=packAllQuickMatches;
 document.getElementById("packingQuickUndoAll").onclick=undoAllQuickMatches;
 document.getElementById("packingQuickInput").addEventListener("keydown",event=>{
@@ -9862,7 +9977,10 @@ document.getElementById("packingQuickInput").addEventListener("keydown",event=>{
 document.getElementById("packingVoiceChoices").onclick=async event=>{
   const quickButton=event.target.closest("[data-quick-item-id]");
   if(quickButton){
-    await updateQuickMatches([String(quickButton.dataset.quickItemId)],quickButton.dataset.quickStatus);
+    const quantities=new Map();
+    if(quickButton.dataset.quickQuantity!==undefined) quantities.set(String(quickButton.dataset.quickItemId),Number(quickButton.dataset.quickQuantity));
+    packingQuickLastIds=[String(quickButton.dataset.quickItemId)];
+    await updateQuickMatches(packingQuickLastIds,quickButton.dataset.quickStatus,quantities);
     return;
   }
   const button=event.target.closest("[data-voice-pack-id]");
