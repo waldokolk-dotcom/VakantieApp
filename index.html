@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="109">
+  <meta name="app-version" content="112">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -107,9 +107,11 @@
     .packing-mode-actions .btn{min-height:62px;font-size:1.05rem}
     .packing-mode-actions .packing-mode-packed{grid-column:1/-1;background:var(--green);font-size:1.2rem}
     .packing-voice{background:white;border-radius:20px;padding:14px;text-align:center}
+    .packing-quick-input{width:100%;min-height:58px;border:2px solid #b9cdbf;border-radius:15px;padding:12px 14px;font-size:1rem;margin-bottom:10px}
     .packing-voice-result{min-height:1.5em;margin-top:8px;font-weight:750}
     .packing-voice-choices{display:grid;gap:8px;margin-top:10px}
     .packing-voice-choices .btn{width:100%}
+    .packed-badge{display:inline-flex;margin-left:8px;padding:3px 8px;border-radius:999px;background:#176d4b;color:#fff;font-size:.75rem;font-weight:900;text-decoration:none;vertical-align:middle}
     .btn{
       border:0;border-radius:14px;padding:12px 16px;background:var(--green);color:white;font-weight:800;cursor:pointer;
     }
@@ -6572,9 +6574,12 @@
               <button id="packingModePacked" class="btn packing-mode-packed" type="button">✓ Ingepakt</button>
             </div>
             <div class="packing-voice">
-              <button id="packingVoiceButton" class="btn" type="button">🎙 Druk en zeg wat ingepakt is</button>
-              <div id="packingVoiceResult" class="packing-voice-result" aria-live="polite">Zeg bijvoorbeeld: “sokken ingepakt”. Bij één duidelijke treffer wordt het direct afgevinkt.</div>
+              <input id="packingQuickInput" class="packing-quick-input" type="search" enterkeyhint="search" autocomplete="off" placeholder="Tik hier en gebruik 🎤 op het toetsenbord" aria-label="Spreek of typ wat is ingepakt">
+              <button id="packingQuickFind" class="btn" type="button">Zoek genoemde items</button>
+              <div id="packingVoiceResult" class="packing-voice-result" aria-live="polite">Tik in het vak, start één keer de microfoon van het telefoontoetsenbord en noem meerdere spullen, bijvoorbeeld: “sokken, onderbroeken en paspoorten”.</div>
               <div id="packingVoiceChoices" class="packing-voice-choices"></div>
+              <button id="packingQuickPackAll" class="btn packing-mode-packed" type="button" hidden>✓ Alles afvinken</button>
+              <button id="packingQuickUndoAll" class="btn secondary" type="button" hidden>↶ Ongedaan maken</button>
             </div>
           </div>
         </div>
@@ -6667,7 +6672,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v109</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v112</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6675,10 +6680,16 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=109" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=112" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v109</strong><br>
+          <strong>Wijzigingen in v112</strong><br>
+          Gevonden items kunnen nu per stuk of met meerdere tegelijk ongedaan worden gemaakt. Open en al ingepakte treffers krijgen ieder hun passende actieknop.<br><br>
+          <strong>Eerdere wijzigingen in v111</strong><br>
+          Eén dicteersessie kan meerdere paklijstitems tegelijk vinden. De gevonden items worden samen getoond en kunnen met één knop allemaal worden afgevinkt.<br><br>
+          <strong>Eerdere wijzigingen in v110</strong><br>
+          De paklijst laadt op telefoon alleen geopende categorieën. Snel afvinken gebruikt de betrouwbare dicteerfunctie van het telefoontoetsenbord, gevolgd door één duidelijke itemknop.<br><br>
+          <strong>Eerdere wijzigingen in v109</strong><br>
           Nieuwe mobiele pakmodus met één groot item tegelijk, grote knoppen voor ingepakt en overslaan, voortgang en optionele spraakbediening. Bij meerdere treffers vraagt de app welk item bedoeld wordt.<br><br>
           <strong>Eerdere wijzigingen in v108</strong><br>
           De paklijstzoekfunctie filtert direct op item, categorie, verantwoordelijke, ontvanger en opmerkingen. De knop Wissen maakt de zoekopdracht en beide filters in één keer leeg.<br><br>
@@ -6938,6 +6949,9 @@ const euro = cents => ((Number(cents)||0)/100).toLocaleString("nl-NL",{style:"cu
 const esc = s => String(s ?? "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 
 function showView(id){
+  const packingModeEl=document.getElementById("packingMode");
+  if(packingModeEl && !packingModeEl.hidden) closePackingMode();
+  else document.body.style.overflow="";
   document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
   document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
   document.getElementById(id).classList.add("active");
@@ -7012,7 +7026,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||109;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||112;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -8693,6 +8707,7 @@ let packingDetailsDbRowId=null;
 let packingDetails={};
 let packingDetailsLoadedTrip=null;
 let packingDetailsSaveTimer=null;
+let packingMobileCollapsedOnce=false;
 
 function packingTripDays(){
   const meta=tripMeta();
@@ -9146,6 +9161,10 @@ function renderPacking(){
   document.getElementById("packPacked").textContent=packingData.filter(x=>x.status==="packed").length;
 
   const categories=packingCategoryNames();
+  if(window.matchMedia("(max-width: 620px)").matches && !packingMobileCollapsedOnce && !q && !owner && !status){
+    categories.forEach(category=>localStorage.setItem("vakantie_pack_collapsed_"+category,"1"));
+    packingMobileCollapsedOnce=true;
+  }
   document.getElementById("packingCategories").innerHTML=categories.map(c=>`<option value="${esc(c)}"></option>`).join("");
   updatePackingExpandButton();
 
@@ -9162,8 +9181,12 @@ function renderPacking(){
     const allInCategory=packingData.filter(x=>canonicalPackingCategory(x.category)===cat);
     const packedCount=allInCategory.filter(x=>x.status==="packed").length;
     const visual=packingCategoryVisual(cat);
+    const collapseKey="vakantie_pack_collapsed_"+cat;
+    const savedCollapse=localStorage.getItem(collapseKey);
+    const filterActive=Boolean(q||owner||status);
+    const collapsed=filterActive ? false : (savedCollapse===null ? window.matchMedia("(max-width: 620px)").matches : savedCollapse==="1");
 
-    const rows=items.map(item=>{
+    const rows=collapsed ? "" : items.map(item=>{
       const packed=item.status==="packed";
       const ready=item.status==="ready";
       const metaParts=[packingOwnerName(item.owner)].filter(Boolean);
@@ -9195,7 +9218,7 @@ function renderPacking(){
         <span class="pack-item-icon" aria-hidden="true" title="${esc(item.name)}">${itemIcon}</span>
 
         <div class="pack-main">
-          <div class="pack-name">${esc(item.name)}${isAutomaticChecklistItem(item)?'<span class="auto-pack-badge" title="Automatisch toegevoegd op basis van officiële reisregels">Automatisch toegevoegd</span>':""}</div>
+          <div class="pack-name">${esc(item.name)}${isAutomaticChecklistItem(item)?'<span class="auto-pack-badge" title="Automatisch toegevoegd op basis van officiële reisregels">Automatisch toegevoegd</span>':""}${packed?'<span class="packed-badge">✓ Ingepakt</span>':""}</div>
           <div class="pack-meta">Regelt: ${metaParts.map(esc).join(" · ")}</div>
           <div class="pack-item-total" data-pack-main-result="${esc(item.id)}">${esc(resultText)}</div>
           <div class="pack-updated">↻ Laatst aangepast door ${esc(item.updated_by||"onbekend")}${item.updated_at ? " · "+esc(formatUpdated(item.updated_at)) : ""}</div>
@@ -9230,9 +9253,6 @@ function renderPacking(){
       </div>`;
     }).join("");
 
-    const collapseKey="vakantie_pack_collapsed_"+cat;
-    const collapsed=localStorage.getItem(collapseKey)==="1";
-
     return `<div class="pack-group ${collapsed?"collapsed":""}"
       data-category="${esc(cat)}"
       style="--cat-accent:${visual.accent};--cat-tint:${visual.tint};--cat-border:${visual.border};--cat-ink:${visual.ink}">
@@ -9261,20 +9281,13 @@ function renderPacking(){
       event.stopPropagation();
       const cat=toggle.dataset.toggleCategory;
       const group=toggle.closest(".pack-group");
-      const isCollapsed=group.classList.toggle("collapsed");
+      const isCollapsed=!group.classList.contains("collapsed");
 
       localStorage.setItem(
         "vakantie_pack_collapsed_"+cat,
         isCollapsed ? "1" : "0"
       );
-
-      toggle.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
-      toggle.setAttribute(
-        "aria-label",
-        isCollapsed ? "Categorie uitklappen" : "Categorie inklappen"
-      );
-
-      updatePackingExpandButton();
+      renderPacking();
     };
   });
 
@@ -9450,6 +9463,8 @@ async function setPackingStatus(id,status){
 let packingModeItems=[];
 let packingModeIndex=0;
 let packingRecognition=null;
+let packingQuickPendingIds=[];
+let packingQuickUndoIds=[];
 
 function packingModeBuildItems(){
   const owner=document.getElementById("packingOwner").value;
@@ -9505,13 +9520,13 @@ async function packCurrentModeItem(){
   }
 }
 
-function packingVoiceMatches(transcript){
+function packingVoiceMatches(transcript,packedOnly=false){
   const query=normalizePackingSearch(transcript)
-    .replace(/\b(is|zijn|staat|staan|heb|hebben|al|nu|klaar|ingepakt|afgevinkt|afvinken)\b/g," ")
+    .replace(/\b(is|zijn|staat|staan|heb|hebben|al|nu|klaar|ingepakt|afgevinkt|afvinken|check|checken|gecheckt|gedaan|af|gepakt|mee|erin|ingeladen)\b/g," ")
     .replace(/\s+/g," ").trim();
   if(!query) return [];
   const words=query.split(" ").filter(word=>word.length>1);
-  return packingData.filter(item=>item.status!=="packed").map(item=>{
+  return packingData.filter(item=>packedOnly ? item.status==="packed" : item.status!=="packed").map(item=>{
     const text=packingSearchText(item);
     const exact=text.includes(query);
     const score=words.filter(word=>text.includes(word)).length;
@@ -9561,6 +9576,95 @@ function startPackingVoice(){
   };
   packingRecognition.onerror=()=>{ result.textContent="Ik kon je niet goed verstaan. Probeer het nog eens."; };
   packingRecognition.start();
+}
+
+async function findPackingQuick(){
+  const input=document.getElementById("packingQuickInput");
+  const spoken=input.value.trim();
+  const result=document.getElementById("packingVoiceResult");
+  const choices=document.getElementById("packingVoiceChoices");
+  const packAll=document.getElementById("packingQuickPackAll");
+  const undoAll=document.getElementById("packingQuickUndoAll");
+  packingQuickPendingIds=[];
+  packingQuickUndoIds=[];
+  choices.innerHTML="";
+  packAll.hidden=true;
+  undoAll.hidden=true;
+  if(!spoken){
+    result.textContent="Spreek of typ eerst één of meer namen.";
+    input.focus();
+    return;
+  }
+
+  const normalizedSpoken=normalizePackingSearch(spoken);
+  const foundOpen=new Map();
+  const foundPacked=new Map();
+  packingData.forEach(item=>{
+    const name=normalizePackingSearch(item.name);
+    if(name.length>=3 && normalizedSpoken.includes(name)){
+      (item.status==="packed"?foundPacked:foundOpen).set(String(item.id),item);
+    }
+  });
+  spoken.split(/[,;.]+|\s+en\s+|\s+plus\s+|\s+ook\s+/i).map(part=>part.trim()).filter(Boolean).forEach(part=>{
+    packingVoiceMatches(part,false).forEach(item=>foundOpen.set(String(item.id),item));
+    packingVoiceMatches(part,true).forEach(item=>foundPacked.set(String(item.id),item));
+  });
+  if(!foundOpen.size && !foundPacked.size){
+    packingVoiceMatches(spoken,false).forEach(item=>foundOpen.set(String(item.id),item));
+    packingVoiceMatches(spoken,true).forEach(item=>foundPacked.set(String(item.id),item));
+  }
+
+  const openMatches=[...foundOpen.values()];
+  const packedMatches=[...foundPacked.values()];
+  if(!openMatches.length && !packedMatches.length){
+    result.textContent=`Geen open items gevonden voor “${spoken}”. Probeer de namen iets korter uit te spreken.`;
+    return;
+  }
+  packingQuickPendingIds=openMatches.map(item=>String(item.id));
+  packingQuickUndoIds=packedMatches.map(item=>String(item.id));
+  result.textContent=`${openMatches.length+packedMatches.length} ${(openMatches.length+packedMatches.length)===1?"item gevonden":"items gevonden"}. Tik op één item of gebruik een knop voor meerdere tegelijk.`;
+  choices.innerHTML=[
+    ...openMatches.map(item=>`<button class="btn secondary" type="button" data-quick-item-id="${esc(item.id)}" data-quick-status="packed">✓ ${esc(item.name)} afvinken</button>`),
+    ...packedMatches.map(item=>`<button class="btn secondary" type="button" data-quick-item-id="${esc(item.id)}" data-quick-status="todo">↶ ${esc(item.name)} ongedaan</button>`)
+  ].join("");
+  packAll.hidden=!openMatches.length;
+  undoAll.hidden=!packedMatches.length;
+  input.value="";
+}
+
+async function updateQuickMatches(ids,status){
+  if(!ids.length) return;
+  const result=document.getElementById("packingVoiceResult");
+  const selected=packingData.filter(item=>ids.includes(String(item.id)));
+  const previous=selected.map(item=>({item,status:item.status,updated_at:item.updated_at,updated_by:item.updated_by}));
+  const patch={status,updated_at:new Date().toISOString(),updated_by:actorName()};
+  try{
+    await ensureSupabaseReady();
+    selected.forEach(item=>Object.assign(item,patch));
+    renderPacking();
+    const {error}=await client.from("packing").update(patch).in("id",selected.map(item=>item.id));
+    if(error) throw error;
+    result.textContent=status==="packed" ? `✓ ${selected.length} ${selected.length===1?"item is":"items zijn"} afgevinkt.` : `↶ ${selected.length} ${selected.length===1?"item is":"items zijn"} teruggezet naar Nog doen.`;
+    packingQuickPendingIds=[];
+    packingQuickUndoIds=[];
+    document.getElementById("packingVoiceChoices").innerHTML="";
+    document.getElementById("packingQuickPackAll").hidden=true;
+    document.getElementById("packingQuickUndoAll").hidden=true;
+    packingModeBuildItems();
+    renderPackingMode();
+  }catch(error){
+    previous.forEach(old=>Object.assign(old.item,{status:old.status,updated_at:old.updated_at,updated_by:old.updated_by}));
+    renderPacking();
+    result.textContent="Opslaan lukte niet. Probeer het nog een keer.";
+  }
+}
+
+async function packAllQuickMatches(){
+  await updateQuickMatches([...packingQuickPendingIds],"packed");
+}
+
+async function undoAllQuickMatches(){
+  await updateQuickMatches([...packingQuickUndoIds],"todo");
 }
 
 async function cyclePacking(id){
@@ -9742,8 +9846,21 @@ document.getElementById("packingModePrevious").onclick=()=>{
   packingModeIndex=(packingModeIndex-1+packingModeItems.length)%packingModeItems.length;
   renderPackingMode();
 };
-document.getElementById("packingVoiceButton").onclick=startPackingVoice;
+document.getElementById("packingQuickFind").onclick=findPackingQuick;
+document.getElementById("packingQuickPackAll").onclick=packAllQuickMatches;
+document.getElementById("packingQuickUndoAll").onclick=undoAllQuickMatches;
+document.getElementById("packingQuickInput").addEventListener("keydown",event=>{
+  if(event.key==="Enter"){
+    event.preventDefault();
+    findPackingQuick();
+  }
+});
 document.getElementById("packingVoiceChoices").onclick=async event=>{
+  const quickButton=event.target.closest("[data-quick-item-id]");
+  if(quickButton){
+    await updateQuickMatches([String(quickButton.dataset.quickItemId)],quickButton.dataset.quickStatus);
+    return;
+  }
   const button=event.target.closest("[data-voice-pack-id]");
   if(!button) return;
   const item=packingData.find(entry=>String(entry.id)===String(button.dataset.voicePackId));
