@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="115">
+  <meta name="app-version" content="116">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=115">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=115">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=116">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=116">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -6674,7 +6674,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v115</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v116</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>16 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6682,10 +6682,12 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=115" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=116" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v115</strong><br>
+          <strong>Wijzigingen in v116</strong><br>
+          Luister nu kan op een iPhone niet meer blijven hangen: de knop opent daar veilig het invoervak voor de iOS-toetsenbordmicrofoon. Op andere toestellen stopt rechtstreeks luisteren automatisch na tien seconden.<br><br>
+          <strong>Eerdere wijzigingen in v115</strong><br>
           Je kunt nu aantallen dicteren, bijvoorbeeld ‘autosleutels aantal twee, klaar’. Het totaal verschijnt direct bij het artikel. Met ‘correctie, aantal moet drie zijn’ wijzig je het laatst genoemde artikel; met ‘zet autosleutels terug’ maak je het afvinken ongedaan.<br><br>
           <strong>Eerdere wijzigingen in v113</strong><br>
           De dicteerinvoer staat direct bovenaan, krijgt automatisch focus en heeft korte stappen. Ongedaan maken blijft zichtbaar en de pakmodus gebruikt een heldere achtergrond.<br><br>
@@ -7032,7 +7034,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||115;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||116;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -9469,6 +9471,7 @@ async function setPackingStatus(id,status){
 let packingModeItems=[];
 let packingModeIndex=0;
 let packingRecognition=null;
+let packingRecognitionTimer=null;
 let packingQuickPendingIds=[];
 let packingQuickUndoIds=[];
 let packingQuickLastIds=[];
@@ -9559,7 +9562,10 @@ function openPackingMode(){
 }
 
 function closePackingMode(){
+  clearTimeout(packingRecognitionTimer);
+  packingRecognitionTimer=null;
   packingRecognition?.abort?.();
+  packingRecognition=null;
   document.getElementById("packingMode").hidden=true;
   document.body.style.overflow="";
 }
@@ -9613,24 +9619,65 @@ async function showPackingVoiceChoices(matches,transcript){
 function startPackingVoice(){
   const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
   const result=document.getElementById("packingVoiceResult");
-  if(!Recognition){
-    result.textContent="De knop Luister nu wordt op dit toestel niet ondersteund. Tik in het witte vak en gebruik de 🎤 van het telefoontoetsenbord; dat werkt wel met dezelfde opdrachten.";
+  const input=document.getElementById("packingQuickInput");
+  const button=document.getElementById("packingVoiceStart");
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+
+  // Safari op iPhone kan Web Speech openen zonder ooit een resultaat of einde
+  // terug te geven. Gebruik daar bewust de betrouwbare dicteerknop van iOS.
+  if(isIOS){
+    input.focus();
+    result.textContent="Tik nu op de 🎤 van je iPhone-toetsenbord, spreek de opdracht uit en tik daarna op Zoek genoemde items.";
     return;
   }
+  if(!Recognition){
+    input.focus();
+    result.textContent="Tik nu op de 🎤 van je telefoontoetsenbord, spreek de opdracht uit en tik daarna op Zoek genoemde items.";
+    return;
+  }
+  clearTimeout(packingRecognitionTimer);
   packingRecognition?.abort?.();
   packingRecognition=new Recognition();
   packingRecognition.lang="nl-NL";
   packingRecognition.interimResults=false;
   packingRecognition.maxAlternatives=1;
+  button.disabled=true;
+  button.textContent="🎙️ Luistert…";
   result.textContent="Ik luister…";
   document.getElementById("packingVoiceChoices").innerHTML="";
   packingRecognition.onresult=async event=>{
+    clearTimeout(packingRecognitionTimer);
     const transcript=event.results[0][0].transcript.trim();
-    document.getElementById("packingQuickInput").value=transcript;
+    input.value=transcript;
     await findPackingQuick();
   };
-  packingRecognition.onerror=()=>{ result.textContent="Ik kon je niet goed verstaan. Probeer het nog eens."; };
-  packingRecognition.start();
+  packingRecognition.onerror=event=>{
+    clearTimeout(packingRecognitionTimer);
+    result.textContent=event.error==="not-allowed" ? "De microfoon is niet toegestaan. Gebruik de 🎤 van het telefoontoetsenbord." : "Ik kon je niet goed verstaan. Probeer het nog eens of gebruik de 🎤 van het toetsenbord.";
+  };
+  packingRecognition.onend=()=>{
+    clearTimeout(packingRecognitionTimer);
+    packingRecognitionTimer=null;
+    packingRecognition=null;
+    button.disabled=false;
+    button.textContent="🎙️ Luister nu";
+    if(result.textContent==="Ik luister…") result.textContent="Ik hoorde niets. Probeer opnieuw of gebruik de 🎤 van het telefoontoetsenbord.";
+  };
+  try{
+    packingRecognition.start();
+    packingRecognitionTimer=setTimeout(()=>{
+      packingRecognition?.abort?.();
+      packingRecognition=null;
+      button.disabled=false;
+      button.textContent="🎙️ Luister nu";
+      result.textContent="Luisteren is gestopt om vastlopen te voorkomen. Gebruik eventueel de 🎤 van het telefoontoetsenbord.";
+    },10000);
+  }catch(error){
+    button.disabled=false;
+    button.textContent="🎙️ Luister nu";
+    input.focus();
+    result.textContent="Rechtstreeks luisteren lukte niet. Gebruik de 🎤 van het telefoontoetsenbord.";
+  }
 }
 
 async function findPackingQuick(){
