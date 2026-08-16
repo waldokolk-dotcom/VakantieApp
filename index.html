@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="116">
+  <meta name="app-version" content="117">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=116">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=116">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=117">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=117">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -112,6 +112,10 @@
     .packing-voice-choices{display:grid;gap:8px;margin-top:10px}
     .packing-voice-choices .btn{width:100%}
     .packing-voice .btn:disabled{opacity:.48;cursor:not-allowed}
+    .packing-phone-voice-steps{margin:0 0 12px;padding:13px 14px;border-radius:15px;background:#edf5ee;border:1px solid #c7d9ca;text-align:left}
+    .packing-phone-voice-steps strong{display:block;margin-bottom:7px;color:var(--green)}
+    .packing-phone-voice-steps ol{margin:0 0 7px;padding-left:22px;font-weight:750;line-height:1.55}
+    .packing-phone-voice-steps small{display:block;color:var(--muted);line-height:1.35}
     .packed-badge{display:inline-flex;margin-left:8px;padding:3px 8px;border-radius:999px;background:#176d4b;color:#fff;font-size:.75rem;font-weight:900;text-decoration:none;vertical-align:middle}
     .btn{
       border:0;border-radius:14px;padding:12px 16px;background:var(--green);color:white;font-weight:800;cursor:pointer;
@@ -6569,7 +6573,12 @@
               <button id="closePackingMode" class="btn secondary" type="button">Sluiten</button>
             </div>
             <div class="packing-voice">
-              <input id="packingQuickInput" class="packing-quick-input" type="search" enterkeyhint="search" autocomplete="off" placeholder="Tik hier en gebruik 🎤 op het toetsenbord" aria-label="Spreek of typ wat is ingepakt">
+              <div id="packingPhoneVoiceSteps" class="packing-phone-voice-steps" hidden>
+                <strong>Zo werkt spraak op de iPhone</strong>
+                <ol><li>Open het iPhone-toetsenbord.</li><li>Tik rechtsonder op de microfoon 🎤 en spreek.</li><li>Tik op ‘Verwerk uitgesproken tekst’.</li></ol>
+                <small>Geen microfoon zichtbaar? Ga naar Instellingen → Algemeen → Toetsenbord en zet ‘Schakel dicteerfunctie in’ aan.</small>
+              </div>
+              <input id="packingQuickInput" class="packing-quick-input" type="text" enterkeyhint="search" autocomplete="off" placeholder="Hier verschijnt wat je uitspreekt" aria-label="Spreek of typ wat is ingepakt">
               <button id="packingVoiceStart" class="btn secondary" type="button">🎙️ Luister nu</button>
               <button id="packingQuickFind" class="btn" type="button">Zoek genoemde items</button>
               <div id="packingVoiceResult" class="packing-voice-result" aria-live="polite">Zeg bijvoorbeeld ‘autosleutels aantal twee, klaar’. Werkt Luister nu niet op je iPhone? Tik dan in het witte vak, gebruik 🎤 op het toetsenbord en tik op Zoek genoemde items.</div>
@@ -6674,7 +6683,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v116</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v117</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>16 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6682,10 +6691,12 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=116" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=117" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v116</strong><br>
+          <strong>Wijzigingen in v117</strong><br>
+          De iPhone toont nu drie duidelijke stappen voor Apple Dicteren, inclusief hulp wanneer de microfoonknop ontbreekt. De knoppen heten op de telefoon voortaan ‘Open iPhone-toetsenbord’ en ‘Verwerk uitgesproken tekst’.<br><br>
+          <strong>Eerdere wijzigingen in v116</strong><br>
           Luister nu kan op een iPhone niet meer blijven hangen: de knop opent daar veilig het invoervak voor de iOS-toetsenbordmicrofoon. Op andere toestellen stopt rechtstreeks luisteren automatisch na tien seconden.<br><br>
           <strong>Eerdere wijzigingen in v115</strong><br>
           Je kunt nu aantallen dicteren, bijvoorbeeld ‘autosleutels aantal twee, klaar’. Het totaal verschijnt direct bij het artikel. Met ‘correctie, aantal moet drie zijn’ wijzig je het laatst genoemde artikel; met ‘zet autosleutels terug’ maak je het afvinken ongedaan.<br><br>
@@ -7034,7 +7045,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||116;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||117;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -9522,6 +9533,18 @@ function setPackingSpokenTotal(item,quantity){
   packingDetails[item.id]=details;
 }
 
+function packingIsIOS(){
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+}
+
+function configurePackingVoiceUI(){
+  if(!packingIsIOS()) return;
+  document.getElementById("packingPhoneVoiceSteps").hidden=false;
+  document.getElementById("packingVoiceStart").textContent="1. Open iPhone-toetsenbord";
+  document.getElementById("packingQuickFind").textContent="3. Verwerk uitgesproken tekst";
+  document.getElementById("packingVoiceResult").textContent="Op de iPhone loopt spraak via de microfoon rechtsonder op het Apple-toetsenbord.";
+}
+
 function packingModeBuildItems(){
   const owner=document.getElementById("packingOwner").value;
   packingModeItems=packingData.filter(item=>item.status!=="packed" && (!owner || packingOwnerName(item.owner)===owner));
@@ -9621,7 +9644,7 @@ function startPackingVoice(){
   const result=document.getElementById("packingVoiceResult");
   const input=document.getElementById("packingQuickInput");
   const button=document.getElementById("packingVoiceStart");
-  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+  const isIOS=packingIsIOS();
 
   // Safari op iPhone kan Web Speech openen zonder ooit een resultaat of einde
   // terug te geven. Gebruik daar bewust de betrouwbare dicteerknop van iOS.
@@ -10013,6 +10036,7 @@ document.getElementById("packingModePrevious").onclick=()=>{
 };
 document.getElementById("packingQuickFind").onclick=findPackingQuick;
 document.getElementById("packingVoiceStart").onclick=startPackingVoice;
+configurePackingVoiceUI();
 document.getElementById("packingQuickPackAll").onclick=packAllQuickMatches;
 document.getElementById("packingQuickUndoAll").onclick=undoAllQuickMatches;
 document.getElementById("packingQuickInput").addEventListener("keydown",event=>{
