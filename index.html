@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="112">
+  <meta name="app-version" content="113">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -95,7 +95,7 @@
     .packing-search-wrap input{min-width:0;width:100%}
     .packing-mode-launch{background:#d7a94b;color:#183f31}
     .packing-mode[hidden]{display:none}
-    .packing-mode{position:fixed;inset:0;z-index:2500;background:linear-gradient(160deg,#f7f1df,#dfece4);padding:max(18px,env(safe-area-inset-top)) 18px max(18px,env(safe-area-inset-bottom));overflow:auto}
+    .packing-mode{position:fixed;inset:0;z-index:2500;background:#fffdf7;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));overflow:auto}
     .packing-mode-inner{width:min(620px,100%);min-height:100%;margin:auto;display:flex;flex-direction:column;gap:16px}
     .packing-mode-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
     .packing-mode-progress{font-weight:800;color:var(--green)}
@@ -111,6 +111,7 @@
     .packing-voice-result{min-height:1.5em;margin-top:8px;font-weight:750}
     .packing-voice-choices{display:grid;gap:8px;margin-top:10px}
     .packing-voice-choices .btn{width:100%}
+    .packing-voice .btn:disabled{opacity:.48;cursor:not-allowed}
     .packed-badge{display:inline-flex;margin-left:8px;padding:3px 8px;border-radius:999px;background:#176d4b;color:#fff;font-size:.75rem;font-weight:900;text-decoration:none;vertical-align:middle}
     .btn{
       border:0;border-radius:14px;padding:12px 16px;background:var(--green);color:white;font-weight:800;cursor:pointer;
@@ -6564,22 +6565,22 @@
         <div id="packingMode" class="packing-mode" hidden aria-modal="true" role="dialog" aria-labelledby="packingModeTitle">
           <div class="packing-mode-inner">
             <div class="packing-mode-head">
-              <div><strong id="packingModeTitle">Pakmodus</strong><div id="packingModeProgress" class="packing-mode-progress"></div></div>
+              <div><strong id="packingModeTitle">Snel items verwerken</strong><div id="packingModeProgress" class="packing-mode-progress"></div></div>
               <button id="closePackingMode" class="btn secondary" type="button">Sluiten</button>
+            </div>
+            <div class="packing-voice">
+              <input id="packingQuickInput" class="packing-quick-input" type="search" enterkeyhint="search" autocomplete="off" placeholder="Tik hier en gebruik 🎤 op het toetsenbord" aria-label="Spreek of typ wat is ingepakt">
+              <button id="packingQuickFind" class="btn" type="button">Zoek genoemde items</button>
+              <div id="packingVoiceResult" class="packing-voice-result" aria-live="polite">1. Tik in het witte vak. 2. Tik op 🎤 van het toetsenbord. 3. Noem meerdere spullen. 4. Tik op Zoek genoemde items.</div>
+              <div id="packingVoiceChoices" class="packing-voice-choices"></div>
+              <button id="packingQuickPackAll" class="btn packing-mode-packed" type="button" hidden>✓ Alles afvinken</button>
+              <button id="packingQuickUndoAll" class="btn secondary" type="button" disabled>↶ Ongedaan maken</button>
             </div>
             <div id="packingModeCard" class="packing-mode-card"></div>
             <div class="packing-mode-actions">
               <button id="packingModePrevious" class="btn secondary" type="button">← Vorige</button>
               <button id="packingModeSkip" class="btn secondary" type="button">Overslaan →</button>
               <button id="packingModePacked" class="btn packing-mode-packed" type="button">✓ Ingepakt</button>
-            </div>
-            <div class="packing-voice">
-              <input id="packingQuickInput" class="packing-quick-input" type="search" enterkeyhint="search" autocomplete="off" placeholder="Tik hier en gebruik 🎤 op het toetsenbord" aria-label="Spreek of typ wat is ingepakt">
-              <button id="packingQuickFind" class="btn" type="button">Zoek genoemde items</button>
-              <div id="packingVoiceResult" class="packing-voice-result" aria-live="polite">Tik in het vak, start één keer de microfoon van het telefoontoetsenbord en noem meerdere spullen, bijvoorbeeld: “sokken, onderbroeken en paspoorten”.</div>
-              <div id="packingVoiceChoices" class="packing-voice-choices"></div>
-              <button id="packingQuickPackAll" class="btn packing-mode-packed" type="button" hidden>✓ Alles afvinken</button>
-              <button id="packingQuickUndoAll" class="btn secondary" type="button" hidden>↶ Ongedaan maken</button>
             </div>
           </div>
         </div>
@@ -6672,7 +6673,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v112</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v113</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6680,10 +6681,12 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=112" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=113" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v112</strong><br>
+          <strong>Wijzigingen in v113</strong><br>
+          De dicteerinvoer staat direct bovenaan, krijgt automatisch focus en heeft korte stappen. Ongedaan maken blijft zichtbaar en de pakmodus gebruikt een heldere achtergrond.<br><br>
+          <strong>Eerdere wijzigingen in v112</strong><br>
           Gevonden items kunnen nu per stuk of met meerdere tegelijk ongedaan worden gemaakt. Open en al ingepakte treffers krijgen ieder hun passende actieknop.<br><br>
           <strong>Eerdere wijzigingen in v111</strong><br>
           Eén dicteersessie kan meerdere paklijstitems tegelijk vinden. De gevonden items worden samen getoond en kunnen met één knop allemaal worden afgevinkt.<br><br>
@@ -7026,7 +7029,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||112;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||113;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -9502,6 +9505,7 @@ function openPackingMode(){
   if(mode.parentElement!==document.body) document.body.appendChild(mode);
   mode.hidden=false;
   document.body.style.overflow="hidden";
+  setTimeout(()=>document.getElementById("packingQuickInput")?.focus(),80);
 }
 
 function closePackingMode(){
@@ -9589,7 +9593,7 @@ async function findPackingQuick(){
   packingQuickUndoIds=[];
   choices.innerHTML="";
   packAll.hidden=true;
-  undoAll.hidden=true;
+  undoAll.disabled=true;
   if(!spoken){
     result.textContent="Spreek of typ eerst één of meer namen.";
     input.focus();
@@ -9628,7 +9632,7 @@ async function findPackingQuick(){
     ...packedMatches.map(item=>`<button class="btn secondary" type="button" data-quick-item-id="${esc(item.id)}" data-quick-status="todo">↶ ${esc(item.name)} ongedaan</button>`)
   ].join("");
   packAll.hidden=!openMatches.length;
-  undoAll.hidden=!packedMatches.length;
+  undoAll.disabled=!packedMatches.length;
   input.value="";
 }
 
@@ -9649,7 +9653,7 @@ async function updateQuickMatches(ids,status){
     packingQuickUndoIds=[];
     document.getElementById("packingVoiceChoices").innerHTML="";
     document.getElementById("packingQuickPackAll").hidden=true;
-    document.getElementById("packingQuickUndoAll").hidden=true;
+    document.getElementById("packingQuickUndoAll").disabled=true;
     packingModeBuildItems();
     renderPackingMode();
   }catch(error){
