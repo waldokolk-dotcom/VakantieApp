@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="107">
+  <meta name="app-version" content="109">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -91,6 +91,25 @@
       border:1px solid #d7d0be;border-radius:14px;padding:12px 13px;background:white;color:var(--ink);
     }
     .toolbar input{flex:1;min-width:190px}
+    .packing-search-wrap{display:flex;flex:1 1 320px;gap:8px;min-width:260px}
+    .packing-search-wrap input{min-width:0;width:100%}
+    .packing-mode-launch{background:#d7a94b;color:#183f31}
+    .packing-mode[hidden]{display:none}
+    .packing-mode{position:fixed;inset:0;z-index:2500;background:linear-gradient(160deg,#f7f1df,#dfece4);padding:max(18px,env(safe-area-inset-top)) 18px max(18px,env(safe-area-inset-bottom));overflow:auto}
+    .packing-mode-inner{width:min(620px,100%);min-height:100%;margin:auto;display:flex;flex-direction:column;gap:16px}
+    .packing-mode-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .packing-mode-progress{font-weight:800;color:var(--green)}
+    .packing-mode-card{flex:1;min-height:310px;background:white;border-radius:28px;padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:0 18px 50px rgba(18,67,48,.16)}
+    .packing-mode-icon{font-size:4rem;line-height:1}
+    .packing-mode-card h3{font-size:clamp(1.8rem,7vw,3rem);margin:18px 0 8px}
+    .packing-mode-meta{font-size:1.05rem;color:#47685c}
+    .packing-mode-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .packing-mode-actions .btn{min-height:62px;font-size:1.05rem}
+    .packing-mode-actions .packing-mode-packed{grid-column:1/-1;background:var(--green);font-size:1.2rem}
+    .packing-voice{background:white;border-radius:20px;padding:14px;text-align:center}
+    .packing-voice-result{min-height:1.5em;margin-top:8px;font-weight:750}
+    .packing-voice-choices{display:grid;gap:8px;margin-top:10px}
+    .packing-voice-choices .btn{width:100%}
     .btn{
       border:0;border-radius:14px;padding:12px 16px;background:var(--green);color:white;font-weight:800;cursor:pointer;
     }
@@ -5137,6 +5156,16 @@
         width:100% !important;
         min-width:0 !important;
       }
+      #meenemen .packing-search-wrap{
+        grid-column:1/-1 !important;
+        display:grid !important;
+        grid-template-columns:minmax(0,1fr) auto !important;
+        gap:8px !important;
+        min-width:0 !important;
+      }
+      #meenemen .packing-search-wrap input{
+        grid-column:auto !important;
+      }
       #meenemen .toolbar select,
       #meenemen .toolbar .btn{
         width:100% !important;
@@ -6519,11 +6548,35 @@
         </div>
 
         <div class="toolbar">
-          <input id="packingSearch" placeholder="Zoeken in paklijst…">
+          <div class="packing-search-wrap" role="search">
+            <input id="packingSearch" type="search" placeholder="Zoeken in paklijst…" aria-label="Zoeken in paklijst" autocomplete="off">
+            <button id="clearPackingSearch" class="btn secondary" type="button">Wissen</button>
+          </div>
           <select id="packingOwner"><option value="">Iedereen</option><option>Brigitte</option><option>Waldo</option><option>Chloë</option><option>Sterre</option><option>Samen</option></select>
           <select id="packingStatus"><option value="">Alle statussen</option><option value="todo">Nog doen</option><option value="ready">Klaar</option><option value="packed">Ingepakt</option></select>
           <button id="toggleAllPacking" class="btn secondary" type="button">▾ Alles uitvouwen</button>
           <button id="refreshPacking" class="btn secondary">Vernieuwen</button>
+          <button id="startPackingMode" class="btn packing-mode-launch" type="button">📦 Start pakmodus</button>
+        </div>
+
+        <div id="packingMode" class="packing-mode" hidden aria-modal="true" role="dialog" aria-labelledby="packingModeTitle">
+          <div class="packing-mode-inner">
+            <div class="packing-mode-head">
+              <div><strong id="packingModeTitle">Pakmodus</strong><div id="packingModeProgress" class="packing-mode-progress"></div></div>
+              <button id="closePackingMode" class="btn secondary" type="button">Sluiten</button>
+            </div>
+            <div id="packingModeCard" class="packing-mode-card"></div>
+            <div class="packing-mode-actions">
+              <button id="packingModePrevious" class="btn secondary" type="button">← Vorige</button>
+              <button id="packingModeSkip" class="btn secondary" type="button">Overslaan →</button>
+              <button id="packingModePacked" class="btn packing-mode-packed" type="button">✓ Ingepakt</button>
+            </div>
+            <div class="packing-voice">
+              <button id="packingVoiceButton" class="btn" type="button">🎙 Druk en zeg wat ingepakt is</button>
+              <div id="packingVoiceResult" class="packing-voice-result" aria-live="polite">Zeg bijvoorbeeld: “sokken ingepakt”. Bij één duidelijke treffer wordt het direct afgevinkt.</div>
+              <div id="packingVoiceChoices" class="packing-voice-choices"></div>
+            </div>
+          </div>
         </div>
 
         <div class="kpis" style="margin-bottom:14px">
@@ -6614,7 +6667,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v107</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v109</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>11 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6622,10 +6675,14 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=107" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=109" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v107</strong><br>
+          <strong>Wijzigingen in v109</strong><br>
+          Nieuwe mobiele pakmodus met één groot item tegelijk, grote knoppen voor ingepakt en overslaan, voortgang en optionele spraakbediening. Bij meerdere treffers vraagt de app welk item bedoeld wordt.<br><br>
+          <strong>Eerdere wijzigingen in v108</strong><br>
+          De paklijstzoekfunctie filtert direct op item, categorie, verantwoordelijke, ontvanger en opmerkingen. De knop Wissen maakt de zoekopdracht en beide filters in één keer leeg.<br><br>
+          <strong>Eerdere wijzigingen in v107</strong><br>
           Het hoofdformulier bevat een namenmenu 'Voor wie is het item?'; deze keuze wordt opgeslagen in het eerste subitem bij nieuwe en bestaande items.
         </div>
       </div>
@@ -6955,7 +7012,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||107;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||109;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -9052,13 +9109,34 @@ function toggleAllPackingCategories(){
   renderPacking();
 }
 
+function normalizePackingSearch(value){
+  return String(value||"")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .toLowerCase()
+    .trim();
+}
+
+function packingSearchText(item){
+  const details=packingDetailsFor(item);
+  return normalizePackingSearch([
+    item.name,
+    canonicalPackingCategory(item.category),
+    packingOwnerName(item.owner),
+    item.status,
+    item.due_date,
+    details.note,
+    ...(details.subItems||[]).flatMap(sub=>[sub.label,sub.customUnit])
+  ].filter(Boolean).join(" "));
+}
+
 function renderPacking(){
-  const q=document.getElementById("packingSearch").value.trim().toLowerCase();
+  const q=normalizePackingSearch(document.getElementById("packingSearch").value);
   const owner=document.getElementById("packingOwner").value;
   const status=document.getElementById("packingStatus").value;
 
   const filtered=packingData.filter(x=>
-    (!q || (x.name||"").toLowerCase().includes(q) || canonicalPackingCategory(x.category).toLowerCase().includes(q)) &&
+    (!q || packingSearchText(x).includes(q)) &&
     (!owner || packingOwnerName(x.owner)===owner) &&
     (!status || x.status===status)
   );
@@ -9369,6 +9447,122 @@ async function setPackingStatus(id,status){
   await savePackingPatch(id,{status});
 }
 
+let packingModeItems=[];
+let packingModeIndex=0;
+let packingRecognition=null;
+
+function packingModeBuildItems(){
+  const owner=document.getElementById("packingOwner").value;
+  packingModeItems=packingData.filter(item=>item.status!=="packed" && (!owner || packingOwnerName(item.owner)===owner));
+  packingModeIndex=Math.min(packingModeIndex,Math.max(0,packingModeItems.length-1));
+}
+
+function packingModeCurrent(){
+  return packingModeItems[packingModeIndex]||null;
+}
+
+function renderPackingMode(){
+  const card=document.getElementById("packingModeCard");
+  const progress=document.getElementById("packingModeProgress");
+  const item=packingModeCurrent();
+  const packed=packingData.filter(entry=>entry.status==="packed").length;
+  progress.textContent=`${packed} van ${packingData.length} ingepakt`;
+  if(!item){
+    card.innerHTML='<div class="packing-mode-icon">🎉</div><h3>Alles is ingepakt</h3><div class="packing-mode-meta">De paklijst is helemaal klaar.</div>';
+    document.getElementById("packingModePacked").disabled=true;
+    document.getElementById("packingModeSkip").disabled=true;
+    return;
+  }
+  document.getElementById("packingModePacked").disabled=false;
+  document.getElementById("packingModeSkip").disabled=packingModeItems.length<2;
+  const visual=packingCategoryVisual(canonicalPackingCategory(item.category));
+  card.innerHTML=`<div class="packing-mode-icon">${packingItemIcon(item.name,item.category)||visual.icon}</div><h3>${esc(item.name)}</h3><div class="packing-mode-meta">${esc(canonicalPackingCategory(item.category))} · Regelt: ${esc(packingOwnerName(item.owner))}</div>`;
+}
+
+function openPackingMode(){
+  packingModeIndex=0;
+  packingModeBuildItems();
+  renderPackingMode();
+  const mode=document.getElementById("packingMode");
+  if(mode.parentElement!==document.body) document.body.appendChild(mode);
+  mode.hidden=false;
+  document.body.style.overflow="hidden";
+}
+
+function closePackingMode(){
+  packingRecognition?.abort?.();
+  document.getElementById("packingMode").hidden=true;
+  document.body.style.overflow="";
+}
+
+async function packCurrentModeItem(){
+  const item=packingModeCurrent();
+  if(!item) return;
+  if(await savePackingPatch(item.id,{status:"packed"})){
+    packingModeItems.splice(packingModeIndex,1);
+    if(packingModeIndex>=packingModeItems.length) packingModeIndex=0;
+    renderPackingMode();
+  }
+}
+
+function packingVoiceMatches(transcript){
+  const query=normalizePackingSearch(transcript)
+    .replace(/\b(is|zijn|staat|staan|heb|hebben|al|nu|klaar|ingepakt|afgevinkt|afvinken)\b/g," ")
+    .replace(/\s+/g," ").trim();
+  if(!query) return [];
+  const words=query.split(" ").filter(word=>word.length>1);
+  return packingData.filter(item=>item.status!=="packed").map(item=>{
+    const text=packingSearchText(item);
+    const exact=text.includes(query);
+    const score=words.filter(word=>text.includes(word)).length;
+    return {item,score:exact?score+10:score};
+  }).filter(match=>match.score>0).sort((a,b)=>b.score-a.score).filter((match,index,all)=>index<5 && match.score===all[0].score).map(match=>match.item);
+}
+
+async function showPackingVoiceChoices(matches,transcript){
+  const result=document.getElementById("packingVoiceResult");
+  const choices=document.getElementById("packingVoiceChoices");
+  choices.innerHTML="";
+  if(!matches.length){
+    result.textContent=`Geen open item gevonden voor “${transcript}”. Probeer alleen de naam van het item.`;
+    return;
+  }
+  if(matches.length===1){
+    const item=matches[0];
+    result.textContent=`“${item.name}” wordt afgevinkt…`;
+    if(await savePackingPatch(item.id,{status:"packed"})){
+      result.textContent=`✓ ${item.name} staat op ingepakt.`;
+      packingModeBuildItems();
+      renderPackingMode();
+    }
+  }else{
+    result.textContent="Ik vond meerdere mogelijkheden. Welke bedoel je?";
+    choices.innerHTML=matches.map(item=>`<button class="btn secondary" type="button" data-voice-pack-id="${esc(item.id)}">${esc(item.name)}</button>`).join("");
+  }
+}
+
+function startPackingVoice(){
+  const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const result=document.getElementById("packingVoiceResult");
+  if(!Recognition){
+    result.textContent="Spraakherkenning wordt niet ondersteund op dit toestel. De grote knoppen blijven wel werken.";
+    return;
+  }
+  packingRecognition?.abort?.();
+  packingRecognition=new Recognition();
+  packingRecognition.lang="nl-NL";
+  packingRecognition.interimResults=false;
+  packingRecognition.maxAlternatives=1;
+  result.textContent="Ik luister…";
+  document.getElementById("packingVoiceChoices").innerHTML="";
+  packingRecognition.onresult=async event=>{
+    const transcript=event.results[0][0].transcript.trim();
+    await showPackingVoiceChoices(packingVoiceMatches(transcript),transcript);
+  };
+  packingRecognition.onerror=()=>{ result.textContent="Ik kon je niet goed verstaan. Probeer het nog eens."; };
+  packingRecognition.start();
+}
+
 async function cyclePacking(id){
   const item=packingData.find(x=>x.id===id);
   if(!item) return;
@@ -9523,8 +9717,44 @@ document.getElementById("newPackRecipient").addEventListener("change",event=>{
 });
 
 ["packingSearch","packingOwner","packingStatus"].forEach(id=>{
-  document.getElementById(id).addEventListener(id==="packingSearch"?"input":"change",renderPacking);
+  const control=document.getElementById(id);
+  const eventName=id==="packingSearch"?"input":"change";
+  control.addEventListener(eventName,renderPacking);
+  if(id==="packingSearch") control.addEventListener("search",renderPacking);
 });
+document.getElementById("clearPackingSearch").onclick=()=>{
+  document.getElementById("packingSearch").value="";
+  document.getElementById("packingOwner").value="";
+  document.getElementById("packingStatus").value="";
+  renderPacking();
+  document.getElementById("packingSearch").focus();
+};
+document.getElementById("startPackingMode").onclick=openPackingMode;
+document.getElementById("closePackingMode").onclick=closePackingMode;
+document.getElementById("packingModePacked").onclick=packCurrentModeItem;
+document.getElementById("packingModeSkip").onclick=()=>{
+  if(packingModeItems.length<2) return;
+  packingModeIndex=(packingModeIndex+1)%packingModeItems.length;
+  renderPackingMode();
+};
+document.getElementById("packingModePrevious").onclick=()=>{
+  if(!packingModeItems.length) return;
+  packingModeIndex=(packingModeIndex-1+packingModeItems.length)%packingModeItems.length;
+  renderPackingMode();
+};
+document.getElementById("packingVoiceButton").onclick=startPackingVoice;
+document.getElementById("packingVoiceChoices").onclick=async event=>{
+  const button=event.target.closest("[data-voice-pack-id]");
+  if(!button) return;
+  const item=packingData.find(entry=>String(entry.id)===String(button.dataset.voicePackId));
+  if(!item) return;
+  if(await savePackingPatch(item.id,{status:"packed"})){
+    document.getElementById("packingVoiceResult").textContent=`✓ ${item.name} staat op ingepakt.`;
+    document.getElementById("packingVoiceChoices").innerHTML="";
+    packingModeBuildItems();
+    renderPackingMode();
+  }
+};
 document.getElementById("refreshPacking").onclick=loadPacking;
 
 function updateSavedCostCategoryOptions(){
