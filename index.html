@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="119">
+  <meta name="app-version" content="120">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=119">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=119">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=120">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=120">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -4905,6 +4905,25 @@
     .mobile-app-nav,
     .mobile-more-sheet{display:none}
 
+    /* Middelgrote schermen: de header mag nooit de pagina breder maken. */
+    @media (min-width:621px) and (max-width:1450px){
+      .legacy-header{
+        grid-template-columns:230px minmax(0,1fr) 96px !important;
+        gap:12px !important;
+      }
+      .legacy-brand-text{font-size:28px !important}
+      .legacy-nav{
+        min-width:0;
+        justify-content:flex-start !important;
+        overflow-x:auto !important;
+        overflow-y:hidden;
+        gap:12px !important;
+        scrollbar-width:thin;
+      }
+      .legacy-nav button{flex:0 0 auto}
+      .legacy-user{min-width:96px !important;padding:12px !important}
+    }
+
     @media(max-width:620px){
       html,body{
         width:100%;
@@ -6687,7 +6706,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v119</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v120</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>16 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6695,10 +6714,10 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=119" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=120" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v119</strong><br>
+          <strong>Wijzigingen in v120</strong><br>
           Gratis spraakbediening zonder externe spraakserver. Op laptop luistert de app rechtstreeks. Op iPhone opent de knop meteen Apple Dicteren; zodra de gesproken tekst verschijnt, verwerkt de app die automatisch zonder een extra verwerkknop.<br><br>
           <strong>Eerdere wijzigingen in v117</strong><br>
           De iPhone toont nu drie duidelijke stappen voor Apple Dicteren, inclusief hulp wanneer de microfoonknop ontbreekt. De knoppen heten op de telefoon voortaan ‘Open iPhone-toetsenbord’ en ‘Verwerk uitgesproken tekst’.<br><br>
@@ -7051,7 +7070,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||119;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||120;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7063,7 +7082,7 @@ async function checkTechnicalVersion(){
 document.getElementById("technicalCheckVersion")?.addEventListener("click",checkTechnicalVersion);
 document.getElementById("technicalReload")?.addEventListener("click",()=>{
   const url=new URL(location.href);
-  url.searchParams.set("v","119");
+  url.searchParams.set("v","120");
   url.searchParams.set("refresh",Date.now());
   location.replace(url.toString());
 });
