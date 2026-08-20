@@ -6,7 +6,7 @@
 - `node tests/voice-smoke.test.js`: 4 parsergevallen, voice-markup en syntax: OK.
 - Live browsercontrole op `https://waldokolk-dotcom.github.io/VakantieApp/?v=119`: pakmodus opent, grote spraakknop is zichtbaar, reserve-invoer is standaard ingeklapt en microfoonweigering opent automatisch toetsenborddicteren.
 - Live browserconsole: geen applicatiefouten; alleen meldingen van een browserextensie.
-- Geen audio wordt naar een server gestuurd of opgeslagen.
+- De app heeft geen audio-endpoint en slaat geen audio op; bij browser-native herkenning bepaalt de browser zelf welke herkenningsdienst wordt gebruikt.
 
 ## Bibliotheek-checklist
 
