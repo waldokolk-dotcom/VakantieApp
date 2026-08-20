@@ -9546,6 +9546,17 @@ function packingIsIOS(){
   return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
 }
 
+function armPackingKeyboardFallback(message){
+  packingDictationArmed=true;
+  const details=document.getElementById("packingManualFallback");
+  const input=document.getElementById("packingQuickInput");
+  const result=document.getElementById("packingVoiceResult");
+  if(details) details.open=true;
+  if(result) result.textContent=message||"Gebruik de microfoon van het toetsenbord. De app verwerkt de tekst daarna vanzelf.";
+  input?.focus({preventScroll:false});
+  input?.scrollIntoView({block:"center",behavior:"auto"});
+}
+
 function resetPackingRecordingUI(){
   const button=document.getElementById("packingVoiceStart");
   button.disabled=false;
@@ -9660,21 +9671,13 @@ async function startPackingVoice(){
   const button=document.getElementById("packingVoiceStart");
   const input=document.getElementById("packingQuickInput");
   if(packingIsIOS()){
-    packingDictationArmed=true;
     input.value="";
-    document.getElementById("packingManualFallback").open=true;
-    result.textContent="Tik nu op 🎤 in het iPhone-toetsenbord en spreek. De app verwerkt de tekst daarna vanzelf.";
-    input.focus({preventScroll:false});
-    input.scrollIntoView({block:"center",behavior:"auto"});
+    armPackingKeyboardFallback("Tik nu op 🎤 in het iPhone-toetsenbord en spreek. De app verwerkt de tekst daarna vanzelf.");
     return;
   }
   const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SpeechRecognition){
-    packingDictationArmed=true;
-    document.getElementById("packingManualFallback").open=true;
-    result.textContent="Gebruik de microfoon van het toetsenbord. De app verwerkt de tekst daarna vanzelf.";
-    input.focus({preventScroll:false});
-    input.scrollIntoView({block:"center",behavior:"auto"});
+    armPackingKeyboardFallback();
     return;
   }
   if(packingRecognition){
@@ -9692,7 +9695,10 @@ async function startPackingVoice(){
       result.textContent=input.value ? `Ik hoor: “${input.value}”` : "Ik luister…";
     };
     packingRecognition.onerror=event=>{
-      result.textContent=event.error==="not-allowed" ? "Geef de browser toestemming voor de microfoon en probeer opnieuw." : "Ik kon je niet verstaan. Tik opnieuw op Spreek.";
+      const message=event.error==="not-allowed"
+        ? "Microfoon geblokkeerd. Gebruik nu de 🎤 van het toetsenbord; de app verwerkt je tekst vanzelf."
+        : "Ik kon je niet verstaan. Gebruik de 🎤 van het toetsenbord of tik opnieuw op Spreek.";
+      armPackingKeyboardFallback(message);
     };
     packingRecognition.onend=async()=>{
       clearTimeout(packingRecognitionTimer);
@@ -9710,7 +9716,7 @@ async function startPackingVoice(){
   }catch(error){
     packingRecognition=null;
     resetPackingRecordingUI();
-    result.textContent="De microfoon kon niet starten. Gebruik ‘Typen als reserve’.";
+    armPackingKeyboardFallback("De microfoon kon niet starten. Gebruik nu de 🎤 van het toetsenbord; de app verwerkt je tekst vanzelf.");
   }
 }
 
