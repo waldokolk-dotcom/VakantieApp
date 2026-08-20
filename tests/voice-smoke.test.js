@@ -10,7 +10,7 @@ const vm = require("node:vm");
 
 const html = fs.readFileSync(require("node:path").join(__dirname, "..", "index.html"), "utf8");
 
-assert.match(html, /<meta name="app-version" content="120">/);
+assert.match(html, /<meta name="app-version" content="124">/);
 for (const id of ["packingVoiceStart", "packingVoiceResult", "packingQuickInput", "packingQuickFind", "packingManualFallback"]) {
   assert.match(html, new RegExp(`id=["']${id}["']`), `ontbrekend spraak-element: ${id}`);
 }

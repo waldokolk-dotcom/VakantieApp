@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="123">
+<meta name="app-version" content="124">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=123">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=123">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=124">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=124">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -4335,7 +4335,7 @@
     .cost-summary-help{display:block;margin-top:10px;color:#60776b;font-size:.78rem;line-height:1.35}
     .cost-breakdown-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
     .cost-breakdown-head h3{margin:0;font-size:1.45rem;color:#154b3b}
-    .cost-count-badge{padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.7);font-size:.9rem;font-weight:850;color:#315948}
+    .cost-count-badge{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;flex:0 0 auto;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.7);font-size:.9rem;font-weight:850;color:#315948}
     .cost-category-totals{
       display:grid;
       grid-template-columns:1fr;
@@ -5051,7 +5051,7 @@
         bottom:max(8px,env(safe-area-inset-bottom));
         z-index:4000;
         display:grid;
-        grid-template-columns:repeat(5,minmax(0,1fr));
+        grid-template-columns:repeat(6,minmax(0,1fr));
         gap:4px;
         padding:7px;
         border:1px solid rgba(214,205,185,.95);
@@ -6762,7 +6762,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v123</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v124</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>16 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6770,10 +6770,10 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=123" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=124" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v123</strong><br>
+          <strong>Wijzigingen in v124</strong><br>
           Op telefoon staat Foto’s nu direct in de onderste balk. Meenemen staat onder Meer. Momenten opent met een grote knop ‘Meteen een foto maken’. Het kostenoverzicht toont één totaal van hotels en overige kosten; de aanbetaling staat alleen los als informatie en telt nergens mee.<br><br>
           Foto’s kunnen nu naast de gedeelde app-opslag ook via de iPhone-deelkaart naar Foto’s worden bewaard. Kies na ‘Bewaar in Foto’s’ in de deelkaart voor ‘Bewaar afbeelding’. Op desktop start een normale download.<br><br>
           Gratis spraakbediening zonder externe spraakserver. Op laptop luistert de app rechtstreeks. Op iPhone opent de knop meteen Apple Dicteren; zodra de gesproken tekst verschijnt, verwerkt de app die automatisch zonder een extra verwerkknop.<br><br>
@@ -7128,7 +7128,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||123;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||124;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -16096,6 +16096,7 @@ if(document.readyState==="loading"){
     <button type="button" data-mobile-view="vandaag"><span>⌂</span><b>Vandaag</b></button>
     <button type="button" data-mobile-view="momenten"><span>📷</span><b>Foto’s</b></button>
     <button type="button" data-mobile-view="omgeving"><span>🗺️</span><b>Omgeving</b></button>
+    <button type="button" data-mobile-view="meenemen"><span>🧳</span><b>Meenemen</b></button>
     <button type="button" id="mobileMoreBtn"><span>☰</span><b>Meer</b></button>
   </nav>
 
@@ -16112,7 +16113,6 @@ if(document.readyState==="loading"){
       <div class="mobile-more-grid">
         <button type="button" data-mobile-view="hotels"><span>🏨</span><b>Hotels</b></button>
         <button type="button" data-mobile-view="kosten"><span>€</span><b>Kosten</b></button>
-        <button type="button" data-mobile-view="meenemen"><span>🧳</span><b>Meenemen</b></button>
         <button type="button" data-mobile-view="momenten"><span>📷</span><b>Momenten</b></button>
         <button type="button" data-mobile-view="reizen"><span>🧭</span><b>Reis beheren</b></button>
         <button type="button" data-mobile-view="technisch"><span>⚙️</span><b>Technisch</b></button>

@@ -18,9 +18,21 @@ for (const view of expectedViews) {
 }
 for (const label of expectedLabels) assert.match(html, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 
-for (const id of ["mobileAppNav", "packingVoiceStart", "packingVoiceResult", "packingManualFallback", "packingSearch", "clearPackingSearch", "environmentMap"]) {
+// De belangrijkste mobiele en spraakcontracten.
+for (const id of ["mobileAppNav", "packingVoiceStart", "packingVoiceResult", "packingManualFallback", "packingSearch", "clearPackingSearch", "environmentMap", "memoryPhotos", "saveMemoryPhotosToPhone"]) {
   assert.match(html, new RegExp(`id=["']${id}["']`), `ontbrekend kernonderdeel: ${id}`);
 }
+assert.match(html, /data-save-room-to-phone=/, "kamerfoto-opslagknop ontbreekt");
+assert.match(html, /navigator\.share/, "deelkaart voor foto-opslag ontbreekt");
+assert.match(html, /roomPhotoFilesForPhone\.set/, "gekozen kamerfoto blijft beschikbaar voor Foto's");
+assert.match(html, /id=["']memoryPhotoQuickButton["']/, "snelle fotoknop ontbreekt");
+assert.match(html, /data-mobile-view=["']momenten["'][\s\S]*?<b>Foto’s<\/b>/, "Foto's staat niet direct in mobiele navigatie");
+assert.match(html, /data-mobile-view=["']meenemen["'][\s\S]*?<b>Meenemen<\/b>/, "Meenemen staat niet direct in mobiele navigatie");
+assert.match(html, /\.cost-count-badge\{[^}]*white-space:nowrap/, "aantal kostenregels mag niet afbreken");
+assert.match(html, /grid-template-columns:repeat\(6,minmax\(0,1fr\)\)/, "mobiele balk heeft niet zes vaste posities");
+assert.match(html, /Totale reissom \(hotels \+ overige uitgaven\)/, "kostenoverzicht maakt de opbouw niet duidelijk");
+assert.match(html, /Al aanbetaald \(los, niet in totaal\):/, "losse aanbetaling ontbreekt in kostenoverzicht");
+assert.match(html, /costData\.filter\(row=>!isDepositCost\(row\)\)/, "aanbetaling wordt nog in de kostenopsomming getoond");
 assert.match(html, /aria-live="polite"/);
 assert.match(html, /role="status"/);
 assert.match(html, /touch-action:manipulation/);
