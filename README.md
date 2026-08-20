@@ -1,4 +1,4 @@
-# VakantieApp v120
+# VakantieApp v122
 
 De complete mobiele vakantie-app van Waldo en Brigitte.
 
@@ -26,6 +26,10 @@ Alleen wanneer opnemen op een toestel echt niet beschikbaar is, staat onder **Ty
 
 Deze variant gebruikt geen betaalde spraakserver en bewaart geen audio-opnamen.
 
-## App Quality Gate
+## Foto's bewaren op de telefoon
 
-Voor iedere release wordt de volledige app gecontroleerd op UX, gebruikersroutes, mobiel/responsive gedrag, visuele consistentie, WCAG, begrijpelijke taal, regressies, performance, privacy en security. Zie `APP-QUALITY-GATE.md` en het bijbehorende testrapport.
+Foto's bij **Hotels** en **Momenten** worden gedeeld opgeslagen in de app. Na het kiezen van één of meer foto's staat daarnaast **Bewaar in Foto's**. Op iPhone opent dit de deelkaart; kies daar **Bewaar afbeelding**. Safari mag foto's niet zonder deze gebruikersactie rechtstreeks in Foto's plaatsen. Op desktop start de knop een normale download.
+
+## Kostenoverzicht
+
+Het totaal bestaat uit hotelkosten en alle overige kosten. Een reeds betaalde hotel-aanbetaling wordt alleen als losse informatie getoond en telt niet mee in het totaal, de deeltotalen of de kostenlijst.
