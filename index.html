@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="app-version" content="122">
+<meta name="app-version" content="123">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=122">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=122">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=123">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=123">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -1252,6 +1252,31 @@
       margin-top:10px;
       color:#718078;
       font-size:.78rem;
+    }
+    .memory-card-actions{
+      display:flex;
+      justify-content:flex-end;
+      align-items:center;
+      gap:8px;
+      margin-top:12px;
+      padding-top:10px;
+      border-top:1px solid #eee8dc;
+    }
+    .memory-delete-btn{
+      border:1px solid #e7c6bd;
+      background:#fff8f5;
+      color:#9a4f43;
+      border-radius:999px;
+      padding:8px 12px;
+      font:inherit;
+      font-size:.8rem;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .memory-delete-btn:hover,
+    .memory-delete-btn:focus-visible{
+      background:#fbe9e4;
+      border-color:#c98a7d;
     }
     .memory-empty-photo{
       min-height:100px;
@@ -6737,7 +6762,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong>v122</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong>v123</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>16 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6745,10 +6770,10 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=122" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=123" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v122</strong><br>
+          <strong>Wijzigingen in v123</strong><br>
           Op telefoon staat Foto’s nu direct in de onderste balk. Meenemen staat onder Meer. Momenten opent met een grote knop ‘Meteen een foto maken’. Het kostenoverzicht toont één totaal van hotels en overige kosten; de aanbetaling staat alleen los als informatie en telt nergens mee.<br><br>
           Foto’s kunnen nu naast de gedeelde app-opslag ook via de iPhone-deelkaart naar Foto’s worden bewaard. Kies na ‘Bewaar in Foto’s’ in de deelkaart voor ‘Bewaar afbeelding’. Op desktop start een normale download.<br><br>
           Gratis spraakbediening zonder externe spraakserver. Op laptop luistert de app rechtstreeks. Op iPhone opent de knop meteen Apple Dicteren; zodra de gesproken tekst verschijnt, verwerkt de app die automatisch zonder een extra verwerkknop.<br><br>
@@ -7103,7 +7128,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||122;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||123;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -11667,9 +11692,61 @@ async function loadMemories(){
         </div>
         <div class="memory-text">${esc(memory.text||"Moment")}</div>
         <div class="memory-meta">${esc(meta)}</div>
+        <div class="memory-card-actions">
+          <button type="button" class="memory-delete-btn" data-delete-memory="${esc(memory.id)}">🗑 Verwijder foto-moment</button>
+        </div>
       </div>
     </article>`;
   }).join("");
+
+  list.querySelectorAll("[data-delete-memory]").forEach(button=>{
+    button.addEventListener("click",()=>deleteMemory(button.dataset.deleteMemory));
+  });
+}
+
+async function deleteMemory(memoryId){
+  if(!client || !memoryId) return;
+  if(!confirm("Dit foto-moment en de bijbehorende foto’s verwijderen?")) return;
+
+  const button=document.querySelector(`[data-delete-memory="${CSS.escape(memoryId)}"]`);
+  if(button){ button.disabled=true; button.textContent="Verwijderen…"; }
+
+  const {data:photos,error:photoListError}=await client.from("photos")
+    .select("id,storage_path")
+    .eq("trip_id",currentTripId)
+    .eq("memory_id",memoryId);
+
+  if(photoListError){
+    if(button){ button.disabled=false; button.textContent="🗑 Verwijder foto-moment"; }
+    alert("Foto-moment verwijderen lukt niet: "+photoListError.message);
+    return;
+  }
+
+  const paths=(photos||[]).map(photo=>photo.storage_path).filter(Boolean);
+  if(paths.length){
+    const {error:storageError}=await client.storage.from("vakantie-media").remove(paths);
+    if(storageError) console.warn("Foto-bestanden konden niet allemaal worden verwijderd",storageError);
+  }
+
+  const {error:photosError}=await client.from("photos").delete()
+    .eq("trip_id",currentTripId)
+    .eq("memory_id",memoryId);
+  if(photosError){
+    if(button){ button.disabled=false; button.textContent="🗑 Verwijder foto-moment"; }
+    alert("Foto’s verwijderen lukt niet: "+photosError.message);
+    return;
+  }
+
+  const {error:memoryError}=await client.from("memories").delete()
+    .eq("trip_id",currentTripId)
+    .eq("id",memoryId);
+  if(memoryError){
+    if(button){ button.disabled=false; button.textContent="🗑 Verwijder foto-moment"; }
+    alert("Foto-moment verwijderen lukt niet: "+memoryError.message);
+    return;
+  }
+
+  await loadMemories();
 }
 
 function subscribeRealtime(){
