@@ -1,4 +1,4 @@
-# VakantieApp v118
+# VakantieApp v119
 
 De complete mobiele vakantie-app van Waldo en Brigitte.
 
@@ -12,7 +12,7 @@ De app blijft dezelfde bestaande Supabase-gegevens gebruiken. Vervang of verwijd
 
 - Open **Meenemen**, tik op **Start pakmodus** en daarna op de grote knop **Spreek**.
 - Zeg bijvoorbeeld `twee autosleutels klaar`.
-- Op laptop luistert de browser rechtstreeks. Op iPhone opent de knop het Apple-toetsenbord: tik daar op het microfoontje. Zodra de tekst verschijnt, verwerkt de app die automatisch.
+- Op laptop luistert de browser rechtstreeks. Op iPhone opent de knop het Apple-toetsenbord: tik daar één keer op het microfoontje. Zodra de tekst verschijnt, verwerkt de app die automatisch.
 - Het aantal wordt bij het artikel opgeslagen en het artikel wordt afgevinkt.
 - Je kunt ook zeggen `check`, `gedaan` of `klaar`.
 
