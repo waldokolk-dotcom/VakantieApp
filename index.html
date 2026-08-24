@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="124">
+<meta name="app-version" content="125">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=124">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=124">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=125">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=125">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -6770,7 +6770,7 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=124" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=125" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
           <strong>Wijzigingen in v124</strong><br>
@@ -7140,7 +7140,7 @@ async function checkTechnicalVersion(){
 document.getElementById("technicalCheckVersion")?.addEventListener("click",checkTechnicalVersion);
 document.getElementById("technicalReload")?.addEventListener("click",()=>{
   const url=new URL(location.href);
-  url.searchParams.set("v","122");
+  url.searchParams.set("v","125");
   url.searchParams.set("refresh",Date.now());
   location.replace(url.toString());
 });
@@ -11693,6 +11693,7 @@ async function loadMemories(){
         <div class="memory-text">${esc(memory.text||"Moment")}</div>
         <div class="memory-meta">${esc(meta)}</div>
         <div class="memory-card-actions">
+          <button type="button" class="btn secondary memory-edit-btn" data-edit-memory="${esc(memory.id)}">✎ Wijzig</button>
           <button type="button" class="memory-delete-btn" data-delete-memory="${esc(memory.id)}">🗑 Verwijder foto-moment</button>
         </div>
       </div>
@@ -11702,6 +11703,90 @@ async function loadMemories(){
   list.querySelectorAll("[data-delete-memory]").forEach(button=>{
     button.addEventListener("click",()=>deleteMemory(button.dataset.deleteMemory));
   });
+  list.querySelectorAll("[data-edit-memory]").forEach(button=>{
+    button.addEventListener("click",()=>editMemory(button.dataset.editMemory));
+  });
+}
+
+async function editMemory(memoryId){
+  if(!client || !memoryId) return;
+  const {data:memory,error}=await client.from("memories")
+    .select("id,text,stop_id")
+    .eq("trip_id",currentTripId)
+    .eq("id",memoryId)
+    .single();
+  if(error || !memory){
+    alert("Dit moment kon niet worden geopend.");
+    return;
+  }
+
+  const textValue=prompt("Wijzig de tekst van dit moment:",memory.text||"");
+  if(textValue===null) return;
+
+  const {error:updateError}=await client.from("memories")
+    .update({text:textValue.trim()||"Foto-moment",updated_at:new Date().toISOString()})
+    .eq("trip_id",currentTripId)
+    .eq("id",memoryId);
+  if(updateError){
+    alert("Tekst wijzigen lukt niet: "+updateError.message);
+    return;
+  }
+
+  if(!confirm("Wil je ook de foto's vervangen?")){
+    await loadMemories();
+    return;
+  }
+
+  const input=document.createElement("input");
+  input.type="file";
+  input.accept="image/*";
+  input.multiple=true;
+  input.setAttribute("capture","environment");
+  const files=await new Promise(resolve=>{
+    input.onchange=()=>resolve([...(input.files||[])]);
+    input.click();
+  });
+  if(!files.length){
+    await loadMemories();
+    return;
+  }
+
+  const {data:oldPhotos,error:oldPhotoError}=await client.from("photos")
+    .select("id,storage_path")
+    .eq("trip_id",currentTripId)
+    .eq("memory_id",memoryId);
+  if(oldPhotoError){
+    alert("Bestaande foto's controleren lukt niet: "+oldPhotoError.message);
+    return;
+  }
+  const oldPaths=(oldPhotos||[]).map(photo=>photo.storage_path).filter(Boolean);
+  if(oldPaths.length){
+    const {error:storageError}=await client.storage.from("vakantie-media").remove(oldPaths);
+    if(storageError) console.warn("Oude foto's konden niet allemaal worden verwijderd",storageError);
+  }
+  const {error:deleteError}=await client.from("photos").delete()
+    .eq("trip_id",currentTripId)
+    .eq("memory_id",memoryId);
+  if(deleteError){
+    alert("Oude foto's verwijderen lukt niet: "+deleteError.message);
+    return;
+  }
+
+  let uploaded=0;
+  for(const file of files){
+    const extension=(file.name.split(".").pop()||"jpg").replace(/[^a-zA-Z0-9]/g,"").toLowerCase()||"jpg";
+    const storagePath=`${currentTripId}/${storageLocationSlug(memory.stop_id)}/${memoryId}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${extension}`;
+    const {error:uploadError}=await client.storage.from("vakantie-media").upload(storagePath,file,{contentType:file.type||"image/jpeg",upsert:false});
+    if(uploadError){ console.error(uploadError); continue; }
+    const {error:photoError}=await client.from("photos").insert({
+      memory_id:memoryId,trip_id:currentTripId,stop_id:memory.stop_id,storage_path:storagePath,
+      file_name:file.name,mime_type:file.type||null,created_by:actorName()
+    });
+    if(photoError){ console.error(photoError); continue; }
+    uploaded++;
+  }
+  if(uploaded!==files.length) alert(`${uploaded} van ${files.length} foto(s) zijn opgeslagen.`);
+  await loadMemories();
 }
 
 async function deleteMemory(memoryId){
@@ -12427,6 +12512,7 @@ function setTodayHotelUI(hotel){
   const ruleCard=document.querySelector(".today-handy-card");
   ruleCard.querySelectorAll(".today-rule").forEach(x=>x.remove());
   const link=ruleCard.querySelector(".today-link");
+  link.onclick=()=>document.querySelector('[data-view="hotels"]')?.click();
   hotel.rules.forEach(([label,value])=>{
     const div=document.createElement("div");
     div.className="today-rule";
