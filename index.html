@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="132">
+<meta name="app-version" content="133">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=132">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=132">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=133">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=133">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -1258,17 +1258,21 @@
     }
     .memory-photo-viewer-close{
       position:absolute;
-      top:14px;
+      z-index:2;
+      top:max(14px,env(safe-area-inset-top));
       right:14px;
-      min-width:46px;
-      min-height:46px;
+      min-width:54px;
+      min-height:54px;
       border:0;
       border-radius:50%;
       background:#fff;
       color:#173d31;
-      font-size:1.65rem;
+      font-size:2rem;
       font-weight:800;
       cursor:pointer;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+      box-shadow:0 4px 14px rgba(0,0,0,.25);
     }
     .memory-card-body{
       padding:14px;
@@ -6835,7 +6839,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v132</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v133</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>24 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6843,10 +6847,12 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=132" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=133" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v132</strong><br>
+          <strong>Wijzigingen in v133</strong><br>
+          Het sluitkruis bij een groot geopende foto is groter en reageert nu direct op een tik. Ook tikken buiten de foto sluit het beeld.<br><br>
+          <strong>Eerdere wijzigingen in v132</strong><br>
           Tik op een foto bij Momenten om hem groot te openen. Tik buiten de foto of op het kruis om terug te gaan.<br><br>
           <strong>Eerdere wijzigingen in v131</strong><br>
           Tekst wijzigen bij een Moment controleert nu echt of de opslag gelukt is en geeft tijdens het opslaan duidelijke feedback.<br><br>
@@ -7215,7 +7221,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||132;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||133;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7227,7 +7233,7 @@ async function checkTechnicalVersion(){
 document.getElementById("technicalCheckVersion")?.addEventListener("click",checkTechnicalVersion);
 document.getElementById("technicalReload")?.addEventListener("click",()=>{
   const url=new URL(location.href);
-  url.searchParams.set("v","132");
+  url.searchParams.set("v","133");
   url.searchParams.set("refresh",Date.now());
   location.replace(url.toString());
 });
@@ -11824,9 +11830,24 @@ function openMemoryPhoto(src){
     close.textContent="×";
     const image=document.createElement("img");
     image.alt="Foto-moment";
-    close.addEventListener("click",()=>{ viewer.hidden=true; image.removeAttribute("src"); });
+    const closeViewer=()=>{
+      viewer.hidden=true;
+      image.removeAttribute("src");
+    };
+    close.addEventListener("pointerup",event=>{
+      event.preventDefault();
+      event.stopPropagation();
+      closeViewer();
+    });
+    close.addEventListener("click",event=>{
+      event.stopPropagation();
+      closeViewer();
+    });
     viewer.addEventListener("click",event=>{
-      if(event.target===viewer){ viewer.hidden=true; image.removeAttribute("src"); }
+      if(event.target===viewer) closeViewer();
+    });
+    viewer.addEventListener("keydown",event=>{
+      if(event.key==="Escape") closeViewer();
     });
     viewer.append(close,image);
     document.body.appendChild(viewer);
