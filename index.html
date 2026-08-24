@@ -11693,7 +11693,6 @@ async function loadMemories(){
         <div class="memory-text">${esc(memory.text||"Moment")}</div>
         <div class="memory-meta">${esc(meta)}</div>
         <div class="memory-card-actions">
-          <button type="button" class="btn secondary memory-edit-btn" data-edit-memory="${esc(memory.id)}">✎ Wijzig</button>
           <button type="button" class="memory-delete-btn" data-delete-memory="${esc(memory.id)}">🗑 Verwijder foto-moment</button>
         </div>
       </div>
@@ -11703,90 +11702,6 @@ async function loadMemories(){
   list.querySelectorAll("[data-delete-memory]").forEach(button=>{
     button.addEventListener("click",()=>deleteMemory(button.dataset.deleteMemory));
   });
-  list.querySelectorAll("[data-edit-memory]").forEach(button=>{
-    button.addEventListener("click",()=>editMemory(button.dataset.editMemory));
-  });
-}
-
-async function editMemory(memoryId){
-  if(!client || !memoryId) return;
-  const {data:memory,error}=await client.from("memories")
-    .select("id,text,stop_id")
-    .eq("trip_id",currentTripId)
-    .eq("id",memoryId)
-    .single();
-  if(error || !memory){
-    alert("Dit moment kon niet worden geopend.");
-    return;
-  }
-
-  const textValue=prompt("Wijzig de tekst van dit moment:",memory.text||"");
-  if(textValue===null) return;
-
-  const {error:updateError}=await client.from("memories")
-    .update({text:textValue.trim()||"Foto-moment",updated_at:new Date().toISOString()})
-    .eq("trip_id",currentTripId)
-    .eq("id",memoryId);
-  if(updateError){
-    alert("Tekst wijzigen lukt niet: "+updateError.message);
-    return;
-  }
-
-  if(!confirm("Wil je ook de foto's vervangen?")){
-    await loadMemories();
-    return;
-  }
-
-  const input=document.createElement("input");
-  input.type="file";
-  input.accept="image/*";
-  input.multiple=true;
-  input.setAttribute("capture","environment");
-  const files=await new Promise(resolve=>{
-    input.onchange=()=>resolve([...(input.files||[])]);
-    input.click();
-  });
-  if(!files.length){
-    await loadMemories();
-    return;
-  }
-
-  const {data:oldPhotos,error:oldPhotoError}=await client.from("photos")
-    .select("id,storage_path")
-    .eq("trip_id",currentTripId)
-    .eq("memory_id",memoryId);
-  if(oldPhotoError){
-    alert("Bestaande foto's controleren lukt niet: "+oldPhotoError.message);
-    return;
-  }
-  const oldPaths=(oldPhotos||[]).map(photo=>photo.storage_path).filter(Boolean);
-  if(oldPaths.length){
-    const {error:storageError}=await client.storage.from("vakantie-media").remove(oldPaths);
-    if(storageError) console.warn("Oude foto's konden niet allemaal worden verwijderd",storageError);
-  }
-  const {error:deleteError}=await client.from("photos").delete()
-    .eq("trip_id",currentTripId)
-    .eq("memory_id",memoryId);
-  if(deleteError){
-    alert("Oude foto's verwijderen lukt niet: "+deleteError.message);
-    return;
-  }
-
-  let uploaded=0;
-  for(const file of files){
-    const extension=(file.name.split(".").pop()||"jpg").replace(/[^a-zA-Z0-9]/g,"").toLowerCase()||"jpg";
-    const storagePath=`${currentTripId}/${storageLocationSlug(memory.stop_id)}/${memoryId}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${extension}`;
-    const {error:uploadError}=await client.storage.from("vakantie-media").upload(storagePath,file,{contentType:file.type||"image/jpeg",upsert:false});
-    if(uploadError){ console.error(uploadError); continue; }
-    const {error:photoError}=await client.from("photos").insert({
-      memory_id:memoryId,trip_id:currentTripId,stop_id:memory.stop_id,storage_path:storagePath,
-      file_name:file.name,mime_type:file.type||null,created_by:actorName()
-    });
-    if(photoError){ console.error(photoError); continue; }
-    uploaded++;
-  }
-  if(uploaded!==files.length) alert(`${uploaded} van ${files.length} foto(s) zijn opgeslagen.`);
-  await loadMemories();
 }
 
 async function deleteMemory(memoryId){
@@ -12512,7 +12427,6 @@ function setTodayHotelUI(hotel){
   const ruleCard=document.querySelector(".today-handy-card");
   ruleCard.querySelectorAll(".today-rule").forEach(x=>x.remove());
   const link=ruleCard.querySelector(".today-link");
-  link.onclick=()=>document.querySelector('[data-view="hotels"]')?.click();
   hotel.rules.forEach(([label,value])=>{
     const div=document.createElement("div");
     div.className="today-rule";
