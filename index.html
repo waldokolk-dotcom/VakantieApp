@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="131">
+<meta name="app-version" content="132">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=131">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=131">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=132">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=132">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -1208,6 +1208,17 @@
       display:block;
       background:#eef2e8;
     }
+    .memory-photo-open{
+      display:block;
+      width:100%;
+      margin:0;
+      padding:0;
+      border:0;
+      background:#eef2e8;
+      cursor:zoom-in;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .memory-photo-open:focus-visible{outline:3px solid #176d4b;outline-offset:-3px}
     .memory-card-photos{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -1217,11 +1228,47 @@
     .memory-card-photos.one{
       grid-template-columns:1fr;
     }
+    .memory-card-photos .memory-photo-open{
+      min-width:0;
+    }
     .memory-card-photos img{
       width:100%;
       aspect-ratio:1/1;
       object-fit:cover;
       display:block;
+    }
+    .memory-photo-viewer{
+      position:fixed;
+      inset:0;
+      z-index:1200;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+      background:rgba(8,22,17,.9);
+    }
+    .memory-photo-viewer[hidden]{display:none}
+    .memory-photo-viewer img{
+      display:block;
+      max-width:100%;
+      max-height:calc(100vh - 80px);
+      border-radius:16px;
+      object-fit:contain;
+      box-shadow:0 16px 46px rgba(0,0,0,.42);
+    }
+    .memory-photo-viewer-close{
+      position:absolute;
+      top:14px;
+      right:14px;
+      min-width:46px;
+      min-height:46px;
+      border:0;
+      border-radius:50%;
+      background:#fff;
+      color:#173d31;
+      font-size:1.65rem;
+      font-weight:800;
+      cursor:pointer;
     }
     .memory-card-body{
       padding:14px;
@@ -6788,7 +6835,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v131</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v132</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>24 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6796,10 +6843,12 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=131" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=132" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v131</strong><br>
+          <strong>Wijzigingen in v132</strong><br>
+          Tik op een foto bij Momenten om hem groot te openen. Tik buiten de foto of op het kruis om terug te gaan.<br><br>
+          <strong>Eerdere wijzigingen in v131</strong><br>
           Tekst wijzigen bij een Moment controleert nu echt of de opslag gelukt is en geeft tijdens het opslaan duidelijke feedback.<br><br>
           <strong>Eerdere wijzigingen in v130</strong><br>
           De knoppen bij een Moment staan op telefoon nu ruim en overzichtelijk: tekst en foto toevoegen naast elkaar, daarna foto’s vervangen en verwijderen over de volle breedte.<br><br>
@@ -7166,7 +7215,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||131;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||132;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7178,7 +7227,7 @@ async function checkTechnicalVersion(){
 document.getElementById("technicalCheckVersion")?.addEventListener("click",checkTechnicalVersion);
 document.getElementById("technicalReload")?.addEventListener("click",()=>{
   const url=new URL(location.href);
-  url.searchParams.set("v","131");
+  url.searchParams.set("v","132");
   url.searchParams.set("refresh",Date.now());
   location.replace(url.toString());
 });
@@ -11700,10 +11749,10 @@ async function loadMemories(){
 
     let media='';
     if(attached.length===1){
-      media=`<img class="memory-card-photo" src="${esc(attached[0].signed_url)}" alt="">`;
+      media=`<button type="button" class="memory-photo-open" data-memory-photo-src="${esc(attached[0].signed_url)}" aria-label="Foto groot bekijken"><img class="memory-card-photo" src="${esc(attached[0].signed_url)}" alt=""></button>`;
     }else if(attached.length>1){
       media=`<div class="memory-card-photos ${attached.length===1?"one":""}">
-        ${attached.slice(0,4).map(p=>`<img src="${esc(p.signed_url)}" alt="">`).join("")}
+        ${attached.slice(0,4).map((p,index)=>`<button type="button" class="memory-photo-open" data-memory-photo-src="${esc(p.signed_url)}" aria-label="Foto ${index+1} groot bekijken"><img src="${esc(p.signed_url)}" alt=""></button>`).join("")}
       </div>`;
     }else{
       media='<div class="memory-empty-photo">📷</div>';
@@ -11752,6 +11801,40 @@ async function loadMemories(){
   list.querySelectorAll("[data-replace-memory-photo]").forEach(button=>{
     button.addEventListener("click",()=>chooseMemoryPhotos(button.dataset.replaceMemoryPhoto,"replace"));
   });
+  list.querySelectorAll("[data-memory-photo-src]").forEach(button=>{
+    button.addEventListener("click",()=>openMemoryPhoto(button.dataset.memoryPhotoSrc));
+  });
+}
+
+function openMemoryPhoto(src){
+  if(!src) return;
+  let viewer=document.getElementById("memoryPhotoViewer");
+  if(!viewer){
+    viewer=document.createElement("div");
+    viewer.id="memoryPhotoViewer";
+    viewer.className="memory-photo-viewer";
+    viewer.hidden=true;
+    viewer.setAttribute("role","dialog");
+    viewer.setAttribute("aria-modal","true");
+    viewer.setAttribute("aria-label","Foto groot bekijken");
+    const close=document.createElement("button");
+    close.type="button";
+    close.className="memory-photo-viewer-close";
+    close.setAttribute("aria-label","Foto sluiten");
+    close.textContent="×";
+    const image=document.createElement("img");
+    image.alt="Foto-moment";
+    close.addEventListener("click",()=>{ viewer.hidden=true; image.removeAttribute("src"); });
+    viewer.addEventListener("click",event=>{
+      if(event.target===viewer){ viewer.hidden=true; image.removeAttribute("src"); }
+    });
+    viewer.append(close,image);
+    document.body.appendChild(viewer);
+  }
+  const image=viewer.querySelector("img");
+  image.src=src;
+  viewer.hidden=false;
+  viewer.querySelector("button")?.focus();
 }
 
 async function editMemory(memoryId){
