@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="127">
+<meta name="app-version" content="129">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=127">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=127">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=129">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=129">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -6762,7 +6762,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v127</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v129</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>24 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6770,10 +6770,14 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=127" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=129" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v127</strong><br>
+          <strong>Wijzigingen in v129</strong><br>
+          De knop ‘Hotelregels’ in de hondenwaarschuwing opent nu direct de informatie van het huidige hotel.<br><br>
+          <strong>Eerdere wijzigingen in v128</strong><br>
+          Bij elk Moment staan aparte knoppen om de tekst te wijzigen, een of meer foto’s toe te voegen of alle foto’s te vervangen. De fotokiezer opent direct vanuit de knop, ook op telefoon.<br><br>
+          <strong>Eerdere wijzigingen in v127</strong><br>
           Het technische scherm toont nu altijd de werkelijk geopende appversie. De mobiele kaart bij Omgeving wordt vanuit de onderste navigatie ook correct gestart.<br><br>
           <strong>Nieuw in v125</strong><br>
           Bij Momenten kun je een bestaand foto-moment wijzigen, inclusief tekst en foto’s. ‘Alles bekijken’ op Vandaag opent voortaan het hoteloverzicht.<br><br>
@@ -7132,7 +7136,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||127;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||129;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7144,7 +7148,7 @@ async function checkTechnicalVersion(){
 document.getElementById("technicalCheckVersion")?.addEventListener("click",checkTechnicalVersion);
 document.getElementById("technicalReload")?.addEventListener("click",()=>{
   const url=new URL(location.href);
-  url.searchParams.set("v","127");
+  url.searchParams.set("v","129");
   url.searchParams.set("refresh",Date.now());
   location.replace(url.toString());
 });
@@ -11697,7 +11701,9 @@ async function loadMemories(){
         <div class="memory-text">${esc(memory.text||"Moment")}</div>
         <div class="memory-meta">${esc(meta)}</div>
         <div class="memory-card-actions">
-          <button type="button" class="btn secondary memory-edit-btn" data-edit-memory="${esc(memory.id)}">✎ Wijzig</button>
+          <button type="button" class="btn secondary memory-edit-btn" data-edit-memory="${esc(memory.id)}">✎ Tekst wijzigen</button>
+          <button type="button" class="btn secondary memory-photo-btn" data-add-memory-photo="${esc(memory.id)}">＋ Foto toevoegen</button>
+          <button type="button" class="btn secondary memory-photo-btn" data-replace-memory-photo="${esc(memory.id)}">↻ Foto's vervangen</button>
           <button type="button" class="memory-delete-btn" data-delete-memory="${esc(memory.id)}">🗑 Verwijder foto-moment</button>
         </div>
       </div>
@@ -11709,6 +11715,12 @@ async function loadMemories(){
   });
   list.querySelectorAll("[data-edit-memory]").forEach(button=>{
     button.addEventListener("click",()=>editMemory(button.dataset.editMemory));
+  });
+  list.querySelectorAll("[data-add-memory-photo]").forEach(button=>{
+    button.addEventListener("click",()=>chooseMemoryPhotos(button.dataset.addMemoryPhoto,"add"));
+  });
+  list.querySelectorAll("[data-replace-memory-photo]").forEach(button=>{
+    button.addEventListener("click",()=>chooseMemoryPhotos(button.dataset.replaceMemoryPhoto,"replace"));
   });
 }
 
@@ -11736,44 +11748,60 @@ async function editMemory(memoryId){
     return;
   }
 
-  if(!confirm("Wil je ook de foto's vervangen?")){
-    await loadMemories();
-    return;
-  }
+  await loadMemories();
+}
 
+function chooseMemoryPhotos(memoryId,mode){
+  if(!client || !memoryId) return;
   const input=document.createElement("input");
   input.type="file";
   input.accept="image/*";
   input.multiple=true;
-  input.setAttribute("capture","environment");
-  const files=await new Promise(resolve=>{
-    input.onchange=()=>resolve([...(input.files||[])]);
-    input.click();
-  });
-  if(!files.length){
-    await loadMemories();
+  input.style.display="none";
+  document.body.appendChild(input);
+  input.onchange=async()=>{
+    const files=[...(input.files||[])];
+    input.remove();
+    if(files.length) await saveMemoryPhotos(memoryId,files,mode);
+  };
+  input.click();
+}
+
+async function saveMemoryPhotos(memoryId,files,mode){
+  const {data:memory,error}=await client.from("memories")
+    .select("id,stop_id")
+    .eq("trip_id",currentTripId)
+    .eq("id",memoryId)
+    .single();
+  if(error || !memory){
+    alert("Dit moment kon niet worden geopend.");
     return;
   }
 
-  const {data:oldPhotos,error:oldPhotoError}=await client.from("photos")
-    .select("id,storage_path")
-    .eq("trip_id",currentTripId)
-    .eq("memory_id",memoryId);
-  if(oldPhotoError){
-    alert("Bestaande foto's controleren lukt niet: "+oldPhotoError.message);
+  if(mode==="replace"){
+  if(!files.length){
     return;
   }
-  const oldPaths=(oldPhotos||[]).map(photo=>photo.storage_path).filter(Boolean);
-  if(oldPaths.length){
-    const {error:storageError}=await client.storage.from("vakantie-media").remove(oldPaths);
-    if(storageError) console.warn("Oude foto's konden niet allemaal worden verwijderd",storageError);
-  }
-  const {error:deleteError}=await client.from("photos").delete()
-    .eq("trip_id",currentTripId)
-    .eq("memory_id",memoryId);
-  if(deleteError){
-    alert("Oude foto's verwijderen lukt niet: "+deleteError.message);
-    return;
+    const {data:oldPhotos,error:oldPhotoError}=await client.from("photos")
+      .select("id,storage_path")
+      .eq("trip_id",currentTripId)
+      .eq("memory_id",memoryId);
+    if(oldPhotoError){
+      alert("Bestaande foto's controleren lukt niet: "+oldPhotoError.message);
+      return;
+    }
+    const oldPaths=(oldPhotos||[]).map(photo=>photo.storage_path).filter(Boolean);
+    if(oldPaths.length){
+      const {error:storageError}=await client.storage.from("vakantie-media").remove(oldPaths);
+      if(storageError) console.warn("Oude foto's konden niet allemaal worden verwijderd",storageError);
+    }
+    const {error:deleteError}=await client.from("photos").delete()
+      .eq("trip_id",currentTripId)
+      .eq("memory_id",memoryId);
+    if(deleteError){
+      alert("Oude foto's verwijderen lukt niet: "+deleteError.message);
+      return;
+    }
   }
 
   let uploaded=0;
@@ -12517,6 +12545,15 @@ function setTodayHotelUI(hotel){
   ruleCard.querySelectorAll(".today-rule").forEach(x=>x.remove());
   const link=ruleCard.querySelector(".today-link");
   link.onclick=()=>document.querySelector('[data-view="hotels"]')?.click();
+  const dogRulesLink=document.querySelector(".today-dog-card .today-link");
+  dogRulesLink.onclick=()=>{
+    showView("hotels");
+    renderHotelsTab();
+    setTimeout(()=>{
+      document.querySelector(`.hotel-detail-card[data-stop="${CSS.escape(hotel.stop)}"]`)
+        ?.scrollIntoView({behavior:"smooth",block:"start"});
+    },80);
+  };
   hotel.rules.forEach(([label,value])=>{
     const div=document.createElement("div");
     div.className="today-rule";
