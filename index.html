@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="125">
+<meta name="app-version" content="126">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=125">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=125">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=126">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=126">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -6770,7 +6770,7 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=125" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=126" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
           <strong>Wijzigingen in v124</strong><br>
@@ -7140,7 +7140,7 @@ async function checkTechnicalVersion(){
 document.getElementById("technicalCheckVersion")?.addEventListener("click",checkTechnicalVersion);
 document.getElementById("technicalReload")?.addEventListener("click",()=>{
   const url=new URL(location.href);
-  url.searchParams.set("v","125");
+  url.searchParams.set("v","126");
   url.searchParams.set("refresh",Date.now());
   location.replace(url.toString());
 });
@@ -16042,19 +16042,21 @@ async function setupEnvironment(){
 
 applyEnvironmentCategoryOrder();
 
+function refreshEnvironmentWhenVisible(){
+  setTimeout(async()=>{
+    if(!envLoadedOnce){
+      await setupEnvironment();
+    }else{
+      await ensureEnvironmentHotel();
+      await initEnvironmentMap();
+      envMap?.invalidateSize();
+    }
+  },90);
+}
+
 /* Start/refresh wanneer Omgeving zichtbaar wordt. */
 document.querySelectorAll('.nav button[data-view="omgeving"]').forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    setTimeout(async()=>{
-      if(!envLoadedOnce){
-        await setupEnvironment();
-      }else{
-        await ensureEnvironmentHotel();
-        await initEnvironmentMap();
-        envMap?.invalidateSize();
-      }
-    },90);
-  });
+  btn.addEventListener("click",refreshEnvironmentWhenVisible);
 });
 
 
@@ -16143,6 +16145,7 @@ function setupMobileNavigation(){
     sheet.hidden=true;
     showView(view);
     markMobileActive(view);
+    if(view==="omgeving") refreshEnvironmentWhenVisible();
     window.scrollTo({top:0,behavior:"smooth"});
   }
 
