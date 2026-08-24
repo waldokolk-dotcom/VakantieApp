@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="133">
+<meta name="app-version" content="134">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=133">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=133">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=134">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=134">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -5589,6 +5589,40 @@
       .technical-actions{flex-direction:column}
       .technical-actions .btn{width:100%;justify-content:center;text-align:center}
     }
+    @media(max-width:620px){
+      /* Momenten: alle invoervelden blijven binnen de kaart op telefoon. */
+      #momenten .card,
+      #momenten .form-grid,
+      #momenten .form-grid > label,
+      #momenten .form-grid > .full,
+      #momenten #memoryFormMsg{
+        min-width:0 !important;
+        max-width:100% !important;
+      }
+      #momenten .form-grid > label,
+      #momenten .form-grid > .full{
+        width:100% !important;
+      }
+      #momenten .form-grid input,
+      #momenten .form-grid select,
+      #momenten .form-grid textarea{
+        display:block;
+        width:100% !important;
+        min-width:0 !important;
+        max-width:100% !important;
+        box-sizing:border-box !important;
+      }
+      #momenten .photo-phone-actions{
+        display:grid;
+        grid-template-columns:minmax(0,1fr);
+      }
+      #momenten #saveMemoryPhotosToPhone,
+      #momenten .notice{
+        width:100%;
+        max-width:100%;
+        box-sizing:border-box;
+      }
+    }
     .hotel-booking-included{margin-top:14px;border:1px solid #d8e6d5;border-radius:20px;padding:18px;background:linear-gradient(135deg,rgba(244,251,239,.97),rgba(255,253,247,.97))}
     .hotel-booking-included-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
     .hotel-booking-included-head h4{margin:0;color:#145f43;font-size:17px}
@@ -6839,7 +6873,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v133</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v134</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>24 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6847,10 +6881,12 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=133" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=134" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v133</strong><br>
+          <strong>Wijzigingen in v134</strong><br>
+          Het formulier om een Moment te maken blijft op telefoon nu volledig binnen de kaart; tekstvak, keuzes, foto-kiezer en meldingen zijn gelijk uitgelijnd.<br><br>
+          <strong>Eerdere wijzigingen in v133</strong><br>
           Het sluitkruis bij een groot geopende foto is groter en reageert nu direct op een tik. Ook tikken buiten de foto sluit het beeld.<br><br>
           <strong>Eerdere wijzigingen in v132</strong><br>
           Tik op een foto bij Momenten om hem groot te openen. Tik buiten de foto of op het kruis om terug te gaan.<br><br>
@@ -7221,7 +7257,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||133;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||134;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7233,7 +7269,7 @@ async function checkTechnicalVersion(){
 document.getElementById("technicalCheckVersion")?.addEventListener("click",checkTechnicalVersion);
 document.getElementById("technicalReload")?.addEventListener("click",()=>{
   const url=new URL(location.href);
-  url.searchParams.set("v","133");
+  url.searchParams.set("v","134");
   url.searchParams.set("refresh",Date.now());
   location.replace(url.toString());
 });
