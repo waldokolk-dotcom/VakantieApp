@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="129">
+<meta name="app-version" content="131">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=129">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=129">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=131">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=131">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -1277,6 +1277,32 @@
     .memory-delete-btn:focus-visible{
       background:#fbe9e4;
       border-color:#c98a7d;
+    }
+    @media(max-width:620px){
+      .memory-card-actions{
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        align-items:stretch;
+        gap:8px;
+      }
+      .memory-card-actions .btn,
+      .memory-card-actions .memory-delete-btn{
+        min-width:0;
+        min-height:50px;
+        padding:10px 8px;
+        font-size:.84rem;
+        line-height:1.2;
+        text-align:center;
+        white-space:normal;
+      }
+      .memory-card-actions [data-replace-memory-photo],
+      .memory-card-actions .memory-delete-btn{
+        grid-column:1 / -1;
+      }
+      .memory-card-actions .memory-delete-btn{
+        min-height:46px;
+        padding:10px 12px;
+      }
     }
     .memory-empty-photo{
       min-height:100px;
@@ -6762,7 +6788,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v129</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v131</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>24 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6770,10 +6796,14 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=129" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=131" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v129</strong><br>
+          <strong>Wijzigingen in v131</strong><br>
+          Tekst wijzigen bij een Moment controleert nu echt of de opslag gelukt is en geeft tijdens het opslaan duidelijke feedback.<br><br>
+          <strong>Eerdere wijzigingen in v130</strong><br>
+          De knoppen bij een Moment staan op telefoon nu ruim en overzichtelijk: tekst en foto toevoegen naast elkaar, daarna foto’s vervangen en verwijderen over de volle breedte.<br><br>
+          <strong>Eerdere wijzigingen in v129</strong><br>
           De knop ‘Hotelregels’ in de hondenwaarschuwing opent nu direct de informatie van het huidige hotel.<br><br>
           <strong>Eerdere wijzigingen in v128</strong><br>
           Bij elk Moment staan aparte knoppen om de tekst te wijzigen, een of meer foto’s toe te voegen of alle foto’s te vervangen. De fotokiezer opent direct vanuit de knop, ook op telefoon.<br><br>
@@ -7136,7 +7166,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||129;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||131;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7148,7 +7178,7 @@ async function checkTechnicalVersion(){
 document.getElementById("technicalCheckVersion")?.addEventListener("click",checkTechnicalVersion);
 document.getElementById("technicalReload")?.addEventListener("click",()=>{
   const url=new URL(location.href);
-  url.searchParams.set("v","129");
+  url.searchParams.set("v","131");
   url.searchParams.set("refresh",Date.now());
   location.replace(url.toString());
 });
@@ -11739,12 +11769,19 @@ async function editMemory(memoryId){
   const textValue=prompt("Wijzig de tekst van dit moment:",memory.text||"");
   if(textValue===null) return;
 
-  const {error:updateError}=await client.from("memories")
-    .update({text:textValue.trim()||"Foto-moment",updated_at:new Date().toISOString()})
+  const button=document.querySelector(`[data-edit-memory="${CSS.escape(memoryId)}"]`);
+  if(button){ button.disabled=true; button.textContent="Opslaan…"; }
+
+  const nextText=textValue.trim()||"Foto-moment";
+  const {data:savedMemory,error:updateError}=await client.from("memories")
+    .update({text:nextText,updated_at:new Date().toISOString(),created_by:actorName()})
     .eq("trip_id",currentTripId)
-    .eq("id",memoryId);
-  if(updateError){
-    alert("Tekst wijzigen lukt niet: "+updateError.message);
+    .eq("id",memory.id)
+    .select("id,text")
+    .maybeSingle();
+  if(updateError || !savedMemory){
+    if(button){ button.disabled=false; button.textContent="✎ Tekst wijzigen"; }
+    alert("Tekst wijzigen lukt niet"+(updateError?.message ? ": "+updateError.message : ". Probeer de pagina opnieuw te laden."));
     return;
   }
 
