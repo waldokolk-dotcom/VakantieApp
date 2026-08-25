@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="139">
+<meta name="app-version" content="140">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=139">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=139">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=140">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=140">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -6901,7 +6901,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v139</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v140</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>24 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6909,10 +6909,12 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=139" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=140" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v139</strong><br>
+          <strong>Wijzigingen in v140</strong><br>
+          Momenten toont nu voor alle bestaande foto’s een kleine serverminiatuur. Zo blijven de foto’s zichtbaar zonder de grote originele camerabestanden te downloaden.<br><br>
+          <strong>Eerdere wijzigingen in v139</strong><br>
           Momenten verschijnt direct, ook bij een matige verbinding. Nieuwe foto’s krijgen automatisch een kleine overzichtsfoto; oude grote foto’s worden uitsluitend gedownload wanneer je er zelf één opent.<br><br>
           <strong>Eerdere wijzigingen in v138</strong><br>
           Momenten laadt nooit meer ongemerkt grote originele foto’s in het overzicht. Als een lichte miniatuur niet beschikbaar is, blijft het overzicht snel en opent de foto pas na een tik.<br><br>
@@ -7295,7 +7297,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||139;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||140;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7307,7 +7309,7 @@ async function checkTechnicalVersion(){
 document.getElementById("technicalCheckVersion")?.addEventListener("click",checkTechnicalVersion);
 document.getElementById("technicalReload")?.addEventListener("click",()=>{
   const url=new URL(location.href);
-  url.searchParams.set("v","139");
+  url.searchParams.set("v","140");
   url.searchParams.set("refresh",Date.now());
   location.replace(url.toString());
 });
@@ -11804,19 +11806,21 @@ async function loadMemories(){
       const paths=memoryPhotos.map(photo=>photo.storage_path);
       const originalResult=await client.storage.from("vakantie-media").createSignedUrls(paths,60*60);
       if(originalResult.error) throw originalResult.error;
-      let previewUrls=[];
-      try{
-        const previewResult=await client.storage
-          .from("vakantie-media")
-          .createSignedUrls(paths.map(path=>path+".thumb.jpg"),60*60);
-        if(previewResult.error) throw previewResult.error;
-        previewUrls=previewResult.data||[];
-      }catch(previewError){
-        console.warn("Foto-miniaturen zijn niet beschikbaar; foto’s openen op aanvraag.",previewError);
-      }
+      const previewUrls=await Promise.all(memoryPhotos.map(async photo=>{
+        try{
+          const {data,error}=await client.storage.from("vakantie-media").createSignedUrl(photo.storage_path,60*60,{
+            transform:{width:480,height:480,resize:"cover"}
+          });
+          if(error) throw error;
+          return data?.signedUrl||"";
+        }catch(previewError){
+          console.warn("Kleine foto-miniatuur kon niet worden gemaakt",previewError);
+          return "";
+        }
+      }));
       memoryPhotos.forEach((photo,index)=>{
         const originalUrl=originalResult.data?.[index]?.signedUrl;
-        const previewUrl=previewUrls[index]?.signedUrl || "";
+        const previewUrl=previewUrls[index] || "";
         if(!originalUrl) return;
         (photoMap[photo.memory_id] ||= []).push({...photo,original_url:originalUrl,preview_url:previewUrl});
       });
