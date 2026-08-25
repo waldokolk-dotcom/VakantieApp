@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="138">
+<meta name="app-version" content="139">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=138">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=138">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=139">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=139">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -1210,7 +1210,9 @@
     }
     .memory-photo-open{
       display:block;
+      position:relative;
       width:100%;
+      min-height:150px;
       margin:0;
       padding:0;
       border:0;
@@ -1233,6 +1235,15 @@
     }
     .memory-photo-placeholder span{font-size:28px}
     .memory-photo-placeholder small{font-size:.74rem;font-weight:750}
+    .memory-preview-image{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      opacity:0;
+      transition:opacity .16s ease;
+    }
+    .memory-preview-image.is-loaded{opacity:1}
     .memory-card-photos{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -1252,6 +1263,7 @@
       display:block;
     }
     .memory-card-photos .memory-photo-placeholder{min-height:112px;aspect-ratio:1/1}
+    .memory-card-photos .memory-photo-open{min-height:112px}
     .memory-photo-viewer{
       position:fixed;
       inset:0;
@@ -6889,7 +6901,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v138</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v139</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>24 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6897,10 +6909,12 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=138" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=139" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v138</strong><br>
+          <strong>Wijzigingen in v139</strong><br>
+          Momenten verschijnt direct, ook bij een matige verbinding. Nieuwe foto’s krijgen automatisch een kleine overzichtsfoto; oude grote foto’s worden uitsluitend gedownload wanneer je er zelf één opent.<br><br>
+          <strong>Eerdere wijzigingen in v138</strong><br>
           Momenten laadt nooit meer ongemerkt grote originele foto’s in het overzicht. Als een lichte miniatuur niet beschikbaar is, blijft het overzicht snel en opent de foto pas na een tik.<br><br>
           <strong>Eerdere wijzigingen in v137</strong><br>
           Momenten gebruikt nu lichte overzichtsfoto’s. De originele foto wordt alleen geladen wanneer je hem groot opent; daardoor opent het foto-overzicht veel sneller, ook met grote telefooncamera-foto’s.<br><br>
@@ -7281,7 +7295,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||138;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||139;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7293,7 +7307,7 @@ async function checkTechnicalVersion(){
 document.getElementById("technicalCheckVersion")?.addEventListener("click",checkTechnicalVersion);
 document.getElementById("technicalReload")?.addEventListener("click",()=>{
   const url=new URL(location.href);
-  url.searchParams.set("v","138");
+  url.searchParams.set("v","139");
   url.searchParams.set("refresh",Date.now());
   location.replace(url.toString());
 });
@@ -11792,13 +11806,13 @@ async function loadMemories(){
       if(originalResult.error) throw originalResult.error;
       let previewUrls=[];
       try{
-        const previewResult=await client.storage.from("vakantie-media").createSignedUrls(paths,60*60,{
-          transform:{width:800,height:600,resize:"cover"}
-        });
+        const previewResult=await client.storage
+          .from("vakantie-media")
+          .createSignedUrls(paths.map(path=>path+".thumb.jpg"),60*60);
         if(previewResult.error) throw previewResult.error;
         previewUrls=previewResult.data||[];
       }catch(previewError){
-        console.warn("Lichte foto-miniaturen zijn niet beschikbaar; foto’s openen op aanvraag.",previewError);
+        console.warn("Foto-miniaturen zijn niet beschikbaar; foto’s openen op aanvraag.",previewError);
       }
       memoryPhotos.forEach((photo,index)=>{
         const originalUrl=originalResult.data?.[index]?.signedUrl;
@@ -11826,10 +11840,10 @@ async function loadMemories(){
 
     let media='';
     if(attached.length===1){
-      media=`<button type="button" class="memory-photo-open" data-memory-photo-src="${esc(attached[0].original_url)}" aria-label="Foto groot bekijken">${attached[0].preview_url ? `<img class="memory-card-photo" src="${esc(attached[0].preview_url)}" alt="" loading="lazy" decoding="async">` : '<span class="memory-photo-placeholder"><span>📷</span><small>Tik om foto te openen</small></span>'}</button>`;
+      media=`<button type="button" class="memory-photo-open" data-memory-photo-src="${esc(attached[0].original_url)}" aria-label="Foto groot bekijken"><span class="memory-photo-placeholder"><span>📷</span><small>${attached[0].preview_url ? "Foto laden…" : "Tik om foto te openen"}</small></span>${attached[0].preview_url ? `<img class="memory-card-photo memory-preview-image" data-memory-preview src="${esc(attached[0].preview_url)}" alt="" loading="lazy" decoding="async">` : ""}</button>`;
     }else if(attached.length>1){
       media=`<div class="memory-card-photos ${attached.length===1?"one":""}">
-        ${attached.slice(0,4).map((p,index)=>`<button type="button" class="memory-photo-open" data-memory-photo-src="${esc(p.original_url)}" aria-label="Foto ${index+1} groot bekijken">${p.preview_url ? `<img src="${esc(p.preview_url)}" alt="" loading="lazy" decoding="async">` : '<span class="memory-photo-placeholder"><span>📷</span><small>Open foto</small></span>'}</button>`).join("")}
+        ${attached.slice(0,4).map((p,index)=>`<button type="button" class="memory-photo-open" data-memory-photo-src="${esc(p.original_url)}" aria-label="Foto ${index+1} groot bekijken"><span class="memory-photo-placeholder"><span>📷</span><small>${p.preview_url ? "Foto laden…" : "Open foto"}</small></span>${p.preview_url ? `<img class="memory-preview-image" data-memory-preview src="${esc(p.preview_url)}" alt="" loading="lazy" decoding="async">` : ""}</button>`).join("")}
       </div>`;
     }else{
       media='<div class="memory-empty-photo">📷</div>';
@@ -11880,6 +11894,10 @@ async function loadMemories(){
   });
   list.querySelectorAll("[data-memory-photo-src]").forEach(button=>{
     button.addEventListener("click",()=>openMemoryPhoto(button.dataset.memoryPhotoSrc));
+  });
+  list.querySelectorAll("[data-memory-preview]").forEach(image=>{
+    image.addEventListener("load",()=>image.classList.add("is-loaded"),{once:true});
+    image.addEventListener("error",()=>image.remove(),{once:true});
   });
 }
 
@@ -11979,6 +11997,38 @@ function chooseMemoryPhotos(memoryId,mode){
   input.click();
 }
 
+async function createMemoryThumbnail(file){
+  if(!file || !String(file.type||"").startsWith("image/")) return null;
+  const objectUrl=URL.createObjectURL(file);
+  try{
+    const image=new Image();
+    image.decoding="async";
+    await new Promise((resolve,reject)=>{
+      image.onload=resolve;
+      image.onerror=reject;
+      image.src=objectUrl;
+    });
+    const longest=Math.max(image.naturalWidth||0,image.naturalHeight||0);
+    if(!longest) return null;
+    const scale=Math.min(1,720/longest);
+    const width=Math.max(1,Math.round((image.naturalWidth||1)*scale));
+    const height=Math.max(1,Math.round((image.naturalHeight||1)*scale));
+    const canvas=document.createElement("canvas");
+    canvas.width=width;
+    canvas.height=height;
+    const context=canvas.getContext("2d",{alpha:false});
+    if(!context) return null;
+    context.drawImage(image,0,0,width,height);
+    const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",.72));
+    return blob ? new File([blob],"overzicht.jpg",{type:"image/jpeg"}) : null;
+  }catch(error){
+    console.warn("Kleine overzichtsfoto maken lukt niet",error);
+    return null;
+  }finally{
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
 async function saveMemoryPhotos(memoryId,files,mode){
   const {data:memory,error}=await client.from("memories")
     .select("id,stop_id")
@@ -12004,7 +12054,7 @@ async function saveMemoryPhotos(memoryId,files,mode){
     }
     const oldPaths=(oldPhotos||[]).map(photo=>photo.storage_path).filter(Boolean);
     if(oldPaths.length){
-      const {error:storageError}=await client.storage.from("vakantie-media").remove(oldPaths);
+      const {error:storageError}=await client.storage.from("vakantie-media").remove([...oldPaths,...oldPaths.map(path=>path+".thumb.jpg")]);
       if(storageError) console.warn("Oude foto's konden niet allemaal worden verwijderd",storageError);
     }
     const {error:deleteError}=await client.from("photos").delete()
@@ -12022,6 +12072,12 @@ async function saveMemoryPhotos(memoryId,files,mode){
     const storagePath=`${currentTripId}/${storageLocationSlug(memory.stop_id)}/${memoryId}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${extension}`;
     const {error:uploadError}=await client.storage.from("vakantie-media").upload(storagePath,file,{contentType:file.type||"image/jpeg",upsert:false});
     if(uploadError){ console.error(uploadError); continue; }
+    const thumbnail=await createMemoryThumbnail(file);
+    if(thumbnail){
+      const {error:thumbnailError}=await client.storage.from("vakantie-media")
+        .upload(storagePath+".thumb.jpg",thumbnail,{contentType:"image/jpeg",upsert:false});
+      if(thumbnailError) console.warn("Kleine overzichtsfoto opslaan lukt niet",thumbnailError);
+    }
     const {error:photoError}=await client.from("photos").insert({
       memory_id:memoryId,trip_id:currentTripId,stop_id:memory.stop_id,storage_path:storagePath,
       file_name:file.name,mime_type:file.type||null,created_by:actorName()
@@ -12053,7 +12109,7 @@ async function deleteMemory(memoryId){
 
   const paths=(photos||[]).map(photo=>photo.storage_path).filter(Boolean);
   if(paths.length){
-    const {error:storageError}=await client.storage.from("vakantie-media").remove(paths);
+    const {error:storageError}=await client.storage.from("vakantie-media").remove([...paths,...paths.map(path=>path+".thumb.jpg")]);
     if(storageError) console.warn("Foto-bestanden konden niet allemaal worden verwijderd",storageError);
   }
 
@@ -14861,6 +14917,17 @@ async function saveMemoryWithPhotos(){
       if(uploadError){
         console.error(uploadError);
         continue;
+      }
+
+      const thumbnail=await createMemoryThumbnail(file);
+      if(thumbnail){
+        const {error:thumbnailError}=await client.storage
+          .from("vakantie-media")
+          .upload(storagePath+".thumb.jpg",thumbnail,{
+            contentType:"image/jpeg",
+            upsert:false
+          });
+        if(thumbnailError) console.warn("Kleine overzichtsfoto opslaan lukt niet",thumbnailError);
       }
 
       const {error:photoInsertError}=await client
