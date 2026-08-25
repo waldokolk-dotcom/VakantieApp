@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="136">
+<meta name="app-version" content="137">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=136">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=136">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=137">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=137">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -6874,7 +6874,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v136</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v137</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>24 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6882,10 +6882,12 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=136" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=137" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v136</strong><br>
+          <strong>Wijzigingen in v137</strong><br>
+          Momenten gebruikt nu lichte overzichtsfoto’s. De originele foto wordt alleen geladen wanneer je hem groot opent; daardoor opent het foto-overzicht veel sneller, ook met grote telefooncamera-foto’s.<br><br>
+          <strong>Eerdere wijzigingen in v136</strong><br>
           Momenten haalt alleen de bijbehorende foto’s in één gezamenlijke aanvraag op. Foto’s lager op de pagina worden pas geladen wanneer je ernaartoe scrolt, waardoor de pagina veel sneller opent. De actieknoppen op laptop lopen nu door naar een nieuwe regel, zodat Tekst wijzigen altijd zichtbaar blijft.<br><br>
           <strong>Eerdere wijzigingen in v135</strong><br>
           In het kostenoverzicht staat bij Laden de geladen energie links van de prijs, zodat de prijs helemaal rechts en in lijn met alle andere bedragen staat.<br><br>
@@ -7262,7 +7264,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||136;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||137;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7274,7 +7276,7 @@ async function checkTechnicalVersion(){
 document.getElementById("technicalCheckVersion")?.addEventListener("click",checkTechnicalVersion);
 document.getElementById("technicalReload")?.addEventListener("click",()=>{
   const url=new URL(location.href);
-  url.searchParams.set("v","136");
+  url.searchParams.set("v","137");
   url.searchParams.set("refresh",Date.now());
   location.replace(url.toString());
 });
@@ -11768,15 +11770,20 @@ async function loadMemories(){
   const memoryPhotos=(photos||[]).filter(photo=>photo.memory_id && photo.storage_path);
   if(memoryPhotos.length){
     try{
-      const {data:signedUrls,error:signedError}=await client.storage
-        .from("vakantie-media")
-        .createSignedUrls(memoryPhotos.map(photo=>photo.storage_path),60*60);
-
-      if(signedError) throw signedError;
+      const paths=memoryPhotos.map(photo=>photo.storage_path);
+      const [originalResult,previewResult]=await Promise.all([
+        client.storage.from("vakantie-media").createSignedUrls(paths,60*60),
+        client.storage.from("vakantie-media").createSignedUrls(paths,60*60,{
+          transform:{width:800,height:600,resize:"cover"}
+        })
+      ]);
+      if(originalResult.error) throw originalResult.error;
+      if(previewResult.error) throw previewResult.error;
       memoryPhotos.forEach((photo,index)=>{
-        const signedUrl=signedUrls?.[index]?.signedUrl;
-        if(!signedUrl) return;
-        (photoMap[photo.memory_id] ||= []).push({...photo,signed_url:signedUrl});
+        const originalUrl=originalResult.data?.[index]?.signedUrl;
+        const previewUrl=previewResult.data?.[index]?.signedUrl || originalUrl;
+        if(!originalUrl) return;
+        (photoMap[photo.memory_id] ||= []).push({...photo,original_url:originalUrl,preview_url:previewUrl});
       });
     }catch(err){
       console.error("Momentenfoto’s konden niet worden geladen",err);
@@ -11798,10 +11805,10 @@ async function loadMemories(){
 
     let media='';
     if(attached.length===1){
-      media=`<button type="button" class="memory-photo-open" data-memory-photo-src="${esc(attached[0].signed_url)}" aria-label="Foto groot bekijken"><img class="memory-card-photo" src="${esc(attached[0].signed_url)}" alt="" loading="lazy" decoding="async"></button>`;
+      media=`<button type="button" class="memory-photo-open" data-memory-photo-src="${esc(attached[0].original_url)}" aria-label="Foto groot bekijken"><img class="memory-card-photo" src="${esc(attached[0].preview_url)}" alt="" loading="lazy" decoding="async"></button>`;
     }else if(attached.length>1){
       media=`<div class="memory-card-photos ${attached.length===1?"one":""}">
-        ${attached.slice(0,4).map((p,index)=>`<button type="button" class="memory-photo-open" data-memory-photo-src="${esc(p.signed_url)}" aria-label="Foto ${index+1} groot bekijken"><img src="${esc(p.signed_url)}" alt="" loading="lazy" decoding="async"></button>`).join("")}
+        ${attached.slice(0,4).map((p,index)=>`<button type="button" class="memory-photo-open" data-memory-photo-src="${esc(p.original_url)}" aria-label="Foto ${index+1} groot bekijken"><img src="${esc(p.preview_url)}" alt="" loading="lazy" decoding="async"></button>`).join("")}
       </div>`;
     }else{
       media='<div class="memory-empty-photo">📷</div>';
