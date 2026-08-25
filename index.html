@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="140">
+<meta name="app-version" content="141">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=140">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=140">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=141">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=141">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -6901,7 +6901,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v140</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v141</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>24 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6909,10 +6909,12 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=140" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=141" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v140</strong><br>
+          <strong>Wijzigingen in v141</strong><br>
+          Bonscannen herkent Duitse en Italiaanse totaalregels beter en gebruikt een datum niet meer als bedrag.<br><br>
+          <strong>Eerdere wijzigingen in v140</strong><br>
           Momenten toont nu voor alle bestaande foto’s een kleine serverminiatuur. Zo blijven de foto’s zichtbaar zonder de grote originele camerabestanden te downloaden.<br><br>
           <strong>Eerdere wijzigingen in v139</strong><br>
           Momenten verschijnt direct, ook bij een matige verbinding. Nieuwe foto’s krijgen automatisch een kleine overzichtsfoto; oude grote foto’s worden uitsluitend gedownload wanneer je er zelf één opent.<br><br>
@@ -7297,7 +7299,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||140;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||141;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -11219,11 +11221,26 @@ function parseEuroNumber(raw){
   return Number.isFinite(number) ? number : NaN;
 }
 
+function receiptMoneyCandidatesFromLine(line){
+  // A European date such as 25.08.2026 used to be read as €25,08.
+  // Remove dates first, then retain the position of every actual money amount.
+  const withoutDates=String(line||"")
+    .replace(/\b\d{1,2}\s*[.\-/]\s*\d{1,2}\s*[.\-/]\s*20\d{2}\b/g," ")
+    .replace(/\b20\d{2}\s*[.\-/]\s*\d{1,2}\s*[.\-/]\s*\d{1,2}\b/g," ");
+  const pattern=/(?:€\s*)?-?\d{1,5}(?:[.,]\d{2})(?!\d)/g;
+  const candidates=[];
+  let match;
+  while((match=pattern.exec(withoutDates))){
+    const amount=parseEuroNumber(match[0]);
+    if(Number.isFinite(amount) && amount>=0.01 && amount<100000){
+      candidates.push({amount,index:match.index,raw:match[0]});
+    }
+  }
+  return candidates;
+}
+
 function receiptAmountsFromLine(line){
-  const matches=String(line).match(/(?:€\s*)?-?\d{1,5}(?:[.,]\d{2})(?!\d)/g) || [];
-  return matches
-    .map(raw=>parseEuroNumber(raw))
-    .filter(n=>Number.isFinite(n) && n>=0.01 && n<100000);
+  return receiptMoneyCandidatesFromLine(line).map(candidate=>candidate.amount);
 }
 
 function receiptDateFromText(text){
@@ -11286,8 +11303,8 @@ function inferReceiptCategory(text,merchant=""){
   const hay=(merchant+" "+text).toLowerCase();
 
   if(/hotel|gasthof|pension|zimmer|overnight|übernacht|halfpension|halbpension|albergo/.test(hay)) return "hotel";
-  if(/restaurant|ristorante|pizzeria|cafe|café|bar\b|bistro|trattoria|gastronomie|imbiss|essen|dinner|lunch/.test(hay)) return "restaurant";
-  if(/supermarkt|supermarket|markt\b|lidl|aldi|edeka|rewe|spar\b|coop\b|conad|despar|boodschap/.test(hay)) return "groceries";
+  if(/restaurant|ristorante|pizzeria|cafe|café|bar\b|bistro|trattoria|osteria|gastronomie|imbiss|essen|dinner|lunch/.test(hay)) return "restaurant";
+  if(/supermarkt|supermarket|markt\b|lidl|aldi|edeka|rewe|spar\b|coop\b|conad|despar|alimentari|salumeria|panificio|macelleria|ortofrutta|getr[aä]nke|bäckerei|lebensmittel|boodschap/.test(hay)) return "groceries";
   if(/charge|charging|laden|ladesäule|ladestation|kwh|ionity|enbw|tesla supercharger/.test(hay)) return "charging";
   if(/tankstelle|fuel|diesel|benz|petrol|esso|shell|aral|eni\b|q8\b/.test(hay)) return "fuel";
   if(/parkhaus|parking|parcheggio|parkeren|parkticket/.test(hay)) return "parking";
@@ -11302,7 +11319,7 @@ function inferReceiptPayment(text){
   const hay=String(text).toLowerCase();
   if(/barzahlung|bargeld|cash\b|contant|contanti/.test(hay)) return "Contant";
   if(/visa|mastercard|american express|credit card|kreditkarte/.test(hay)) return "Creditcard";
-  if(/maestro|ec-karte|debit|pin\b|bancontact|girocard/.test(hay)) return "Pin";
+  if(/maestro|ec-karte|debit|pin\b|bancontact|girocard|bancomat|pagamento\s+pos/.test(hay)) return "Pin";
   if(/apple pay|google pay|paypal|app payment/.test(hay)) return "App";
   if(/ladekarte|laadpas|charging card/.test(hay)) return "Laadpas";
   return "";
@@ -11330,30 +11347,36 @@ function inferReceiptStop(text,date,location=""){
 }
 
 function receiptAmountFromLines(lines){
-  const totalWords=/\b(total|totaal|gesamt|summe|endsumme|zu zahlen|betrag|amount|totale|importo|da pagare|payment)\b/i;
-  const subtotalWords=/\b(subtotal|zwischensumme|subtotaal)\b/i;
-
+  const totalWords=/\b(grand\s*total|total(?:e)?|totaal|gesamt(?:betrag)?|summe|endsumme|zahlbetrag|endbetrag|zu\s*(?:zahlen|bezahlen)|importo(?:\s+totale)?|da\s+pagare|tot\.?|payment)\b/i;
+  const subtotalWords=/\b(subtotal|zwischensumme|subtotaal|teilsumme|parziale)\b/i;
+  const taxWords=/\b(mwst|ust|steuer|tax|iva|vat)\b/i;
   const totalCandidates=[];
   const allCandidates=[];
 
   lines.forEach((line,index)=>{
-    const amounts=receiptAmountsFromLine(line);
-    amounts.forEach(amount=>allCandidates.push({amount,index,line}));
+    const candidates=receiptMoneyCandidatesFromLine(line);
+    candidates.forEach(candidate=>allCandidates.push({...candidate,index,line}));
+    if(subtotalWords.test(line) || taxWords.test(line) || !totalWords.test(line)) return;
 
-    if(totalWords.test(line) && !subtotalWords.test(line)){
-      amounts.forEach(amount=>totalCandidates.push({amount,index,line}));
-    }
+    // On a line like "TOTAL 24,50 CASH 30,00" the first amount after TOTAL
+    // is the payable amount, not the cash tendered.
+    const labelIndex=line.search(totalWords);
+    const afterLabel=candidates.filter(candidate=>candidate.index>=labelIndex);
+    const selected=(afterLabel.length ? afterLabel : candidates)
+      .sort((a,b)=>Math.abs(a.index-labelIndex)-Math.abs(b.index-labelIndex))[0];
+    if(selected) totalCandidates.push({...selected,index,line});
   });
 
   if(totalCandidates.length){
-    // Receipts frequently repeat totals; the last plausible total line is usually safest.
+    // The final explicitly-labelled total is the safest receipt convention.
     return totalCandidates[totalCandidates.length-1].amount;
   }
 
   if(!allCandidates.length) return NaN;
-
-  // Fallback: the largest plausible amount is more often the receipt total than a line item.
-  return Math.max(...allCandidates.map(x=>x.amount));
+  // Without a label, a larger amount in the final half of the receipt is the
+  // most useful fallback; dates were already removed above.
+  const finalHalf=allCandidates.filter(candidate=>candidate.index>=Math.floor(lines.length/2));
+  return Math.max(...(finalHalf.length ? finalHalf : allCandidates).map(candidate=>candidate.amount));
 }
 
 function receiptRecognitionConfidence(parsed){
