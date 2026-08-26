@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="141">
+<meta name="app-version" content="142">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=141">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=141">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=142">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=142">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -6901,18 +6901,20 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v141</strong></div>
-          <div class="technical-item"><small>Publicatiedatum</small><strong>24 augustus 2026</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v142</strong></div>
+          <div class="technical-item"><small>Publicatiedatum</small><strong>26 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
         </div>
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=141" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=142" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v141</strong><br>
+          <strong>Wijzigingen in v142</strong><br>
+          Vandaag bevat nu dagboek, vertrekchecklist, budget, onderweg-modus en hoogtepunten. Hotels krijgen persoonlijke notities en momenten kunnen als favoriet worden gemarkeerd.<br><br>
+          <strong>Eerdere wijzigingen in v141</strong><br>
           Bonscannen herkent Duitse en Italiaanse totaalregels beter en gebruikt een datum niet meer als bedrag.<br><br>
           <strong>Eerdere wijzigingen in v140</strong><br>
           Momenten toont nu voor alle bestaande foto’s een kleine serverminiatuur. Zo blijven de foto’s zichtbaar zonder de grote originele camerabestanden te downloaden.<br><br>
@@ -7299,7 +7301,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||141;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||142;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -8592,6 +8594,8 @@ function renderHotelsTab(){
   list.querySelectorAll("[data-delete-room-photos]").forEach(button=>{
     button.onclick=()=>deleteSelectedRoomPhotos(button.dataset.deleteRoomPhotos);
   });
+
+  if(typeof window.renderTripFeatureHotelNotes==="function") window.renderTripFeatureHotelNotes();
 
   loadAllRoomPhotos();
 }
@@ -11805,6 +11809,7 @@ async function loadMemories(){
     .order("created_at",{ascending:false});
 
   const memories=(memoriesRaw||[]).filter(m=>![TRIP_META_MOOD,TRIP_STOP_MOOD].includes(m.mood));
+  window.lastTripMemories=memories;
 
   if(memoryError){
     if(list) list.innerHTML='<div class="empty">'+esc(memoryError.message)+'</div>';
@@ -11898,6 +11903,7 @@ async function loadMemories(){
         <div class="memory-text">${esc(memory.text||"Moment")}</div>
         <div class="memory-meta">${esc(meta)}</div>
         <div class="memory-card-actions">
+          <button type="button" class="btn secondary" data-favorite-memory="${esc(memory.id)}">${tripFeatureState?.favorites?.includes(memory.id) ? "★ Favoriet" : "☆ Favoriet"}</button>
           <button type="button" class="btn secondary memory-edit-btn" data-edit-memory="${esc(memory.id)}">✎ Tekst wijzigen</button>
           <button type="button" class="btn secondary memory-photo-btn" data-add-memory-photo="${esc(memory.id)}">＋ Foto toevoegen</button>
           <button type="button" class="btn secondary memory-photo-btn" data-replace-memory-photo="${esc(memory.id)}">↻ Foto's vervangen</button>
@@ -11909,6 +11915,9 @@ async function loadMemories(){
 
   list.querySelectorAll("[data-delete-memory]").forEach(button=>{
     button.addEventListener("click",()=>deleteMemory(button.dataset.deleteMemory));
+  });
+  list.querySelectorAll("[data-favorite-memory]").forEach(button=>{
+    button.addEventListener("click",()=>toggleTripFavourite(button.dataset.favoriteMemory));
   });
   list.querySelectorAll("[data-edit-memory]").forEach(button=>{
     button.addEventListener("click",()=>editMemory(button.dataset.editMemory));
@@ -16555,6 +16564,138 @@ if(document.readyState==="loading"){
       </div>
     </div>
   </div>
+
+  <script>
+  /* ===== v142: onderweg, dagboek en persoonlijke reislaag ===== */
+  const TRIP_FEATURES_DB_TRIP="__system__";
+  const TRIP_FEATURES_DB_MOOD_PREFIX="__trip_features__:";
+  let tripFeatureState={favorites:[],hotelNotes:{},budgetCents:0,departureChecks:{}};
+  let tripFeatureRowId=null;
+
+  function tripFeatureDefaults(){ return {favorites:[],hotelNotes:{},budgetCents:0,departureChecks:{}}; }
+  function mergeTripFeatureState(value){
+    const next={...tripFeatureDefaults(),...(value||{})};
+    next.favorites=Array.isArray(next.favorites)?next.favorites:[];
+    next.hotelNotes=next.hotelNotes||{};
+    next.departureChecks=next.departureChecks||{};
+    return next;
+  }
+  async function loadTripFeatures(){
+    if(!client || !currentTripId) return;
+    const mood=TRIP_FEATURES_DB_MOOD_PREFIX+currentTripId;
+    const {data,error}=await client.from("memories").select("id,text").eq("trip_id",TRIP_FEATURES_DB_TRIP).eq("mood",mood).limit(1);
+    if(error){ console.warn("Reisfuncties laden mislukt",error); return; }
+    const row=data?.[0];
+    if(row){ tripFeatureRowId=row.id; tripFeatureState=mergeTripFeatureState(safeJsonParse(row.text,{})); }
+    else{
+      const {data:created,error:createError}=await client.from("memories").insert({trip_id:TRIP_FEATURES_DB_TRIP,stop_id:null,mood,text:JSON.stringify(tripFeatureDefaults()),created_by:actorName(),updated_at:new Date().toISOString()}).select("id").single();
+      if(createError){ console.warn("Reisfuncties maken mislukt",createError); return; }
+      tripFeatureRowId=created.id;
+    }
+    renderTripFeatureHub(); renderTripFeatureHotelNotes(); loadMemories();
+  }
+  async function saveTripFeatures(){
+    if(!client || !tripFeatureRowId) return;
+    const {error}=await client.from("memories").update({text:JSON.stringify(tripFeatureState),created_by:actorName(),updated_at:new Date().toISOString()}).eq("id",tripFeatureRowId);
+    if(error) alert("Opslaan van de reisfuncties lukt niet: "+error.message);
+  }
+  async function toggleTripFavourite(id){
+    if(!id) return;
+    const set=new Set(tripFeatureState.favorites||[]);
+    set.has(id)?set.delete(id):set.add(id);
+    tripFeatureState.favorites=[...set];
+    await saveTripFeatures(); await loadMemories(); renderTripFeatureHub();
+  }
+  function featureEuro(cents){ return (Number(cents||0)/100).toLocaleString("nl-NL",{style:"currency",currency:"EUR"}); }
+  function featureCostTotal(){ return (costData||[]).filter(row=>!isDepositCost(row)).reduce((sum,row)=>sum+(Number(row.amount_cents)||0),0); }
+  function featureNextStop(){
+    const today=dateOnlyLocal();
+    return tripStops().find(stop=>today<stop.arrival) || null;
+  }
+  function featureDepartureStop(){
+    const today=dateOnlyLocal();
+    return tripStops().find(stop=>today===stop.departure) || null;
+  }
+  function installTripFeatureHub(){
+    if(document.getElementById("tripFeatureHub")) return;
+    const page=document.querySelector("#vandaag .today-page"); if(!page) return;
+    const hub=document.createElement("section"); hub.id="tripFeatureHub"; hub.className="trip-feature-hub";
+    const planner=page.querySelector(".today-planner"); planner?.insertAdjacentElement("afterend",hub);
+  }
+  function renderTripFeatureHub(){
+    installTripFeatureHub(); const hub=document.getElementById("tripFeatureHub"); if(!hub) return;
+    const current=activeTodayHotel?.(); const next=featureNextStop(); const departure=featureDepartureStop();
+    const total=featureCostTotal(); const budget=Number(tripFeatureState.budgetCents)||0;
+    const pct=budget?Math.min(100,Math.round(total/budget*100)):0;
+    const favorites=(window.lastTripMemories||[]).filter(m=>tripFeatureState.favorites.includes(m.id));
+    const most=Object.entries((costData||[]).filter(r=>!isDepositCost(r)).reduce((a,r)=>{a[r.category||"other"]=(a[r.category||"other"]||0)+(Number(r.amount_cents)||0);return a;},{})).sort((a,b)=>b[1]-a[1])[0];
+    const checks=["Kamerfoto’s","Sleutel","Hondenvoer","Laadpas","Laatste kosten"];
+    const checked=tripFeatureState.departureChecks?.[departure?.id]||[];
+    hub.innerHTML=`
+      <div class="trip-feature-card trip-diary-card">
+        <div class="legacy-kicker">DAGBOEK VAN VANDAAG</div><h2>Wat was vandaag leuk?</h2>
+        <textarea id="todayDiaryText" maxlength="600" placeholder="Bijv. prachtige wandeling, heerlijk gegeten, grappig moment met de honden…"></textarea>
+        <div class="trip-feature-actions"><label class="trip-file-label">📷 Foto <input id="todayDiaryPhoto" type="file" accept="image/*"></label><button id="saveTodayDiary" class="btn" type="button">Bewaar terugblik</button></div>
+        <small id="todayDiaryStatus">Wordt als moment opgeslagen voor ${current?.hotel||"vandaag"}.</small>
+      </div>
+      <div class="trip-feature-card ${departure?"trip-departure-active":""}">
+        <div class="legacy-kicker">${departure?"VERTREK VANDAAG":"SLIMME HERINNERING"}</div><h2>${departure?`${departure.hotel||departure.city}: niets vergeten?`:"Vertrekchecklist"}</h2>
+        <div class="trip-checklist">${checks.map(item=>`<label><input type="checkbox" data-departure-check="${esc(item)}" ${checked.includes(item)?"checked":""}> ${esc(item)}</label>`).join("")}</div>
+        <small>${departure?"Vink af wanneer jullie het geregeld hebben.":"Verschijnt extra duidelijk op de uitcheckdag."}</small>
+      </div>
+      <div class="trip-feature-card">
+        <div class="legacy-kicker">KOSTEN SLIMMER</div><h2>Budget & overzicht</h2>
+        <div class="trip-budget-line"><strong>${featureEuro(total)}</strong><span>${budget?`${pct}% van ${featureEuro(budget)}`:"Stel een budget in"}</span></div>
+        <div class="trip-budget-track"><i style="width:${pct}%"></i></div>
+        <div class="trip-feature-actions"><input id="tripBudgetInput" inputmode="decimal" placeholder="Budget in euro" value="${budget?(budget/100).toFixed(2).replace('.',','):''}"><button id="saveTripBudget" class="btn secondary" type="button">Bewaar</button></div>
+        <small>${most?`Grootste post: ${esc(most[0])} · ${featureEuro(most[1])}`:"Nog geen kosten opgeslagen."}</small>
+      </div>
+      <div class="trip-feature-card trip-road-card">
+        <div class="legacy-kicker">ONDERWEG-MODUS</div><h2>${next?`Volgende stop: ${next.hotel||next.city}`:"Reisoverzicht"}</h2>
+        <p>${next?`${next.city||next.place||""} · aankomst ${formatTripDate(next.arrival)}`:"Alle stops zijn bereikt."}</p>
+        <div class="trip-road-meta"><span>⚡ ${((costData||[]).filter(r=>r.category==="charging").slice(0,1)[0]?.kwh||0).toLocaleString("nl-NL")} kWh laatst geladen</span><span>🐾 hondenpauze plannen</span></div>
+        <button id="openRoadMode" class="btn secondary" type="button">Rustig scherm openen</button>
+      </div>
+      <div class="trip-feature-card trip-favorite-card">
+        <div class="legacy-kicker">HOOGTEPUNTEN</div><h2>Favoriete momenten</h2>
+        <p>${favorites.length?favorites.slice(0,2).map(m=>esc(m.text||"Foto-moment")).join(" · "):"Tik bij een moment op ☆ Favoriet. Deze lijst wordt later de basis voor het reisboek."}</p>
+        <button id="openFavorites" class="btn secondary" type="button">Bekijk favorieten (${favorites.length})</button>
+      </div>`;
+    hub.querySelectorAll("[data-departure-check]").forEach(box=>box.onchange=async()=>{
+      if(!departure) return; const nextChecks=new Set(tripFeatureState.departureChecks[departure.id]||[]);
+      box.checked?nextChecks.add(box.dataset.departureCheck):nextChecks.delete(box.dataset.departureCheck);
+      tripFeatureState.departureChecks[departure.id]=[...nextChecks]; await saveTripFeatures();
+    });
+    hub.querySelector("#saveTripBudget").onclick=async()=>{ const raw=hub.querySelector("#tripBudgetInput").value.replace(".","").replace(",","."); tripFeatureState.budgetCents=Math.max(0,Math.round(Number(raw||0)*100)); await saveTripFeatures(); renderTripFeatureHub(); };
+    hub.querySelector("#saveTodayDiary").onclick=async()=>{
+      const text=hub.querySelector("#todayDiaryText").value.trim(); const file=hub.querySelector("#todayDiaryPhoto").files?.[0]; const status=hub.querySelector("#todayDiaryStatus");
+      if(!text&&!file){status.textContent="Schrijf iets of kies een foto.";return;}
+      const originalText=document.getElementById("memoryText"), originalFiles=document.getElementById("memoryPhotos"), mode=document.getElementById("memoryLocationMode");
+      originalText.value=text||"Dagboekfoto"; if(current?.stop) mode.value=current.stop;
+      if(file){const transfer=new DataTransfer();transfer.items.add(file);originalFiles.files=transfer.files;}
+      status.textContent="Terugblik opslaan…"; await saveMemoryWithPhotos(); status.textContent="✓ Terugblik bewaard bij Momenten."; hub.querySelector("#todayDiaryText").value=""; hub.querySelector("#todayDiaryPhoto").value="";
+    };
+    hub.querySelector("#openRoadMode").onclick=()=>openTripRoadMode(next);
+    hub.querySelector("#openFavorites").onclick=()=>{showView("momenten");setTimeout(()=>document.querySelector("[data-favorite-memory]")?.scrollIntoView({behavior:"smooth",block:"center"}),100);};
+  }
+  function openTripRoadMode(next){
+    let modal=document.getElementById("tripRoadMode"); if(!modal){modal=document.createElement("div");modal.id="tripRoadMode";modal.className="trip-road-modal";document.body.appendChild(modal);}
+    modal.innerHTML=`<div><button aria-label="Sluiten">×</button><small>ONDERWEG</small><h2>${esc(next?.hotel||next?.city||"Reisoverzicht")}</h2><p>${esc(next?.city||"")} · ${next?`aankomst ${formatTripDate(next.arrival)}`:"Geen volgende stop"}</p><hr><strong>🐾 Volgende hondenpauze</strong><p>Plan een rustige stop binnen 90 minuten.</p><strong>⚡ Laden</strong><p>Controleer laadpas en de laatste laadbeurt bij Kosten.</p></div>`;
+    modal.hidden=false;modal.querySelector("button").onclick=()=>modal.hidden=true;
+  }
+  function renderTripFeatureHotelNotes(){
+    document.querySelectorAll(".hotel-detail-card[data-stop]").forEach(card=>{
+      if(card.querySelector(".trip-hotel-notes")) return; const stop=card.dataset.stop; const note=tripFeatureState.hotelNotes?.[stop]||{};
+      const section=document.createElement("section");section.className="hotel-info-panel trip-hotel-notes";
+      section.innerHTML=`<h4>✍️ Onze notities</h4><label>Fijne kamer / aandachtspunt<textarea data-hotel-note="room" placeholder="Bijv. kamer 214, stil aan de boskant…">${esc(note.room||"")}</textarea></label><label>Beste wandeling<textarea data-hotel-note="walk" placeholder="Startpunt, afstand of tip…">${esc(note.walk||"")}</textarea></label><label>Restaurant om terug te gaan<textarea data-hotel-note="food" placeholder="Naam en wat zo lekker was…">${esc(note.food||"")}</textarea></label><button class="btn secondary" type="button">Notities opslaan</button>`;
+      section.querySelector("button").onclick=async()=>{tripFeatureState.hotelNotes[stop]=Object.fromEntries([...section.querySelectorAll("[data-hotel-note]")].map(el=>[el.dataset.hotelNote,el.value.trim()]));await saveTripFeatures();section.querySelector("button").textContent="✓ Opgeslagen";setTimeout(()=>section.querySelector("button").textContent="Notities opslaan",1300);};
+      card.querySelector(".hotel-detail-content")?.appendChild(section);
+    });
+  }
+  const tripFeatureStyle=document.createElement("style");tripFeatureStyle.textContent=`.trip-feature-hub{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:26px 0}.trip-feature-card{background:#fffdf8;border:1px solid #e5dcc7;border-radius:20px;padding:20px;color:#173d31}.trip-feature-card h2{font-size:22px;margin:6px 0 12px}.trip-feature-card textarea,.trip-feature-card input,.trip-hotel-notes textarea{box-sizing:border-box;width:100%;border:1px solid #ded5c3;border-radius:11px;padding:10px;font:inherit;margin:5px 0 10px;background:#fff}.trip-feature-card textarea{min-height:86px;resize:vertical}.trip-feature-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.trip-file-label{font-weight:800;color:#176147;cursor:pointer}.trip-file-label input{display:none}.trip-checklist{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.trip-checklist label{font-size:13px;font-weight:700}.trip-budget-line{display:flex;justify-content:space-between;gap:8px}.trip-budget-line span,.trip-feature-card small,.trip-road-card p,.trip-favorite-card p{color:#718078}.trip-budget-track{height:9px;border-radius:99px;background:#e9eee4;margin:12px 0;overflow:hidden}.trip-budget-track i{display:block;height:100%;background:#19805a;border-radius:inherit}.trip-road-meta{display:grid;gap:6px;font-size:13px;margin:12px 0}.trip-hotel-notes label{display:block;font-size:12px;font-weight:800}.trip-hotel-notes textarea{min-height:62px;resize:vertical}.trip-road-modal{position:fixed;inset:0;z-index:1500;background:rgba(6,38,29,.88);display:grid;place-items:center;padding:20px}.trip-road-modal[hidden]{display:none}.trip-road-modal>div{width:min(440px,100%);background:#f7f3e8;color:#173d31;padding:30px;border-radius:26px}.trip-road-modal button{float:right;border:0;background:none;font-size:32px;color:#173d31}@media(max-width:700px){.trip-feature-hub{grid-template-columns:1fr}.trip-checklist{grid-template-columns:1fr}}`;document.head.appendChild(tripFeatureStyle);
+  setTimeout(()=>{installTripFeatureHub();loadTripFeatures();},900);
+  document.querySelectorAll('[data-view="vandaag"],[data-mobile-view="vandaag"]').forEach(btn=>btn.addEventListener("click",()=>setTimeout(renderTripFeatureHub,80)));
+  </script>
 
 </body>
 </html>
