@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="144">
+<meta name="app-version" content="145">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=144">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=144">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=145">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=145">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -6905,7 +6905,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v144</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v145</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>26 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6913,10 +6913,12 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=144" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=145" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v144</strong><br>
+          <strong>Wijzigingen in v145</strong><br>
+          De dagboekreeks staat nu onder <em>Onze reis</em>, direct onder ieder hotel, met een verticale datum- en tijdlijn.<br><br>
+          <strong>Eerdere wijzigingen in v144</strong><br>
           Onder ieder hotel staat nu een dagboekreeks met alle momenten op tijdsvolgorde.<br><br>
           <strong>Eerdere wijzigingen in v143</strong><br>
           Bij Momenten zijn vier extra reacties toegevoegd: boos, huilen, duim omhoog en duim omlaag.<br><br>
@@ -7309,7 +7311,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||144;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||145;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -8942,6 +8944,7 @@ function renderJourneyForTrip(){
     const tripTotal=costData.reduce((sum,item)=>sum+(Number(item.amount_cents)||0),0);
     if(document.getElementById("tripCostTotal")) document.getElementById("tripCostTotal").textContent=euro(tripTotal);
     if(document.getElementById("hotelsTabList")) renderHotelsTab();
+    if(typeof window.renderTripFeatureJourneyTimelines==="function") window.renderTripFeatureJourneyTimelines();
     return;
   }
 
@@ -8978,6 +8981,7 @@ function renderJourneyForTrip(){
       </div>
     </div>
   `).join("");
+  if(typeof window.renderTripFeatureJourneyTimelines==="function") window.renderTripFeatureJourneyTimelines();
 }
 
 async function refreshTripDrivenUI(){
@@ -11818,6 +11822,7 @@ async function loadMemories(){
 
   const memories=(memoriesRaw||[]).filter(m=>![TRIP_META_MOOD,TRIP_STOP_MOOD].includes(m.mood));
   window.lastTripMemories=memories;
+  if(typeof window.renderTripFeatureJourneyTimelines==="function") window.renderTripFeatureJourneyTimelines();
 
   if(memoryError){
     if(list) list.innerHTML='<div class="empty">'+esc(memoryError.message)+'</div>';
@@ -16702,14 +16707,22 @@ if(document.readyState==="loading"){
         section.querySelector("button").onclick=async()=>{tripFeatureState.hotelNotes[stop]=Object.fromEntries([...section.querySelectorAll("[data-hotel-note]")].map(el=>[el.dataset.hotelNote,el.value.trim()]));await saveTripFeatures();section.querySelector("button").textContent="✓ Opgeslagen";setTimeout(()=>section.querySelector("button").textContent="Notities opslaan",1300);};
         card.querySelector(".hotel-detail-content")?.appendChild(section);
       }
-      let timeline=card.querySelector(".trip-hotel-timeline");
-      if(!timeline){timeline=document.createElement("section");timeline.className="trip-hotel-timeline";card.appendChild(timeline);}
+    });
+  }
+  function renderTripFeatureJourneyTimelines(){
+    document.querySelectorAll("#journeyHotelGrid [data-hotel-stop]").forEach(card=>{
+      const stop=card.dataset.hotelStop;
+      let wrap=card.closest(".journey-hotel-timeline-wrap");
+      if(!wrap){wrap=document.createElement("div");wrap.className="journey-hotel-timeline-wrap";card.parentNode.insertBefore(wrap,card);wrap.appendChild(card);}
+      let timeline=wrap.querySelector(".trip-journey-timeline");
+      if(!timeline){timeline=document.createElement("section");timeline.className="trip-journey-timeline";wrap.appendChild(timeline);}
       const entries=(window.lastTripMemories||[]).filter(memory=>memory.stop_id===stop).sort((a,b)=>String(a.created_at||"").localeCompare(String(b.created_at||"")));
-      timeline.innerHTML=`<div class="legacy-kicker">DAGBOEKREEKS</div><h4>${entries.length?`${entries.length} moment${entries.length===1?"":"en"} bij dit hotel`:"Jullie dagboek bij dit hotel"}</h4>${entries.length?`<div class="trip-timeline-list">${entries.map(memory=>{const when=memory.created_at?new Date(memory.created_at).toLocaleString("nl-NL",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}):"Moment";return `<article><time>${esc(when)}</time><div><strong>${esc(memory.mood||"Terugblik")}</strong><p>${esc(memory.text||"Foto-moment")}</p></div></article>`;}).join("")}</div>`:`<p class="trip-timeline-empty">Hier verschijnen terugblikken en foto-momenten die jullie bij dit hotel bewaren.</p>`}`;
+      timeline.innerHTML=`<div class="legacy-kicker">DAGBOEKREEKS</div><h4>${entries.length?`${entries.length} moment${entries.length===1?"":"en"} bij dit hotel`:"Jullie dagboek bij dit hotel"}</h4>${entries.length?`<div class="trip-timeline-list">${entries.map(memory=>{const when=memory.created_at?new Date(memory.created_at).toLocaleString("nl-NL",{day:"2-digit",month:"long",hour:"2-digit",minute:"2-digit"}):"Moment";return `<article><time>${esc(when)}</time><div><strong>${esc(memory.mood||"Terugblik")}</strong><p>${esc(memory.text||"Foto-moment")}</p></div></article>`;}).join("")}</div>`:`<p class="trip-timeline-empty">Hier verschijnen jullie terugblikken en foto-momenten bij dit hotel.</p>`}`;
     });
   }
   const tripFeatureStyle=document.createElement("style");tripFeatureStyle.textContent=`.trip-feature-hub{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:26px 0}.trip-feature-card{background:#fffdf8;border:1px solid #e5dcc7;border-radius:20px;padding:20px;color:#173d31}.trip-feature-card h2{font-size:22px;margin:6px 0 12px}.trip-feature-card textarea,.trip-feature-card input,.trip-hotel-notes textarea{box-sizing:border-box;width:100%;border:1px solid #ded5c3;border-radius:11px;padding:10px;font:inherit;margin:5px 0 10px;background:#fff}.trip-feature-card textarea{min-height:86px;resize:vertical}.trip-feature-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.trip-file-label{font-weight:800;color:#176147;cursor:pointer}.trip-file-label input{display:none}.trip-checklist{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.trip-checklist label{font-size:13px;font-weight:700}.trip-budget-line{display:flex;justify-content:space-between;gap:8px}.trip-budget-line span,.trip-feature-card small,.trip-road-card p,.trip-favorite-card p{color:#718078}.trip-budget-track{height:9px;border-radius:99px;background:#e9eee4;margin:12px 0;overflow:hidden}.trip-budget-track i{display:block;height:100%;background:#19805a;border-radius:inherit}.trip-road-meta{display:grid;gap:6px;font-size:13px;margin:12px 0}.trip-hotel-notes label{display:block;font-size:12px;font-weight:800}.trip-hotel-notes textarea{min-height:62px;resize:vertical}.trip-hotel-timeline{margin:18px 0 0;padding:20px 22px;border:1px solid #d7e5d2;border-radius:18px;background:linear-gradient(135deg,#f8fcf5,#fffdf8)}.trip-hotel-timeline h4{font-size:21px;margin:5px 0 16px}.trip-timeline-list{position:relative;margin-left:7px;border-left:3px solid #8abd78}.trip-timeline-list article{position:relative;display:grid;grid-template-columns:110px 1fr;gap:13px;padding:0 0 18px 20px}.trip-timeline-list article:before{content:"";position:absolute;width:11px;height:11px;border-radius:50%;background:#197252;border:3px solid #f8fcf5;left:-9px;top:2px}.trip-timeline-list time{font-size:11px;font-weight:900;color:#4d7462}.trip-timeline-list strong{font-size:12px;color:#257653;text-transform:capitalize}.trip-timeline-list p{margin:3px 0 0;line-height:1.45;color:#173d31}.trip-timeline-empty{margin:0;color:#718078}.trip-road-modal{position:fixed;inset:0;z-index:1500;background:rgba(6,38,29,.88);display:grid;place-items:center;padding:20px}.trip-road-modal[hidden]{display:none}.trip-road-modal>div{width:min(440px,100%);background:#f7f3e8;color:#173d31;padding:30px;border-radius:26px}.trip-road-modal button{float:right;border:0;background:none;font-size:32px;color:#173d31}@media(max-width:700px){.trip-feature-hub{grid-template-columns:1fr}.trip-checklist{grid-template-columns:1fr}.trip-timeline-list article{grid-template-columns:1fr;gap:3px}}`;document.head.appendChild(tripFeatureStyle);
-  setTimeout(()=>{installTripFeatureHub();loadTripFeatures();},900);
+  const journeyTimelineStyle=document.createElement("style");journeyTimelineStyle.textContent=`.journey-hotel-timeline-wrap{min-width:0}.trip-journey-timeline{margin:0;padding:22px;border:1px solid #d7e5d2;border-radius:0 0 22px 22px;background:linear-gradient(135deg,#f8fcf5,#fffdf8)}.trip-journey-timeline h4{font-size:21px;margin:5px 0 16px}@media(max-width:700px){.trip-journey-timeline{padding:18px}.trip-timeline-list article{grid-template-columns:1fr;gap:3px}}`;document.head.appendChild(journeyTimelineStyle);
+  setTimeout(()=>{installTripFeatureHub();loadTripFeatures();renderTripFeatureJourneyTimelines();},900);
   document.querySelectorAll('[data-view="vandaag"],[data-mobile-view="vandaag"]').forEach(btn=>btn.addEventListener("click",()=>setTimeout(renderTripFeatureHub,80)));
   </script>
 
