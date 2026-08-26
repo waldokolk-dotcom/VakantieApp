@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="148">
+<meta name="app-version" content="149">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=148">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=148">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=149">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=149">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -6905,7 +6905,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v148</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v149</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>26 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6913,10 +6913,12 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=148" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=149" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v148</strong><br>
+          <strong>Wijzigingen in v149</strong><br>
+          De afteller slaat bij nul automatisch om naar een oplopende reismeter, vanaf het begin van de reis.<br><br>
+          <strong>Eerdere wijzigingen in v148</strong><br>
           Kies nu zelf de datum voor een dagboekmoment. Handig om eerdere reisdagen later aan te vullen; de tijdlijn zet het moment op die datum.<br><br>
           <strong>Eerdere wijzigingen in v147</strong><br>
           Voeg bij iedere dag in de hotel-dagboekreeks één of meer foto’s toe. De foto’s horen bij diezelfde dag en zijn vanuit de tijdlijn te openen.<br><br>
@@ -7317,7 +7319,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||148;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||149;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -12270,7 +12272,8 @@ function updateHotelCountdowns(){
 
   document.querySelectorAll("[data-countdown-full]").forEach(panel=>{
     const target = new Date(panel.dataset.countdownFull);
-    let diff = Math.max(0, target - now);
+    const hasStarted=now>=target;
+    let diff = hasStarted ? now-target : target-now;
 
     const days = Math.floor(diff / 86400000);
     diff -= days * 86400000;
@@ -12287,10 +12290,16 @@ function updateHotelCountdowns(){
 
     const note = panel.querySelector("[data-note]");
     if(note){
-      const dayText = days === 1 ? "1 nachtje slapen." : `${days + 1} nachtjes slapen.`;
-      if(panel.closest('[data-hotel-stop="zuid-tirol"]')){
+      const hotelCard=panel.closest("[data-hotel-stop]");
+      const countdownTitle=hotelCard?.querySelector(".legacy-hotel-bottom strong");
+      if(hasStarted){
+        if(countdownTitle) countdownTitle.textContent="Reis is begonnen";
+        note.textContent=`Al ${days} dag${days===1?"":"en"} onderweg. Tijd voor een nieuwe terugblik.`;
+      }else if(panel.closest('[data-hotel-stop="zuid-tirol"]')){
+        const dayText = days === 1 ? "1 nachtje slapen." : `${days + 1} nachtjes slapen.`;
         note.textContent = `De koffers doen nog alsof ze rustig zijn: nog ${days + 1} dagen.`;
       }else{
+        const dayText = days === 1 ? "1 nachtje slapen." : `${days + 1} nachtjes slapen.`;
         note.textContent = `${dayText} De honden rekenen waarschijnlijk liever in ontbijtjes.`;
       }
     }
