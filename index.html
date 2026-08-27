@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="173">
+<meta name="app-version" content="174">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=173">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=173">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=174">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=174">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -1211,7 +1211,11 @@
     .memory-story-group h3{margin:2px 0 0;font-size:1rem;text-transform:capitalize;color:#173d31}
     .memory-story-group header small{font:800 .66rem Arial;letter-spacing:1px;text-transform:uppercase;color:#4c8065}
     .memory-story-group>header>span{font:700 .72rem Arial;color:#668074;white-space:nowrap}
+    .memory-journey-map{margin:12px 0 18px;padding:16px;border-radius:18px;background:linear-gradient(135deg,#124f3b,#227257);color:#fff;overflow:auto}
+    .memory-journey-map header{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:14px}.memory-journey-map h3{margin:3px 0 0;font-size:1.18rem}.memory-journey-map small{font:800 .66rem Arial;letter-spacing:1.4px;color:#d8efcf}.memory-journey-map header span{font:700 .75rem Arial;color:#e6f1e0;white-space:nowrap}
+    .memory-journey-rail{display:flex;align-items:stretch;min-width:max-content;padding:2px 4px}.memory-journey-stop{position:relative;display:grid;grid-template-columns:58px minmax(104px,1fr);gap:9px;align-items:center;min-width:188px;padding:0 22px 0 0}.memory-journey-stop:after{content:"";position:absolute;top:29px;right:0;width:22px;height:3px;background:#a8d188}.memory-journey-stop:last-child:after{display:none}.memory-journey-stop img,.memory-journey-photo-placeholder{width:58px;height:58px;border-radius:50%;object-fit:cover;border:3px solid #d8efcf;background:#e6efe1;display:grid;place-items:center}.memory-journey-stop strong{display:block;font-size:.84rem}.memory-journey-stop span{display:block;margin-top:3px;color:#d8efcf;font:700 .68rem Arial}.memory-journey-favorite{color:#ffe38a!important}
     .memory-card{
+      position:relative;
       overflow:hidden;
       background:#fff;
       border:1px solid #e7dfcf;
@@ -1220,7 +1224,7 @@
     .memory-collapse-toggle{
       width:100%;
       display:grid;
-      grid-template-columns:100px minmax(0,1fr) 58px 24px;
+      grid-template-columns:100px minmax(0,1fr) 34px 58px 24px;
       align-items:center;
       gap:12px;
       padding:12px 14px;
@@ -1237,6 +1241,7 @@
     .memory-collapse-thumb{width:58px;height:48px;border-radius:9px;overflow:hidden;background:#eaf0e8;display:grid;place-items:center;font-size:1.15rem}
     .memory-collapse-thumb img{display:block;width:100%;height:100%;object-fit:cover}
     .memory-collapse-chevron{font-size:1.2rem;font-weight:900;color:#397057;transition:transform .18s ease}
+    .memory-summary-favorite{position:absolute;z-index:1;top:17px;right:94px;width:30px;height:30px;border:0;border-radius:50%;background:#eaf3e6;color:#176147;font-size:1rem;font-weight:900;cursor:pointer}.memory-summary-favorite.is-favorite{background:#f8e4a3;color:#9b6912}
     .memory-card.is-expanded .memory-collapse-chevron{transform:rotate(180deg)}
     .memory-card-content{display:none}
     .memory-card.is-expanded .memory-card-content{display:block}
@@ -1474,8 +1479,10 @@
         align-items:stretch;
         gap:8px;
       }
-      .memory-collapse-toggle{grid-template-columns:84px minmax(0,1fr) 52px 18px;gap:8px;padding:10px}
+      .memory-collapse-toggle{grid-template-columns:84px minmax(0,1fr) 30px 52px 18px;gap:8px;padding:10px}
       .memory-collapse-date{font-size:.67rem}.memory-collapse-title{font-size:.84rem}.memory-collapse-thumb{width:52px;height:44px}
+      .memory-summary-favorite{top:16px;right:82px}
+      .memory-journey-map{margin-top:8px;padding:13px}.memory-journey-stop{min-width:170px}.memory-journey-map h3{font-size:1rem}
       .memory-card-actions .btn,
       .memory-card-actions .memory-delete-btn{
         min-width:0;
@@ -6994,8 +7001,12 @@
         </p>
 
         <div class="form-grid">
-          <label class="full">Wat wil je onthouden?
-            <textarea id="memoryText" rows="4" placeholder="Bijv. prachtige wandeling, heerlijk gegeten, grappig moment met de honden…"></textarea>
+          <label class="full">Titel
+            <input id="memoryTitle" maxlength="90" placeholder="Bijv. Wandeling bij de Mummelsee">
+          </label>
+
+          <label class="full">Jullie verhaal
+            <textarea id="memoryText" rows="4" placeholder="Wat wil je hierover onthouden?"></textarea>
           </label>
 
           <label>Soort bijdrage
@@ -7063,6 +7074,7 @@
       <div class="card span-7">
         <div class="eyebrow">Jullie tijdlijn</div>
         <h2>Reisverhaal</h2>
+        <section id="memoryJourneyMap" class="memory-journey-map" aria-label="Grafische tijdreis"></section>
         <div class="toolbar">
           <button id="refreshMemories" class="btn secondary">Vernieuwen</button>
         </div>
@@ -7080,7 +7092,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v173</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v174</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>27 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -7088,11 +7100,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=173" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=174" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v173</strong><br>
-          De dubbele dagboekblokken onder ieder hotel zijn verwijderd. Dagboek en Momenten staan alleen nog samen in Reisverhaal, gegroepeerd per dag en plek; de menubalken heten nu overal Reisverhaal.<br><br>
+          <strong>Wijzigingen in v174</strong><br>
+          Reisverhaal heeft nu een losse titelbalk, een directe ster in iedere kaart om favorieten te maken en een grafische tijdreis met alle hotels, verhalen en foto’s. Op telefoon staan Foto toevoegen en Bewaar foto’s netjes naast elkaar. De losse hoogtepunten- en reisboekblokken zijn verwijderd van Vandaag.<br><br>
           <strong>Eerdere wijzigingen in v165</strong><br>
           De weerinformatie heet nu overal Weerkaart. De knop ‘Vernieuw weer’ haalt de weersverwachting daadwerkelijk opnieuw op; een tijdelijke storing blijft duidelijk als weerstoring gemeld.<br><br>
           <strong>Eerdere wijzigingen in v164</strong><br>
@@ -7537,7 +7549,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||173;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||174;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7546,7 +7558,7 @@ async function checkTechnicalVersion(){
   }
 }
 
-const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||173;
+const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||174;
 const technicalCurrentVersion=document.getElementById("technicalCurrentVersion");
 if(technicalCurrentVersion) technicalCurrentVersion.textContent=`v${openedAppVersion}`;
 const technicalLink=document.querySelector(".technical-link");
@@ -8541,6 +8553,7 @@ function loadAllRoomPhotos(){
 function renderHotelsTab(){
   const list=document.getElementById("hotelsTabList");
   const intro=document.getElementById("hotelsTabIntro");
+  renderMemoryJourneyMap(memories||[],photoMap);
   if(!list) return;
 
   const meta=tripMeta();
@@ -12203,14 +12216,19 @@ async function loadMemories(){
       attached.length ? `${attached.length} foto${attached.length===1?"":"\'s"}` : ""
     ].filter(Boolean).join(" · ");
 
-    const rawTitle=String(memory.text||"Moment").trim().split(/\n|(?<=[.!?])\s/)[0]||"Moment";
+    const savedText=String(memory.text||"Moment").trim();
+    const titleSeparator=savedText.indexOf("\n\n");
+    const rawTitle=(titleSeparator>0?savedText.slice(0,titleSeparator):savedText.split(/\n|(?<=[.!?])\s/)[0]).trim()||"Moment";
+    const storyBody=titleSeparator>0?savedText.slice(titleSeparator+2).trim():savedText;
     const compactTitle=rawTitle.length>58?`${rawTitle.slice(0,55).trimEnd()}…`:rawTitle;
     const thumbnail=attached[0]?.preview_url||attached[0]?.original_url||"";
 
     return `<article class="memory-card">
+      <button type="button" class="memory-summary-favorite ${tripFeatureState?.favorites?.includes(memory.id)?"is-favorite":""}" data-favorite-memory="${esc(memory.id)}" aria-label="${tripFeatureState?.favorites?.includes(memory.id)?"Niet meer favoriet maken":"Als favoriet markeren"}" title="Favoriet maken">${tripFeatureState?.favorites?.includes(memory.id)?"★":"☆"}</button>
       <button type="button" class="memory-collapse-toggle" data-toggle-memory="${esc(memory.id)}" aria-expanded="false" aria-controls="memory-content-${esc(memory.id)}">
         <span class="memory-collapse-date">${esc(created||"Moment")}</span>
         <strong class="memory-collapse-title">${esc(compactTitle)}</strong>
+        <span aria-hidden="true"></span>
         <span class="memory-collapse-thumb">${thumbnail?`<img src="${esc(thumbnail)}" alt="" loading="lazy" decoding="async">`:"📷"}</span>
         <span class="memory-collapse-chevron" aria-hidden="true">⌄</span>
       </button>
@@ -12221,14 +12239,13 @@ async function loadMemories(){
           <span class="memory-author">🛏️ ${esc(memory.created_by||"Onbekend")}</span>
           <span class="memory-date">${esc(created)}</span>
         </div>
-        <div class="memory-text">${esc(memory.text||"Moment")}</div>
+        ${storyBody?`<div class="memory-text">${esc(storyBody)}</div>`:""}
         <div class="memory-meta">${esc(meta)}</div>
         <div class="memory-card-actions">
-          <button type="button" class="btn secondary" data-favorite-memory="${esc(memory.id)}">${tripFeatureState?.favorites?.includes(memory.id) ? "★ Favoriet" : "☆ Favoriet"}</button>
           <button type="button" class="btn secondary memory-edit-btn" data-edit-memory="${esc(memory.id)}">✎ Tekst wijzigen</button>
           <button type="button" class="btn secondary memory-photo-btn" data-add-memory-photo="${esc(memory.id)}">＋ Foto toevoegen</button>
-          <button type="button" class="btn secondary memory-photo-btn" data-replace-memory-photo="${esc(memory.id)}">↻ Foto's vervangen</button>
           ${attached.length?`<button type="button" class="btn secondary" data-save-memory-to-phone="${esc(memory.id)}">📲 Bewaar foto${attached.length===1?"":"’s"} in Foto’s</button>`:""}
+          <button type="button" class="btn secondary memory-photo-btn" data-replace-memory-photo="${esc(memory.id)}">↻ Foto's vervangen</button>
           <button type="button" class="memory-delete-btn" data-delete-memory="${esc(memory.id)}">🗑 Verwijder foto-moment</button>
         </div>
         ${attached.length?`<span class="photo-phone-status memory-photo-phone-status" data-memory-phone-status="${esc(memory.id)}" role="status" aria-live="polite"></span>`:""}
@@ -12275,6 +12292,20 @@ async function loadMemories(){
     image.addEventListener("error",()=>image.remove(),{once:true});
   });
   if(typeof window.renderTripFeatureHotelNotes==="function") window.renderTripFeatureHotelNotes();
+}
+
+function renderMemoryJourneyMap(memories,photoMap){
+  const host=document.getElementById("memoryJourneyMap");if(!host) return;
+  const stops=(typeof tripStops==="function"?tripStops():[]);
+  const favorites=new Set(tripFeatureState?.favorites||[]);
+  const rail=stops.map(stop=>{
+    const entries=memories.filter(memory=>memory.stop_id===stop.id);
+    const photo=entries.flatMap(memory=>photoMap[memory.id]||[])[0];
+    const favorite=entries.some(memory=>favorites.has(memory.id));
+    return `<article class="memory-journey-stop"><span class="memory-journey-photo-placeholder">${photo?`<img src="${esc(photo.preview_url||photo.original_url)}" alt="">`:"🏨"}</span><div><strong>${esc(stop.city||stop.hotel||"Stop")}</strong><span>${entries.length} verhaal${entries.length===1?"":"en"}${favorite?` <b class="memory-journey-favorite">★</b>`:""}</span></div></article>`;
+  }).join("")||"<p>Nog geen hotelstops ingevoerd.</p>";
+  const photoCount=Object.values(photoMap||{}).reduce((sum,photos)=>sum+photos.length,0);
+  host.innerHTML=`<header><div><small>TIJDREIS</small><h3>Onze reis in één oogopslag</h3></div><span>${memories.length} verhalen · ${photoCount} foto’s</span></header><div class="memory-journey-rail">${rail}</div>`;
 }
 
 function openMemoryPhoto(src,sources){
@@ -15365,7 +15396,9 @@ async function saveMemoryWithPhotos(){
     return;
   }
 
-  const textValue=document.getElementById("memoryText").value.trim();
+  const titleValue=document.getElementById("memoryTitle")?.value.trim()||"";
+  const storyValue=document.getElementById("memoryText").value.trim();
+  const textValue=titleValue ? (storyValue?`${titleValue}\n\n${storyValue}`:titleValue) : storyValue;
   const stop=await resolveMemoryLocation();
   const entryKind=document.getElementById("memoryEntryKind")?.value||"moment";
   const mood=entryKind==="diary" ? "Dagboek" : (document.getElementById("memoryMood").value || null);
@@ -15375,8 +15408,8 @@ async function saveMemoryWithPhotos(){
   const msg=document.getElementById("memoryFormMsg");
   const button=document.getElementById("saveMemory");
 
-  if(!textValue && !files.length){
-    msg.innerHTML='<div class="notice">Voeg een tekst of minimaal één foto toe.</div>';
+  if(!titleValue && !textValue && !files.length){
+    msg.innerHTML='<div class="notice">Geef je reisverhaal eerst een titel.</div>';
     return;
   }
 
@@ -15452,6 +15485,7 @@ async function saveMemoryWithPhotos(){
       uploaded++;
     }
 
+    document.getElementById("memoryTitle").value="";
     document.getElementById("memoryText").value="";
     document.getElementById("memoryMood").value="";
     document.getElementById("memoryPhotos").value="";
@@ -15481,7 +15515,7 @@ document.getElementById("memoryEntryKind")?.addEventListener("change",event=>{
   const moodField=document.getElementById("memoryMoodField");
   if(moodField) moodField.hidden=diary;
   const text=document.getElementById("memoryText");
-  if(text) text.placeholder=diary?"Schrijf jullie terugblik van deze dag…":"Bijv. prachtige wandeling, heerlijk gegeten, grappig moment met de honden…";
+  if(text) text.placeholder=diary?"Schrijf jullie terugblik van deze dag…":"Wat wil je hierover onthouden?";
 });
 
 const memoryPhotosInput=document.getElementById("memoryPhotos");
@@ -17177,17 +17211,6 @@ if(document.readyState==="loading"){
         <p>${next?`${next.city||next.place||""} · aankomst ${formatTripDate(next.arrival)}`:"Alle stops zijn bereikt."}</p>
         <div class="trip-road-meta"><span>⚡ ${((costData||[]).filter(r=>r.category==="charging").slice(0,1)[0]?.kwh||0).toLocaleString("nl-NL")} kWh laatst geladen</span><span>🐾 hondenpauze plannen</span></div>
         <button id="openRoadMode" class="btn secondary" type="button">Rustig scherm openen</button>
-      </div>
-      <div class="trip-feature-card trip-favorite-card">
-        <div class="legacy-kicker">HOOGTEPUNTEN</div><h2>Favoriete momenten</h2>
-        <p>${favorites.length?favorites.slice(0,2).map(m=>esc(m.text||"Foto-moment")).join(" · "):"Tik bij een moment op ☆ Favoriet. Deze lijst wordt later de basis voor het reisboek."}</p>
-        <button id="openFavorites" class="btn secondary" type="button">Bekijk favorieten (${favorites.length})</button>
-      </div>
-      <div class="trip-feature-card trip-recap-card">
-        <div class="legacy-kicker">TERUGBLIK & REISBOEK</div><h2>Jullie reis in één keer</h2>
-        <p>${nights} nachten · ${(window.lastTripMemories||[]).length} momenten · ${photoCount} foto’s · ${favorites.length} favorieten · ${featureEuro(total)}</p>
-        <div class="trip-feature-actions"><input id="tripOdoInput" inputmode="numeric" placeholder="Gereden kilometers" value="${Number(tripFeatureState.odometerKm)||""}"><button id="saveTripOdo" class="btn secondary" type="button">Bewaar km</button></div>
-        <button id="openTripBook" class="btn" type="button">📖 Open fotoboekatelier</button>
       </div>`;
     hub.querySelectorAll("[data-departure-check]").forEach(box=>box.onchange=async()=>{
       if(!departure) return; const nextChecks=new Set(tripFeatureState.departureChecks[departure.id]||[]);
@@ -17205,9 +17228,6 @@ if(document.readyState==="loading"){
       status.textContent="Terugblik opslaan…"; await saveMemoryWithPhotos(); status.textContent="✓ Terugblik bewaard in jullie reisverhaal."; hub.querySelector("#todayDiaryTitle").value=""; hub.querySelector("#todayDiaryText").value=""; hub.querySelector("#todayDiaryPhoto").value="";
     };
     hub.querySelector("#openRoadMode").onclick=()=>openTripRoadMode(next);
-    hub.querySelector("#openFavorites").onclick=()=>openTripHighlights();
-    hub.querySelector("#saveTripOdo").onclick=async()=>{tripFeatureState.odometerKm=Math.max(0,Math.round(Number(hub.querySelector("#tripOdoInput").value||0)));await saveTripFeatures();renderTripFeatureHub();};
-    hub.querySelector("#openTripBook").onclick=()=>openTripBookAtelier();
   }
   function tripBookStorageKey(){return `vakantieapp:fotoboek:${currentTripId||"reis"}`;}
   function tripBookPhotoKey(memory,index){return `${memory.id}:${index}`;}
