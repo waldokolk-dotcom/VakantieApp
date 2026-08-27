@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="172">
+<meta name="app-version" content="173">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=172">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=172">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=173">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=173">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -7080,7 +7080,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v172</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v173</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>27 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -7088,11 +7088,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=172" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=173" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v172</strong><br>
-          Dagboek en Momenten zijn samengebracht als Reisverhaal. Kies bij een nieuwe bijdrage kort moment of dagboekverhaal, datum en hotel. Alles verschijnt samen, gegroepeerd per dag en plek; de menubalken heten nu overal Reisverhaal.<br><br>
+          <strong>Wijzigingen in v173</strong><br>
+          De dubbele dagboekblokken onder ieder hotel zijn verwijderd. Dagboek en Momenten staan alleen nog samen in Reisverhaal, gegroepeerd per dag en plek; de menubalken heten nu overal Reisverhaal.<br><br>
           <strong>Eerdere wijzigingen in v165</strong><br>
           De weerinformatie heet nu overal Weerkaart. De knop ‘Vernieuw weer’ haalt de weersverwachting daadwerkelijk opnieuw op; een tijdelijke storing blijft duidelijk als weerstoring gemeld.<br><br>
           <strong>Eerdere wijzigingen in v164</strong><br>
@@ -7537,7 +7537,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||172;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||173;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7546,7 +7546,7 @@ async function checkTechnicalVersion(){
   }
 }
 
-const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||172;
+const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||173;
 const technicalCurrentVersion=document.getElementById("technicalCurrentVersion");
 if(technicalCurrentVersion) technicalCurrentVersion.textContent=`v${openedAppVersion}`;
 const technicalLink=document.querySelector(".technical-link");
@@ -17335,6 +17335,14 @@ if(document.readyState==="loading"){
     return {title:title.length>76?`${title.slice(0,73).trimEnd()}…`:title,body:raw};
   }
   function renderTripFeatureJourneyTimelines(){
+    // Dagboek en Momenten zijn samengevoegd in Reisverhaal. Verwijder de oude,
+    // dubbele dagboekblokken onder de hotels ook als ze al op de pagina stonden.
+    document.querySelectorAll(".trip-journey-timeline").forEach(timeline=>timeline.remove());
+    document.querySelectorAll(".journey-hotel-timeline-wrap").forEach(wrap=>{
+      const hotelCard=wrap.querySelector("[data-hotel-stop]");
+      if(hotelCard) wrap.replaceWith(hotelCard);
+    });
+    return;
     document.querySelectorAll("#journeyHotelGrid [data-hotel-stop]").forEach(card=>{
       const stop=card.dataset.hotelStop;
       let wrap=card.closest(".journey-hotel-timeline-wrap");
@@ -17441,7 +17449,7 @@ if(document.readyState==="loading"){
     document.head.appendChild(mobileGuidePosition);
     const button=document.createElement("button");button.id="appGuideButton";button.className="app-guide-button";button.type="button";button.textContent="✦ Wegwijzer";button.setAttribute("aria-haspopup","dialog");
     const guide=document.createElement("section");guide.id="appGuide";guide.className="app-guide";guide.hidden=true;guide.setAttribute("role","dialog");guide.setAttribute("aria-modal","true");guide.setAttribute("aria-label","Wegwijzer van de Vakantie-app");
-    guide.innerHTML=`<div class="app-guide-card"><button class="app-guide-close" type="button" aria-label="Wegwijzer sluiten">×</button><div class="legacy-kicker">SNEL WEGWIJS</div><h2>Wat wil je nu doen?</h2><p>De belangrijkste nieuwe onderdelen staan hieronder. Tik of klik; de app brengt je direct naar de juiste plek.</p><div class="app-guide-grid"><button class="app-guide-go" data-guide-view="vandaag" data-guide-target="#tripFeatureHub"><strong>✍️ Vandaag vastleggen</strong><span>Dagboek, foto, vertrekchecklist en budget.</span></button><button class="app-guide-go" data-guide-view="momenten" data-guide-target="#memoryPhotoQuickButton"><strong>📷 Foto of moment toevoegen</strong><span>Maak een foto, voeg tekst toe of kies een favoriet.</span></button><button class="app-guide-go" data-guide-view="reis" data-guide-target="#journeyHotelGrid"><strong>🗓️ Dagboek per hotel</strong><span>Schrijf voor een eigen datum in de tijdlijn onder jullie hotels.</span></button><button class="app-guide-go" data-guide-view="hotels" data-guide-target="#hotelsTabList"><strong>🏨 Hotelnotities</strong><span>Bewaar kamer-, wandeling- en restauranttips per verblijf.</span></button><button class="app-guide-go" data-guide-view="kosten" data-guide-target="#costCategoryTotals"><strong>€ Kosten en laden</strong><span>Bekijk totalen en koppel laadkosten aan een hotel.</span></button><button class="app-guide-go" data-guide-view="vandaag" data-guide-target="#openTripBook"><strong>📖 Fotoboek en onderweg</strong><span>Open het fotoboekatelier of het rustige reisscherm.</span></button></div></div>`;
+    guide.innerHTML=`<div class="app-guide-card"><button class="app-guide-close" type="button" aria-label="Wegwijzer sluiten">×</button><div class="legacy-kicker">SNEL WEGWIJS</div><h2>Wat wil je nu doen?</h2><p>De belangrijkste nieuwe onderdelen staan hieronder. Tik of klik; de app brengt je direct naar de juiste plek.</p><div class="app-guide-grid"><button class="app-guide-go" data-guide-view="vandaag" data-guide-target="#tripFeatureHub"><strong>✍️ Vandaag vastleggen</strong><span>Terugblik, foto, vertrekchecklist en budget.</span></button><button class="app-guide-go" data-guide-view="momenten" data-guide-target="#memoryPhotoQuickButton"><strong>📖 Reisverhaal toevoegen</strong><span>Kies een kort moment of dagboekverhaal, met foto en datum.</span></button><button class="app-guide-go" data-guide-view="momenten" data-guide-target="#memoryList"><strong>🗓️ Tijdlijn bekijken</strong><span>Alle bijdragen samen, gegroepeerd per dag en plek.</span></button><button class="app-guide-go" data-guide-view="hotels" data-guide-target="#hotelsTabList"><strong>🏨 Hotelnotities</strong><span>Bewaar kamer-, wandeling- en restauranttips per verblijf.</span></button><button class="app-guide-go" data-guide-view="kosten" data-guide-target="#costCategoryTotals"><strong>€ Kosten en laden</strong><span>Bekijk totalen en koppel laadkosten aan een hotel.</span></button><button class="app-guide-go" data-guide-view="vandaag" data-guide-target="#openTripBook"><strong>📖 Fotoboek en onderweg</strong><span>Open het fotoboekatelier of het rustige reisscherm.</span></button></div></div>`;
     document.body.append(button,guide);
     const close=()=>{guide.hidden=true;button.focus();};
     button.onclick=()=>{guide.hidden=false;guide.querySelector(".app-guide-close").focus();};
