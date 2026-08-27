@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="152">
+<meta name="app-version" content="155">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=152">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=152">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=155">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=155">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -6664,6 +6664,9 @@
           <label>Datum
             <input id="chargeDate" type="date">
           </label>
+          <label>Hotel
+            <select id="chargeHotelStop"><option value="">Niet aan een hotel koppelen</option></select>
+          </label>
           <label>Betaald door
             <select id="chargePaidBy"><option>Waldo</option><option>Brigitte</option><option>Samen</option></select>
           </label>
@@ -6905,7 +6908,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v152</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v155</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>26 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6913,10 +6916,16 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=152" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=155" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v152</strong><br>
+          <strong>Wijzigingen in v155</strong><br>
+          Bestaande laadbeurten zonder hotel worden automatisch gekoppeld aan het hotel van de laaddatum. Nieuwe laadbeurten hebben een hotelkeuze.<br><br>
+          <strong>Eerdere wijzigingen in v154</strong><br>
+          Kies bij iedere laadbeurt het hotel. De laadkosten worden direct meegenomen in het totaalbedrag van dat hotel.<br><br>
+          <strong>Eerdere wijzigingen in v153</strong><br>
+          Nieuw fotoboekmodel Alpenverhaal: luxe coverlabel, hoofdstukaccenten, collages, dagboektypografie, paginanummers en een consistente boekstijl.<br><br>
+          <strong>Eerdere wijzigingen in v152</strong><br>
           Het reisboek is nu een fotoboekatelier: cover, route, hotelhoofdstukken, grote foto’s, collages, dagboekpagina’s, hoogtepunten en afsluitspread. Kies in het atelier zelf Bewaar als PDF.<br><br>
           <strong>Eerdere wijzigingen in v151</strong><br>
           Het reisboek bevat nu route, herkenbare hoogtepunten en een afsluitpagina. Onderweg-modus haalt rijtijd en weer op; favorieten hebben hun eigen hoogtepuntenlijst.<br><br>
@@ -7325,7 +7334,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||152;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||155;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -10499,9 +10508,26 @@ async function loadCosts(){
   if(!client) return;
   const {data,error}=await client.from("costs").select("*").eq("trip_id",currentTripId).order("date",{ascending:false}).order("created_at",{ascending:false});
   if(error){ document.getElementById("costList").innerHTML='<div class="empty">'+esc(error.message)+'</div>'; return; }
-  costData=data||[];
+  costData=await assignExistingChargingCosts(data||[]);
   updateSavedCostCategoryOptions();
   renderCosts();
+}
+
+async function assignExistingChargingCosts(rows){
+  const stops=tripStops();
+  const assignments=[];
+  const updated=rows.map(row=>{
+    if(row.category!=="charging" || row.stop_id || !row.date) return row;
+    const stop=stops.find(item=>row.date>=item.arrival&&row.date<=item.departure);
+    if(!stop) return row;
+    assignments.push({id:row.id,stopId:stop.id});
+    return {...row,stop_id:stop.id};
+  });
+  if(assignments.length){
+    const results=await Promise.all(assignments.map(item=>client.from("costs").update({stop_id:item.stopId}).eq("id",item.id)));
+    results.forEach((result,index)=>{if(result.error) console.warn("Bestaande laadbeurt koppelen mislukt",assignments[index],result.error);});
+  }
+  return updated;
 }
 
 
@@ -10625,6 +10651,13 @@ function openChargeSession(place=null){
 
   document.getElementById("chargePaidBy").value=actorName();
   document.getElementById("chargeDate").value=dateOnlyLocal();
+  const hotelSelect=document.getElementById("chargeHotelStop");
+  if(hotelSelect){
+    const today=dateOnlyLocal();
+    const currentStop=tripStops().find(stop=>today>=stop.arrival&&today<stop.departure)?.id||"";
+    hotelSelect.innerHTML='<option value="">Niet aan een hotel koppelen</option>'+tripStops().map(stop=>`<option value="${esc(stop.id)}">${esc(stop.hotel||stop.city||stop.id)}</option>`).join("");
+    hotelSelect.value=currentStop;
+  }
 
   if(place){
     setPendingChargeStation(place,"omgeving");
@@ -10677,7 +10710,7 @@ async function saveChargeSession(){
 
   const record={
     trip_id:currentTripId,
-    stop_id:null,
+    stop_id:document.getElementById("chargeHotelStop")?.value||null,
     amount_cents:amount,
     category:"charging",
     date:document.getElementById("chargeDate").value || dateOnlyLocal(),
@@ -16746,6 +16779,9 @@ if(document.readyState==="loading"){
     const bookStats=`${featureNights()} nachten · ${memories.length} momenten · ${Object.values(window.lastTripPhotoMap||{}).reduce((sum,photos)=>sum+photos.length,0)} foto’s · ${Number(tripFeatureState.odometerKm)||0} km · ${featureEuro(total)}`;
     book.document.write(`<!doctype html><html lang="nl"><head><meta charset="utf-8"><title>${esc(meta.name||"Onze reis")}</title><style>*{box-sizing:border-box}body{margin:0;background:#dde5da;color:#173d31;font-family:Georgia,serif}.toolbar{position:sticky;top:0;z-index:4;padding:13px;text-align:center;background:#173d31}.toolbar button{border:0;border-radius:999px;background:#f5e9cb;color:#173d31;padding:10px 18px;font:700 14px Arial;cursor:pointer}.page{width:min(1120px,94vw);min-height:min(790px,72vw);margin:30px auto;background:#fffdf8;padding:64px;box-shadow:0 14px 42px #19342544;break-after:page;position:relative}.cover,.chapter{display:flex;align-items:end;background:#176147 center/cover;color:#fff;overflow:hidden}.cover:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,35,25,.84),rgba(8,35,25,.08))}.cover>*{position:relative}.cover h1,.chapter h1{font-size:clamp(42px,7vw,88px);line-height:.95;margin:14px 0}.cover .stats{max-width:610px;font:600 16px Arial;line-height:1.7}.eyebrow,small{font:800 13px Arial;letter-spacing:2px;color:#518b68}.cover small,.chapter small{color:#e0f2d8}.route{display:grid;place-items:center;text-align:center;background:#edf4e9}.route h1{font-size:56px}.route-line{max-width:800px;font:700 19px Arial;line-height:2.3}.route-line span{white-space:nowrap}.chapter{min-height:min(650px,64vw)}.chapter p{max-width:520px;font:18px Arial;line-height:1.5}.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}.photo-grid.few{grid-template-columns:repeat(2,1fr)}figure{margin:0;min-height:210px;background:#e4ece1;overflow:hidden}figure img{width:100%;height:100%;min-height:210px;object-fit:cover;display:block}figcaption{font:12px Arial;color:#668074;padding:6px}.diary article{border-left:4px solid #73a866;padding:10px 18px;margin:16px 0;background:#f3f7ee}.diary article p{font-size:22px;line-height:1.45;margin:7px 0}.highlights{background:#f5e9cb}.closing{display:grid;place-items:center;text-align:center;background:#176147;color:#fff}.closing h1{font-size:64px}.closing p{font:20px Arial;max-width:600px;line-height:1.6}@media(max-width:700px){.page{padding:30px;min-height:600px}.photo-grid{gap:7px}.cover h1,.chapter h1{font-size:44px}.route h1,.closing h1{font-size:38px}.diary article p{font-size:18px}}@media print{body{background:white}.toolbar{display:none}.page{width:280mm;height:198mm;min-height:198mm;margin:0;box-shadow:none;page-break-after:always}.photo-grid figure{min-height:42mm}figure img{min-height:42mm}}</style></head><body><div class="toolbar"><button onclick="window.print()">Bewaar dit fotoboek als PDF</button></div><section class="page cover" ${coverPhoto?`style="background-image:linear-gradient(90deg,rgba(8,35,25,.84),rgba(8,35,25,.08)),url('${esc(coverPhoto.preview_url||coverPhoto.original_url)}')"`:""}><div><small>REISBOEK</small><h1>${esc(meta.name||"Onze reis")}</h1><p>Waldo & Brigitte</p><p class="stats">${bookStats}</p></div></section><section class="page route"><div><div class="eyebrow">DE ROUTE</div><h1>Op weg</h1><p class="route-line">${route.map((place,index)=>`<span>${esc(place)}${index<route.length-1?" &nbsp;→&nbsp; ":""}</span>`).join("")}</p><p>${bookStats}</p></div></section>${hotelChapters}${highlightPage}<section class="page closing"><div><div class="eyebrow" style="color:#d9ebd3">EINDE VAN DE REIS</div><h1>Wat een mooie reis</h1><p>Herinneringen aan samen onderweg zijn, bijzondere plekken en heel veel foto’s om nog vaak doorheen te bladeren.</p></div></section></body></html>`);
     book.document.close();
+    book.document.head.insertAdjacentHTML("beforeend",`<style>.toolbar:before{content:"ALPENVERHAAL · FOTBOEKATELIER";display:block;margin:0 0 8px;color:#d9ebd3;font:800 11px Arial;letter-spacing:2px}.page:after{content:attr(data-page);position:absolute;right:30px;bottom:22px;color:#668074;font:700 11px Arial;letter-spacing:1px}.cover:after{display:none}.page:not(.cover):not(.closing){border-top:9px solid #e8d6a8}.chapter{border-top:0}.chapter:after{color:#e0f2d8}.photo-grid figure{border-radius:3px;box-shadow:0 8px 18px #173d3124}.diary article:first-of-type:first-letter{float:left;font-size:52px;line-height:.78;padding:6px 8px 0 0;color:#176147;font-weight:bold}.route:before{content:"✦";font-size:35px;color:#b78845}.highlights{background:linear-gradient(135deg,#f7e8c4,#fffdf8)}.closing:before{content:"WALDO & BRIGITTE";font:800 12px Arial;letter-spacing:3px;color:#d9ebd3}</style>`);
+    book.document.querySelectorAll(".page").forEach((page,index)=>page.dataset.page=`${String(index+1).padStart(2,"0")} · ALPENVERHAAL`);
+    const coverLabel=book.document.querySelector(".cover small");if(coverLabel) coverLabel.textContent="ALPENVERHAAL · FOTBOEKMODEL";
   }
   function openTripRoadMode(next){
     let modal=document.getElementById("tripRoadMode"); if(!modal){modal=document.createElement("div");modal.id="tripRoadMode";modal.className="trip-road-modal";document.body.appendChild(modal);}
