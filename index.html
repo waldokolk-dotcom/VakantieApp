@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="164">
+<meta name="app-version" content="165">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=164">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=164">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=165">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=165">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -3763,6 +3763,8 @@
     .hotel-weather-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:13px}
     .hotel-weather-head h4{margin:0}.hotel-weather-head p{margin:4px 0 0;color:#718078;font-size:11px;line-height:1.4}
     .hotel-weather-badge{flex:0 0 auto;border-radius:999px;background:#dcefe1;color:#176147;padding:6px 9px;font-size:10px;font-weight:900}
+    .hotel-weather-retry{border:0;border-radius:999px;background:#176147;color:#fff;padding:7px 10px;font-size:10px;font-weight:900;cursor:pointer}
+    .hotel-weather-retry:disabled{opacity:.65;cursor:wait}
     .hotel-weather-now{display:flex;align-items:center;gap:12px;padding:12px 13px;border:1px solid #dbe9d9;border-radius:14px;background:#fff;margin-bottom:11px}
     .hotel-weather-now-icon{font-size:27px;line-height:1}.hotel-weather-now strong{display:block;color:#173d31;font-size:19px}.hotel-weather-now span{display:block;color:#61736a;font-size:11px;margin-top:2px}
     .hotel-weather-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px}
@@ -6986,7 +6988,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v164</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v165</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>27 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6994,10 +6996,12 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=164" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=165" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v164</strong><br>
+          <strong>Wijzigingen in v165</strong><br>
+          De weerinformatie heet nu overal Weerkaart. De knop ‘Vernieuw weer’ haalt de weersverwachting daadwerkelijk opnieuw op; een tijdelijke storing blijft duidelijk als weerstoring gemeld.<br><br>
+          <strong>Eerdere wijzigingen in v164</strong><br>
           Ieder hotel toont nu altijd een volledig zevendaags weerbericht. De bron staat zichtbaar vermeld: Open-Meteo met actuele weermodellen, nooit een hotelwebsite.<br><br>
           <strong>Eerdere wijzigingen in v163</strong><br>
           Ieder hotel heeft nu een eigen live weerkaart met de actuele situatie. Het fotoboek kreeg afwisselende, redactionele fotocollages.<br><br>
@@ -7439,7 +7443,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||164;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||165;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7448,7 +7452,7 @@ async function checkTechnicalVersion(){
   }
 }
 
-const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||164;
+const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||165;
 const technicalCurrentVersion=document.getElementById("technicalCurrentVersion");
 if(technicalCurrentVersion) technicalCurrentVersion.textContent=`v${openedAppVersion}`;
 const technicalLink=document.querySelector(".technical-link");
@@ -8517,7 +8521,7 @@ function renderHotelsTab(){
 
           <section class="hotel-info-panel hotel-weather-panel" data-hotel-weather="${esc(stop.id)}">
             <div class="hotel-weather-head">
-              <div><h4>🌦️ Weer bij dit hotel</h4><p>Actueel weer en verwachting voor jullie verblijf laden…</p></div>
+              <div><h4>🌦️ Weerkaart</h4><p>Actueel weer en verwachting voor jullie verblijf laden…</p></div>
               <span class="hotel-weather-badge">WEER LADEN</span>
             </div>
             <div class="hotel-weather-now"><div class="hotel-weather-now-icon">🌦️</div><div><strong>Even ophalen…</strong><span>De hotelkaart wordt zo aangevuld.</span></div></div>
@@ -8877,7 +8881,9 @@ function updateDynamicStopSelects(){
 }
 
 function normalizeStopForLive(stop){
-  const currentDefaults=TODAY_HOTELS?.[stop.id] || {};
+  /* Deze functie kan al tijdens de eerste hotelweergave draaien, voordat de
+     live-standaardhotels verderop in het document zijn aangemaakt. */
+  const currentDefaults=(globalThis.TODAY_HOTELS||{})[stop.id] || {};
   return {
     ...currentDefaults,
     ...stop,
@@ -12911,6 +12917,7 @@ const TODAY_HOTELS = {
     ]
   }
 };
+globalThis.TODAY_HOTELS=TODAY_HOTELS;
 
 /* Wellness-informatie, gebaseerd op de officiële hotelwebsites (gecontroleerd augustus 2026). */
 const WELLNESS_DATA = {
@@ -13212,21 +13219,28 @@ function renderHotelWeatherPanel(stop,weather){
     return `<div class="hotel-weather-day"><strong>${esc(label)}</strong><span>${weatherIcon(weather.daily.weather_code?.[index])}</span><small>${max}° / ${min}°</small><small>💧 ${rain}%</small></div>`;
   }).join("");
   const updated=new Date(weather._fetchedAt||Date.now()).toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"});
-  panel.innerHTML=`<div class="hotel-weather-head"><div><h4>🌦️ Weer bij ${esc(hotel.city||hotel.hotel)}</h4><p>${esc(forecast.label)} · bijgewerkt ${updated}</p></div><span class="hotel-weather-badge">LIVE</span></div><div class="hotel-weather-now"><div class="hotel-weather-now-icon">${currentIcon}</div><div><strong>${currentTemp}°C · ${esc(currentText)}</strong><span>Actueel op de hotellocatie · wind ${Math.round(weather.current?.wind_speed_10m??0)} km/u</span></div></div>${days?`<div class="hotel-weather-days">${days}</div>`:""}<p class="hotel-weather-note">${esc(forecast.note)}</p>`;
+  panel.innerHTML=`<div class="hotel-weather-head"><div><h4>🌦️ Weerkaart · ${esc(hotel.city||hotel.hotel)}</h4><p>${esc(forecast.label)} · bijgewerkt ${updated}</p></div><span class="hotel-weather-badge">LIVE</span></div><div class="hotel-weather-now"><div class="hotel-weather-now-icon">${currentIcon}</div><div><strong>${currentTemp}°C · ${esc(currentText)}</strong><span>Actueel op de hotellocatie · wind ${Math.round(weather.current?.wind_speed_10m??0)} km/u</span></div></div>${days?`<div class="hotel-weather-days">${days}</div>`:""}<p class="hotel-weather-note">${esc(forecast.note)}</p>`;
 }
 
-async function loadHotelWeatherPanels(){
-  const stops=tripStops();
+function renderWeatherCardUnavailable(stop,panel){
+  if(!panel) return;
+  panel.innerHTML=`<div class="hotel-weather-head"><div><h4>🌦️ Weerkaart</h4><p>Weerbron tijdelijk niet bereikbaar</p></div><button type="button" class="hotel-weather-retry" data-retry-hotel-weather="${esc(stop.id)}">Vernieuw weer</button></div><p class="hotel-weather-note">De weersverwachting kon nu niet worden opgehaald. Probeer het opnieuw zodra er verbinding is.</p>`;
+  panel.querySelector("[data-retry-hotel-weather]").onclick=()=>loadHotelWeatherPanels(stop.id,true);
+}
+
+async function loadHotelWeatherPanels(onlyStopId="",force=false){
+  const stops=tripStops().filter(stop=>!onlyStopId||stop.id===onlyStopId);
   await Promise.all(stops.map(async stop=>{
     const hotel=normalizeStopForLive(stop),cached=cachedWeather(hotel);
     if(cached) renderHotelWeatherPanel(stop,cached);
     const cacheAge=Date.now()-new Date(cached?._fetchedAt||0).getTime();
-    if(cached&&cacheAge<15*60*1000) return;
+    if(cached&&!force&&cacheAge<15*60*1000) return;
+    const panel=document.querySelector(`[data-hotel-weather="${CSS.escape(stop.id)}"]`);
+    if(force&&panel) panel.innerHTML=`<div class="hotel-weather-head"><div><h4>🌦️ Weerkaart</h4><p>Nieuwe weersverwachting ophalen…</p></div><span class="hotel-weather-badge">VERNIEUWEN</span></div>`;
     try{renderHotelWeatherPanel(stop,await fetchLiveWeather(hotel));}
     catch(error){
-      console.warn("Hotelweer laden mislukt",stop.id,error);
-      const panel=document.querySelector(`[data-hotel-weather="${CSS.escape(stop.id)}"]`);
-      if(panel&&!cached) panel.innerHTML=`<div class="hotel-weather-head"><div><h4>🌦️ Weer bij dit hotel</h4><p>Nu niet beschikbaar</p></div><span class="hotel-weather-badge">OPNIEUW PROBEREN</span></div><p class="hotel-weather-note">Controleer de internetverbinding en open deze hotelkaart later opnieuw.</p>`;
+      console.warn("Weerkaart laden mislukt",stop.id,error);
+      if(!cached||force) renderWeatherCardUnavailable(stop,panel);
     }
   }));
 }
