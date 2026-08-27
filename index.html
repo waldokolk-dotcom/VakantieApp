@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="155">
+<meta name="app-version" content="157">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=155">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=155">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=157">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=157">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -6919,7 +6919,9 @@
           <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=155" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v155</strong><br>
+          <strong>Wijzigingen in v157</strong><br>
+          Het dagboek start nu met de nieuwste bijdrage bovenaan. Kies bij iedere dagboekreeks zelf Nieuwste eerst of Oudste eerst; die keuze blijft bewaard op dit apparaat. Iedere bijdrage heeft een titel en klapt pas open als je hem aantikt.<br><br>
+          <strong>Eerdere wijzigingen in v155</strong><br>
           Bestaande laadbeurten zonder hotel worden automatisch gekoppeld aan het hotel van de laaddatum. Nieuwe laadbeurten hebben een hotelkeuze.<br><br>
           <strong>Eerdere wijzigingen in v154</strong><br>
           Kies bij iedere laadbeurt het hotel. De laadkosten worden direct meegenomen in het totaalbedrag van dat hotel.<br><br>
@@ -7334,7 +7336,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||155;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||157;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -16816,6 +16818,29 @@ if(document.readyState==="loading"){
       }
     });
   }
+  function diarySortStorageKey(){
+    return `vakantieapp:dagboek-volgorde:${String(typeof actorName==="function" ? actorName() : "dit-apparaat").trim().toLowerCase()||"dit-apparaat"}`;
+  }
+  function diarySortOrder(){
+    try{return localStorage.getItem(diarySortStorageKey())==="oldest" ? "oldest" : "newest";}catch(error){return "newest";}
+  }
+  function saveDiarySortOrder(order){
+    try{localStorage.setItem(diarySortStorageKey(),order==="oldest" ? "oldest" : "newest");}catch(error){}
+  }
+  function compareDiaryEntries(first,second){
+    const chronological=String(first.created_at||"").localeCompare(String(second.created_at||"")) || String(first.id||"").localeCompare(String(second.id||""));
+    return diarySortOrder()==="newest" ? -chronological : chronological;
+  }
+  function diaryEntryContent(memory){
+    const raw=String(memory.text||"").trim();
+    const separator=raw.indexOf("\n\n");
+    if(memory.mood==="Dagboek" && separator>0){
+      return {title:raw.slice(0,separator).trim()||"Dagboekmoment",body:raw.slice(separator+2).trim()};
+    }
+    const firstLine=raw.split(/\r?\n/).find(line=>line.trim())||"";
+    const title=(firstLine.split(/(?<=[.!?])\s/)[0]||firstLine||"Dagboekmoment").trim();
+    return {title:title.length>76?`${title.slice(0,73).trimEnd()}…`:title,body:raw};
+  }
   function renderTripFeatureJourneyTimelines(){
     document.querySelectorAll("#journeyHotelGrid [data-hotel-stop]").forEach(card=>{
       const stop=card.dataset.hotelStop;
@@ -16823,14 +16848,19 @@ if(document.readyState==="loading"){
       if(!wrap){wrap=document.createElement("div");wrap.className="journey-hotel-timeline-wrap";card.parentNode.insertBefore(wrap,card);wrap.appendChild(card);}
       let timeline=wrap.querySelector(".trip-journey-timeline");
       if(!timeline){timeline=document.createElement("section");timeline.className="trip-journey-timeline";wrap.appendChild(timeline);}
-      const entries=(window.lastTripMemories||[]).filter(memory=>memory.stop_id===stop).sort((a,b)=>String(a.created_at||"").localeCompare(String(b.created_at||"")));
+      const sortOrder=diarySortOrder();
+      const entries=(window.lastTripMemories||[]).filter(memory=>memory.stop_id===stop).sort(compareDiaryEntries);
       const today=new Date().toLocaleDateString("nl-NL",{weekday:"long",day:"2-digit",month:"long"});
       const todayValue=new Date().toISOString().slice(0,10);
-      timeline.innerHTML=`<div class="legacy-kicker">DAGBOEKREEKS</div><h4>Jullie dagboek bij dit hotel</h4><div class="journey-diary-compose"><label>Datum<input class="journey-diary-date" data-diary-date type="date" value="${todayValue}"></label><label>Terugblik · ${esc(today)}<textarea placeholder="Wat was vandaag leuk? Schrijf hier jullie terugblik…"></textarea></label><label class="journey-diary-photo">📷 Foto’s bij deze dag<input type="file" accept="image/*" multiple></label><div><button class="btn primary" type="button">Dag toevoegen</button><span aria-live="polite"></span></div></div>${entries.length?`<div class="trip-timeline-list">${entries.map(memory=>{const when=memory.created_at?new Date(memory.created_at).toLocaleString("nl-NL",{day:"2-digit",month:"long",hour:"2-digit",minute:"2-digit"}):"Moment";const photos=window.lastTripPhotoMap?.[memory.id]||[];const photoLink=photos.length?`<button type="button" class="journey-timeline-photo" data-journey-photo-src="${esc(photos[0].original_url)}">📷 ${photos.length} foto${photos.length===1?"":"’s"}</button>`:"";return `<article><time>${esc(when)}</time><div><strong>${esc(memory.mood||"Dagboek")}</strong><p>${esc(memory.text||"Foto-moment")}</p>${photoLink}</div></article>`;}).join("")}</div>`:`<p class="trip-timeline-empty">Voeg hierboven jullie eerste dag bij dit hotel toe.</p>`}`;
+      timeline.innerHTML=`<div class="legacy-kicker">DAGBOEKREEKS</div><h4>Jullie dagboek bij dit hotel</h4><label class="journey-diary-sort">Volgorde<select data-diary-sort aria-label="Sorteervolgorde dagboek"><option value="newest" ${sortOrder==="newest"?"selected":""}>Nieuwste eerst</option><option value="oldest" ${sortOrder==="oldest"?"selected":""}>Oudste eerst</option></select></label><div class="journey-diary-compose"><label>Datum<input class="journey-diary-date" data-diary-date type="date" value="${todayValue}"></label><label>Titel<input data-diary-title maxlength="90" placeholder="Bijv. Wandeling bij het meer"></label><label>Terugblik · ${esc(today)}<textarea placeholder="Wat wil je hierover onthouden?"></textarea></label><label class="journey-diary-photo">📷 Foto’s bij deze dag<input type="file" accept="image/*" multiple></label><div><button class="btn primary" type="button">Dag toevoegen</button><span aria-live="polite"></span></div></div>${entries.length?`<div class="trip-timeline-list">${entries.map(memory=>{const when=memory.created_at?new Date(memory.created_at).toLocaleString("nl-NL",{day:"2-digit",month:"long",hour:"2-digit",minute:"2-digit"}):"Moment";const content=diaryEntryContent(memory);const photos=window.lastTripPhotoMap?.[memory.id]||[];const photoLink=photos.length?`<button type="button" class="journey-timeline-photo" data-journey-photo-src="${esc(photos[0].original_url)}">📷 ${photos.length} foto${photos.length===1?"":"’s"}</button>`:"";return `<details class="trip-timeline-entry"><summary><time>${esc(when)}</time><strong>${esc(content.title)}</strong></summary><div class="trip-timeline-entry-body">${content.body?`<p>${esc(content.body)}</p>`:""}${photoLink}</div></details>`;}).join("")}</div>`:`<p class="trip-timeline-empty">Voeg hierboven jullie eerste dag bij dit hotel toe.</p>`}`;
       timeline.querySelectorAll("[data-journey-photo-src]").forEach(photo=>photo.onclick=()=>openMemoryPhoto(photo.dataset.journeyPhotoSrc));
-      const textarea=timeline.querySelector("textarea"),dateInput=timeline.querySelector("[data-diary-date]"),photoInput=timeline.querySelector('input[type="file"]'),button=timeline.querySelector("button"),status=timeline.querySelector("span");
+      const sortSelect=timeline.querySelector("[data-diary-sort]");
+      sortSelect.onchange=()=>{saveDiarySortOrder(sortSelect.value);renderTripFeatureJourneyTimelines();};
+      const textarea=timeline.querySelector("textarea"),titleInput=timeline.querySelector("[data-diary-title]"),dateInput=timeline.querySelector("[data-diary-date]"),photoInput=timeline.querySelector('input[type="file"]'),button=timeline.querySelector("button"),status=timeline.querySelector("span");
       button.onclick=async()=>{
-        const text=textarea.value.trim(),files=[...(photoInput.files||[])];
+        const title=titleInput.value.trim(),note=textarea.value.trim(),files=[...(photoInput.files||[])];
+        if(!title){status.textContent="Geef dit dagboekmoment eerst een titel.";titleInput.focus();return;}
+        const text=note?`${title}\n\n${note}`:title;
         if(!text&&!files.length){status.textContent="Schrijf een terugblik of kies minimaal één foto.";return;}
         if(!client){status.textContent="De app is nog niet verbonden.";return;}
         button.disabled=true;button.textContent="Opslaan…";status.textContent="";
@@ -16851,13 +16881,13 @@ if(document.readyState==="loading"){
             const {error:photoError}=await client.from("photos").insert({memory_id:memory.id,trip_id:currentTripId,stop_id:stop,storage_path:path,file_name:file.name,mime_type:file.type||null,created_by:actorName()});
             if(photoError){console.error(photoError);continue;} uploaded++;
           }
-          textarea.value="";photoInput.value="";status.textContent=`✓ Dag toegevoegd${files.length?` · ${uploaded}/${files.length} foto${files.length===1?"":"’s"}`:""}`;await loadMemories();
+          titleInput.value="";textarea.value="";photoInput.value="";status.textContent=`✓ Dag toegevoegd${files.length?` · ${uploaded}/${files.length} foto${files.length===1?"":"’s"}`:""}`;await loadMemories();
         }catch(error){console.error(error);status.textContent="Opslaan mislukt: "+(error.message||"probeer opnieuw");button.disabled=false;button.textContent="Dag toevoegen";}
       };
     });
   }
   const tripFeatureStyle=document.createElement("style");tripFeatureStyle.textContent=`.trip-feature-hub{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:26px 0}.trip-feature-card{background:#fffdf8;border:1px solid #e5dcc7;border-radius:20px;padding:20px;color:#173d31}.trip-feature-card h2{font-size:22px;margin:6px 0 12px}.trip-feature-card textarea,.trip-feature-card input,.trip-hotel-notes textarea{box-sizing:border-box;width:100%;border:1px solid #ded5c3;border-radius:11px;padding:10px;font:inherit;margin:5px 0 10px;background:#fff}.trip-feature-card textarea{min-height:86px;resize:vertical}.trip-feature-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.trip-file-label{font-weight:800;color:#176147;cursor:pointer}.trip-file-label input{display:none}.trip-checklist{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.trip-checklist label{font-size:13px;font-weight:700}.trip-budget-line{display:flex;justify-content:space-between;gap:8px}.trip-budget-line span,.trip-feature-card small,.trip-road-card p,.trip-favorite-card p{color:#718078}.trip-budget-track{height:9px;border-radius:99px;background:#e9eee4;margin:12px 0;overflow:hidden}.trip-budget-track i{display:block;height:100%;background:#19805a;border-radius:inherit}.trip-road-meta{display:grid;gap:6px;font-size:13px;margin:12px 0}.trip-hotel-notes label{display:block;font-size:12px;font-weight:800}.trip-hotel-notes textarea{min-height:62px;resize:vertical}.trip-hotel-timeline{margin:18px 0 0;padding:20px 22px;border:1px solid #d7e5d2;border-radius:18px;background:linear-gradient(135deg,#f8fcf5,#fffdf8)}.trip-hotel-timeline h4{font-size:21px;margin:5px 0 16px}.trip-timeline-list{position:relative;margin-left:7px;border-left:3px solid #8abd78}.trip-timeline-list article{position:relative;display:grid;grid-template-columns:110px 1fr;gap:13px;padding:0 0 18px 20px}.trip-timeline-list article:before{content:"";position:absolute;width:11px;height:11px;border-radius:50%;background:#197252;border:3px solid #f8fcf5;left:-9px;top:2px}.trip-timeline-list time{font-size:11px;font-weight:900;color:#4d7462}.trip-timeline-list strong{font-size:12px;color:#257653;text-transform:capitalize}.trip-timeline-list p{margin:3px 0 0;line-height:1.45;color:#173d31}.trip-timeline-empty{margin:0;color:#718078}.trip-road-modal{position:fixed;inset:0;z-index:1500;background:rgba(6,38,29,.88);display:grid;place-items:center;padding:20px}.trip-road-modal[hidden]{display:none}.trip-road-modal>div{width:min(440px,100%);background:#f7f3e8;color:#173d31;padding:30px;border-radius:26px}.trip-road-modal button{float:right;border:0;background:none;font-size:32px;color:#173d31}@media(max-width:700px){.trip-feature-hub{grid-template-columns:1fr}.trip-checklist{grid-template-columns:1fr}.trip-timeline-list article{grid-template-columns:1fr;gap:3px}}`;document.head.appendChild(tripFeatureStyle);
-  const journeyTimelineStyle=document.createElement("style");journeyTimelineStyle.textContent=`.journey-hotel-timeline-wrap{min-width:0}.trip-journey-timeline{margin:16px 0 0;padding:22px;border:1px solid #d7e5d2;border-radius:26px;background:#fffdf8;box-shadow:0 14px 28px rgba(10,68,48,.12)}.trip-journey-timeline h4{font-size:21px;margin:5px 0 16px}.journey-diary-compose{margin:0 0 22px;padding:14px;border-radius:16px;background:#edf4e9}.journey-diary-compose label{display:block;font-size:12px;font-weight:900;color:#29754f}.journey-diary-compose textarea,.journey-diary-date{box-sizing:border-box;display:block;width:100%;margin:7px 0 10px;padding:11px;border:1px solid #d1ddcc;border-radius:12px;background:#fff;font:inherit;color:#173d31}.journey-diary-compose textarea{min-height:82px;resize:vertical}.journey-diary-photo{margin:2px 0 11px;color:#176147;cursor:pointer}.journey-diary-photo input{display:block;max-width:100%;margin-top:5px;font:inherit}.journey-diary-compose>div{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.journey-diary-compose span{font-size:12px;font-weight:800;color:#287354}.journey-timeline-photo{margin-top:8px;border:0;border-radius:10px;padding:6px 9px;background:#e9f3e5;color:#176147;font:800 12px inherit;cursor:pointer}@media(max-width:700px){.trip-journey-timeline{padding:18px}.trip-timeline-list article{grid-template-columns:1fr;gap:3px}}`;document.head.appendChild(journeyTimelineStyle);
+  const journeyTimelineStyle=document.createElement("style");journeyTimelineStyle.textContent=`.journey-hotel-timeline-wrap{min-width:0}.trip-journey-timeline{margin:16px 0 0;padding:22px;border:1px solid #d7e5d2;border-radius:26px;background:#fffdf8;box-shadow:0 14px 28px rgba(10,68,48,.12)}.trip-journey-timeline h4{font-size:21px;margin:5px 0 16px}.journey-diary-sort{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-5px 0 16px;font-size:12px;font-weight:900;color:#29754f}.journey-diary-sort select{min-width:145px;max-width:100%;padding:9px 11px;border:1px solid #d1ddcc;border-radius:12px;background:#fff;font:inherit;color:#173d31}.journey-diary-compose{margin:0 0 22px;padding:14px;border-radius:16px;background:#edf4e9}.journey-diary-compose label{display:block;font-size:12px;font-weight:900;color:#29754f}.journey-diary-compose textarea,.journey-diary-compose input:not([type="file"]),.journey-diary-date{box-sizing:border-box;display:block;width:100%;margin:7px 0 10px;padding:11px;border:1px solid #d1ddcc;border-radius:12px;background:#fff;font:inherit;color:#173d31}.journey-diary-compose textarea{min-height:82px;resize:vertical}.journey-diary-photo{margin:2px 0 11px;color:#176147;cursor:pointer}.journey-diary-photo input{display:block;max-width:100%;margin-top:5px;font:inherit}.journey-diary-compose>div{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.journey-diary-compose span{font-size:12px;font-weight:800;color:#287354}.trip-timeline-entry{border-bottom:1px solid #dce8d7}.trip-timeline-entry:last-child{border-bottom:0}.trip-timeline-entry summary{display:grid;grid-template-columns:110px 1fr;gap:13px;padding:13px 3px;cursor:pointer;list-style:none}.trip-timeline-entry summary::-webkit-details-marker{display:none}.trip-timeline-entry summary:after{content:"⌄";font-weight:900;color:#287354}.trip-timeline-entry[open] summary:after{transform:rotate(180deg)}.trip-timeline-entry time{font-size:11px;font-weight:900;color:#4d7462}.trip-timeline-entry strong{font-size:14px;color:#173d31}.trip-timeline-entry-body{padding:0 20px 16px 123px}.trip-timeline-entry-body p{margin:0;line-height:1.5;color:#173d31;white-space:pre-wrap}.journey-timeline-photo{margin-top:8px;border:0;border-radius:10px;padding:6px 9px;background:#e9f3e5;color:#176147;font:800 12px inherit;cursor:pointer}@media(max-width:700px){.trip-journey-timeline{padding:18px}.journey-diary-sort{align-items:flex-start;flex-direction:column}.journey-diary-sort select{width:100%}.trip-timeline-entry summary{grid-template-columns:1fr 24px;gap:3px}.trip-timeline-entry summary time{grid-column:1}.trip-timeline-entry strong{grid-column:1}.trip-timeline-entry summary:after{grid-column:2;grid-row:1 / span 2;align-self:center}.trip-timeline-entry-body{padding:0 0 15px}.trip-timeline-list article{grid-template-columns:1fr;gap:3px}}`;document.head.appendChild(journeyTimelineStyle);
   setTimeout(()=>{installTripFeatureHub();loadTripFeatures();renderTripFeatureJourneyTimelines();},900);
   document.querySelectorAll('[data-view="vandaag"],[data-mobile-view="vandaag"]').forEach(btn=>btn.addEventListener("click",()=>setTimeout(renderTripFeatureHub,80)));
   </script>
