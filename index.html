@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="174">
+<meta name="app-version" content="176">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=174">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=174">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=176">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=176">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -1211,7 +1211,7 @@
     .memory-story-group h3{margin:2px 0 0;font-size:1rem;text-transform:capitalize;color:#173d31}
     .memory-story-group header small{font:800 .66rem Arial;letter-spacing:1px;text-transform:uppercase;color:#4c8065}
     .memory-story-group>header>span{font:700 .72rem Arial;color:#668074;white-space:nowrap}
-    .memory-journey-map{margin:12px 0 18px;padding:16px;border-radius:18px;background:linear-gradient(135deg,#124f3b,#227257);color:#fff;overflow:auto}
+    .memory-journey-map{margin:12px 0 18px;padding:16px;border-radius:18px;background:linear-gradient(135deg,#124f3b,#227257);color:#fff;overflow:auto}.memory-journey-map:empty{display:none}
     .memory-journey-map header{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:14px}.memory-journey-map h3{margin:3px 0 0;font-size:1.18rem}.memory-journey-map small{font:800 .66rem Arial;letter-spacing:1.4px;color:#d8efcf}.memory-journey-map header span{font:700 .75rem Arial;color:#e6f1e0;white-space:nowrap}
     .memory-journey-rail{display:flex;align-items:stretch;min-width:max-content;padding:2px 4px}.memory-journey-stop{position:relative;display:grid;grid-template-columns:58px minmax(104px,1fr);gap:9px;align-items:center;min-width:188px;padding:0 22px 0 0}.memory-journey-stop:after{content:"";position:absolute;top:29px;right:0;width:22px;height:3px;background:#a8d188}.memory-journey-stop:last-child:after{display:none}.memory-journey-stop img,.memory-journey-photo-placeholder{width:58px;height:58px;border-radius:50%;object-fit:cover;border:3px solid #d8efcf;background:#e6efe1;display:grid;place-items:center}.memory-journey-stop strong{display:block;font-size:.84rem}.memory-journey-stop span{display:block;margin-top:3px;color:#d8efcf;font:700 .68rem Arial}.memory-journey-favorite{color:#ffe38a!important}
     .memory-card{
@@ -7074,7 +7074,6 @@
       <div class="card span-7">
         <div class="eyebrow">Jullie tijdlijn</div>
         <h2>Reisverhaal</h2>
-        <section id="memoryJourneyMap" class="memory-journey-map" aria-label="Grafische tijdreis"></section>
         <div class="toolbar">
           <button id="refreshMemories" class="btn secondary">Vernieuwen</button>
         </div>
@@ -7092,7 +7091,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v174</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v176</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>27 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -7100,11 +7099,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=174" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=176" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v174</strong><br>
-          Reisverhaal heeft nu een losse titelbalk, een directe ster in iedere kaart om favorieten te maken en een grafische tijdreis met alle hotels, verhalen en foto’s. Op telefoon staan Foto toevoegen en Bewaar foto’s netjes naast elkaar. De losse hoogtepunten- en reisboekblokken zijn verwijderd van Vandaag.<br><br>
+          <strong>Wijzigingen in v176</strong><br>
+          De hotelweergave en Supabase-verbinding zijn hersteld. Een fout in de tijdelijke tijdreis-weergave kon de app vóór het laden van gegevens stoppen; die weergave is verwijderd. Bestaande reisgegevens, Dagboek van vandaag en Vertrekchecklist blijven behouden.<br><br>
           <strong>Eerdere wijzigingen in v165</strong><br>
           De weerinformatie heet nu overal Weerkaart. De knop ‘Vernieuw weer’ haalt de weersverwachting daadwerkelijk opnieuw op; een tijdelijke storing blijft duidelijk als weerstoring gemeld.<br><br>
           <strong>Eerdere wijzigingen in v164</strong><br>
@@ -7549,7 +7548,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||174;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||176;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7558,7 +7557,7 @@ async function checkTechnicalVersion(){
   }
 }
 
-const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||174;
+const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||176;
 const technicalCurrentVersion=document.getElementById("technicalCurrentVersion");
 if(technicalCurrentVersion) technicalCurrentVersion.textContent=`v${openedAppVersion}`;
 const technicalLink=document.querySelector(".technical-link");
@@ -8553,7 +8552,6 @@ function loadAllRoomPhotos(){
 function renderHotelsTab(){
   const list=document.getElementById("hotelsTabList");
   const intro=document.getElementById("hotelsTabIntro");
-  renderMemoryJourneyMap(memories||[],photoMap);
   if(!list) return;
 
   const meta=tripMeta();
@@ -17221,9 +17219,8 @@ if(document.readyState==="loading"){
     hub.querySelector("#saveTodayDiary").onclick=async()=>{
       const title=hub.querySelector("#todayDiaryTitle").value.trim(); const note=hub.querySelector("#todayDiaryText").value.trim(); const file=hub.querySelector("#todayDiaryPhoto").files?.[0]; const status=hub.querySelector("#todayDiaryStatus");
       if(!title){status.textContent="Geef deze terugblik eerst een titel.";hub.querySelector("#todayDiaryTitle").focus();return;}
-      const text=note?`${title}\n\n${note}`:title;
-      const originalText=document.getElementById("memoryText"), originalFiles=document.getElementById("memoryPhotos"), mode=document.getElementById("memoryLocationMode"), kind=document.getElementById("memoryEntryKind"), date=document.getElementById("memoryDate");
-      originalText.value=text||"Dagboekfoto"; if(current?.stop) mode.value=current.stop;if(kind){kind.value="diary";kind.dispatchEvent(new Event("change"));}if(date) date.value=new Date().toISOString().slice(0,10);
+      const originalText=document.getElementById("memoryText"), originalTitle=document.getElementById("memoryTitle"), originalFiles=document.getElementById("memoryPhotos"), mode=document.getElementById("memoryLocationMode"), kind=document.getElementById("memoryEntryKind"), date=document.getElementById("memoryDate");
+      if(originalTitle) originalTitle.value=title;originalText.value=note; if(current?.stop) mode.value=current.stop;if(kind){kind.value="diary";kind.dispatchEvent(new Event("change"));}if(date) date.value=new Date().toISOString().slice(0,10);
       if(file){const transfer=new DataTransfer();transfer.items.add(file);originalFiles.files=transfer.files;}
       status.textContent="Terugblik opslaan…"; await saveMemoryWithPhotos(); status.textContent="✓ Terugblik bewaard in jullie reisverhaal."; hub.querySelector("#todayDiaryTitle").value=""; hub.querySelector("#todayDiaryText").value=""; hub.querySelector("#todayDiaryPhoto").value="";
     };
