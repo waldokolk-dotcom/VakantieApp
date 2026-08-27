@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="158">
+<meta name="app-version" content="160">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=158">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=158">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=160">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=160">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -1300,6 +1300,41 @@
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
       box-shadow:0 4px 14px rgba(0,0,0,.25);
+    }
+    .memory-photo-viewer-nav{
+      position:absolute;
+      z-index:2;
+      top:50%;
+      transform:translateY(-50%);
+      width:52px;
+      height:64px;
+      border:0;
+      border-radius:14px;
+      background:rgba(255,255,255,.94);
+      color:#173d31;
+      font-size:3rem;
+      line-height:1;
+      cursor:pointer;
+      touch-action:manipulation;
+      box-shadow:0 4px 14px rgba(0,0,0,.25);
+    }
+    .memory-photo-viewer-nav.previous{left:max(12px,env(safe-area-inset-left))}
+    .memory-photo-viewer-nav.next{right:max(12px,env(safe-area-inset-right))}
+    .memory-photo-viewer-counter{
+      position:absolute;
+      bottom:max(16px,env(safe-area-inset-bottom));
+      left:50%;
+      transform:translateX(-50%);
+      padding:7px 12px;
+      border-radius:99px;
+      background:rgba(0,0,0,.62);
+      color:#fff;
+      font-size:13px;
+      font-weight:800;
+    }
+    @media(max-width:520px){
+      .memory-photo-viewer{padding:14px}
+      .memory-photo-viewer-nav{width:46px;height:56px;font-size:2.5rem}
     }
     .memory-card-body{
       padding:14px;
@@ -6919,7 +6954,9 @@
           <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=155" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v158</strong><br>
+          <strong>Wijzigingen in v160</strong><br>
+          Open je bij een dagboekbijdrage meerdere foto’s, dan kun je nu naar de volgende of vorige foto vegen of de pijlen gebruiken. Met ‘Alle bijdragen dichtvouwen’ klap je de hele dagboekreeks weer in.<br><br>
+          <strong>Eerdere wijzigingen in v158</strong><br>
           Ook de dagboekinvoer op Vandaag heeft nu een eigen titelveld. Alle dagboekbijdragen klappen standaard in en tonen eerst alleen datum en titel.<br><br>
           <strong>Eerdere wijzigingen in v157</strong><br>
           Het dagboek start nu met de nieuwste bijdrage bovenaan. Kies bij iedere dagboekreeks zelf Nieuwste eerst of Oudste eerst; die keuze blijft bewaard op dit apparaat. Iedere bijdrage heeft een titel en klapt pas open als je hem aantikt.<br><br>
@@ -7338,7 +7375,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||158;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||160;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -12004,8 +12041,9 @@ async function loadMemories(){
   if(typeof window.renderTripFeatureHotelNotes==="function") window.renderTripFeatureHotelNotes();
 }
 
-function openMemoryPhoto(src){
-  if(!src) return;
+function openMemoryPhoto(src,sources){
+  const gallerySources=[...new Set((sources||[src]).filter(Boolean))];
+  if(!src || !gallerySources.length) return;
   let viewer=document.getElementById("memoryPhotoViewer");
   if(!viewer){
     viewer=document.createElement("div");
@@ -12020,6 +12058,19 @@ function openMemoryPhoto(src){
     close.className="memory-photo-viewer-close";
     close.setAttribute("aria-label","Foto sluiten");
     close.textContent="×";
+    const previous=document.createElement("button");
+    previous.type="button";
+    previous.className="memory-photo-viewer-nav previous";
+    previous.setAttribute("aria-label","Vorige foto");
+    previous.textContent="‹";
+    const next=document.createElement("button");
+    next.type="button";
+    next.className="memory-photo-viewer-nav next";
+    next.setAttribute("aria-label","Volgende foto");
+    next.textContent="›";
+    const counter=document.createElement("div");
+    counter.className="memory-photo-viewer-counter";
+    counter.setAttribute("aria-live","polite");
     const image=document.createElement("img");
     image.alt="Foto-moment";
     const closeViewer=()=>{
@@ -12040,12 +12091,38 @@ function openMemoryPhoto(src){
     });
     viewer.addEventListener("keydown",event=>{
       if(event.key==="Escape") closeViewer();
+      if(event.key==="ArrowLeft") viewer._showPhoto?.(viewer._photoIndex-1);
+      if(event.key==="ArrowRight") viewer._showPhoto?.(viewer._photoIndex+1);
     });
-    viewer.append(close,image);
+    previous.addEventListener("click",event=>{event.stopPropagation();viewer._showPhoto?.(viewer._photoIndex-1);});
+    next.addEventListener("click",event=>{event.stopPropagation();viewer._showPhoto?.(viewer._photoIndex+1);});
+    let swipeStartX=null;
+    viewer.addEventListener("touchstart",event=>{swipeStartX=event.changedTouches?.[0]?.clientX??null;},{passive:true});
+    viewer.addEventListener("touchend",event=>{
+      const endX=event.changedTouches?.[0]?.clientX;
+      if(swipeStartX===null || endX===undefined) return;
+      const distance=endX-swipeStartX;
+      swipeStartX=null;
+      if(Math.abs(distance)<45) return;
+      viewer._showPhoto?.(viewer._photoIndex+(distance<0?1:-1));
+    },{passive:true});
+    viewer.append(close,previous,image,next,counter);
     document.body.appendChild(viewer);
   }
   const image=viewer.querySelector("img");
-  image.src=src;
+  viewer._gallerySources=gallerySources;
+  viewer._showPhoto=index=>{
+    const count=viewer._gallerySources.length;
+    viewer._photoIndex=((index%count)+count)%count;
+    image.src=viewer._gallerySources[viewer._photoIndex];
+    const multiple=count>1;
+    viewer.querySelector(".memory-photo-viewer-nav.previous").hidden=!multiple;
+    viewer.querySelector(".memory-photo-viewer-nav.next").hidden=!multiple;
+    const counter=viewer.querySelector(".memory-photo-viewer-counter");
+    counter.hidden=!multiple;
+    counter.textContent=multiple?`${viewer._photoIndex+1} / ${count}`:"";
+  };
+  viewer._showPhoto(Math.max(0,gallerySources.indexOf(src)));
   viewer.hidden=false;
   viewer.querySelector("button")?.focus();
 }
@@ -16856,10 +16933,17 @@ if(document.readyState==="loading"){
       const entries=(window.lastTripMemories||[]).filter(memory=>memory.stop_id===stop).sort(compareDiaryEntries);
       const today=new Date().toLocaleDateString("nl-NL",{weekday:"long",day:"2-digit",month:"long"});
       const todayValue=new Date().toISOString().slice(0,10);
-      timeline.innerHTML=`<div class="legacy-kicker">DAGBOEKREEKS</div><h4>Jullie dagboek bij dit hotel</h4><label class="journey-diary-sort">Volgorde<select data-diary-sort aria-label="Sorteervolgorde dagboek"><option value="newest" ${sortOrder==="newest"?"selected":""}>Nieuwste eerst</option><option value="oldest" ${sortOrder==="oldest"?"selected":""}>Oudste eerst</option></select></label><div class="journey-diary-compose"><label>Datum<input class="journey-diary-date" data-diary-date type="date" value="${todayValue}"></label><label>Titel<input data-diary-title maxlength="90" placeholder="Bijv. Wandeling bij het meer"></label><label>Terugblik · ${esc(today)}<textarea placeholder="Wat wil je hierover onthouden?"></textarea></label><label class="journey-diary-photo">📷 Foto’s bij deze dag<input type="file" accept="image/*" multiple></label><div><button class="btn primary" type="button">Dag toevoegen</button><span aria-live="polite"></span></div></div>${entries.length?`<div class="trip-timeline-list">${entries.map(memory=>{const when=memory.created_at?new Date(memory.created_at).toLocaleString("nl-NL",{day:"2-digit",month:"long",hour:"2-digit",minute:"2-digit"}):"Moment";const content=diaryEntryContent(memory);const photos=window.lastTripPhotoMap?.[memory.id]||[];const photoLink=photos.length?`<button type="button" class="journey-timeline-photo" data-journey-photo-src="${esc(photos[0].original_url)}">📷 ${photos.length} foto${photos.length===1?"":"’s"}</button>`:"";return `<details class="trip-timeline-entry"><summary><time>${esc(when)}</time><strong>${esc(content.title)}</strong></summary><div class="trip-timeline-entry-body">${content.body?`<p>${esc(content.body)}</p>`:""}${photoLink}</div></details>`;}).join("")}</div>`:`<p class="trip-timeline-empty">Voeg hierboven jullie eerste dag bij dit hotel toe.</p>`}`;
-      timeline.querySelectorAll("[data-journey-photo-src]").forEach(photo=>photo.onclick=()=>openMemoryPhoto(photo.dataset.journeyPhotoSrc));
+      timeline.innerHTML=`<div class="legacy-kicker">DAGBOEKREEKS</div><h4>Jullie dagboek bij dit hotel</h4><div class="journey-diary-tools"><label class="journey-diary-sort">Volgorde<select data-diary-sort aria-label="Sorteervolgorde dagboek"><option value="newest" ${sortOrder==="newest"?"selected":""}>Nieuwste eerst</option><option value="oldest" ${sortOrder==="oldest"?"selected":""}>Oudste eerst</option></select></label><button type="button" class="btn secondary journey-diary-collapse" data-collapse-all-diary>Alle bijdragen dichtvouwen</button></div><div class="journey-diary-compose"><label>Datum<input class="journey-diary-date" data-diary-date type="date" value="${todayValue}"></label><label>Titel<input data-diary-title maxlength="90" placeholder="Bijv. Wandeling bij het meer"></label><label>Terugblik · ${esc(today)}<textarea placeholder="Wat wil je hierover onthouden?"></textarea></label><label class="journey-diary-photo">📷 Foto’s bij deze dag<input type="file" accept="image/*" multiple></label><div><button class="btn primary" type="button">Dag toevoegen</button><span aria-live="polite"></span></div></div>${entries.length?`<div class="trip-timeline-list">${entries.map(memory=>{const when=memory.created_at?new Date(memory.created_at).toLocaleString("nl-NL",{day:"2-digit",month:"long",hour:"2-digit",minute:"2-digit"}):"Moment";const content=diaryEntryContent(memory);const photos=window.lastTripPhotoMap?.[memory.id]||[];const photoLink=photos.length?`<button type="button" class="journey-timeline-photo" data-journey-memory-id="${esc(memory.id)}">📷 ${photos.length} foto${photos.length===1?"":"’s"}</button>`:"";return `<details class="trip-timeline-entry"><summary><time>${esc(when)}</time><strong>${esc(content.title)}</strong></summary><div class="trip-timeline-entry-body">${content.body?`<p>${esc(content.body)}</p>`:""}${photoLink}</div></details>`;}).join("")}</div>`:`<p class="trip-timeline-empty">Voeg hierboven jullie eerste dag bij dit hotel toe.</p>`}`;
+      timeline.querySelectorAll("[data-journey-memory-id]").forEach(button=>button.onclick=()=>{
+        const photos=window.lastTripPhotoMap?.[button.dataset.journeyMemoryId]||[];
+        const sources=photos.map(photo=>photo.original_url).filter(Boolean);
+        openMemoryPhoto(sources[0],sources);
+      });
       const sortSelect=timeline.querySelector("[data-diary-sort]");
       sortSelect.onchange=()=>{saveDiarySortOrder(sortSelect.value);renderTripFeatureJourneyTimelines();};
+      timeline.querySelector("[data-collapse-all-diary]").onclick=()=>{
+        document.querySelectorAll(".trip-timeline-entry[open]").forEach(entry=>entry.open=false);
+      };
       const textarea=timeline.querySelector("textarea"),titleInput=timeline.querySelector("[data-diary-title]"),dateInput=timeline.querySelector("[data-diary-date]"),photoInput=timeline.querySelector('input[type="file"]'),button=timeline.querySelector("button"),status=timeline.querySelector("span");
       button.onclick=async()=>{
         const title=titleInput.value.trim(),note=textarea.value.trim(),files=[...(photoInput.files||[])];
