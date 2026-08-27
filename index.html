@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="176">
+<meta name="app-version" content="178">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=176">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=176">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=178">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=178">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -1198,8 +1198,12 @@
       grid-template-columns:1fr;
       gap:14px;
       margin-top:14px;
+      position:relative;
+      padding-left:28px;
     }
+    .memory-grid:before{content:"";position:absolute;top:0;bottom:0;left:10px;width:3px;border-radius:9px;background:linear-gradient(#76ae6e,#d7e7d3)}
     .memory-story-group{
+      position:relative;
       display:grid;
       gap:8px;
       padding:14px;
@@ -1207,10 +1211,12 @@
       border-radius:18px;
       background:linear-gradient(135deg,#f5faf2,#fffdf8);
     }
+    .memory-story-group:before{content:"";position:absolute;left:-25px;top:20px;width:15px;height:15px;border:4px solid #f5faf2;border-radius:50%;background:#176147;box-shadow:0 0 0 2px #76ae6e}
     .memory-story-group>header{display:flex;align-items:end;justify-content:space-between;gap:12px;padding:0 3px 5px;border-bottom:2px solid #84b574}
     .memory-story-group h3{margin:2px 0 0;font-size:1rem;text-transform:capitalize;color:#173d31}
     .memory-story-group header small{font:800 .66rem Arial;letter-spacing:1px;text-transform:uppercase;color:#4c8065}
     .memory-story-group>header>span{font:700 .72rem Arial;color:#668074;white-space:nowrap}
+    .memory-story-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 14px}.memory-story-actions span{font-size:.82rem;color:#65786e}
     .memory-journey-map{margin:12px 0 18px;padding:16px;border-radius:18px;background:linear-gradient(135deg,#124f3b,#227257);color:#fff;overflow:auto}.memory-journey-map:empty{display:none}
     .memory-journey-map header{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:14px}.memory-journey-map h3{margin:3px 0 0;font-size:1.18rem}.memory-journey-map small{font:800 .66rem Arial;letter-spacing:1.4px;color:#d8efcf}.memory-journey-map header span{font:700 .75rem Arial;color:#e6f1e0;white-space:nowrap}
     .memory-journey-rail{display:flex;align-items:stretch;min-width:max-content;padding:2px 4px}.memory-journey-stop{position:relative;display:grid;grid-template-columns:58px minmax(104px,1fr);gap:9px;align-items:center;min-width:188px;padding:0 22px 0 0}.memory-journey-stop:after{content:"";position:absolute;top:29px;right:0;width:22px;height:3px;background:#a8d188}.memory-journey-stop:last-child:after{display:none}.memory-journey-stop img,.memory-journey-photo-placeholder{width:58px;height:58px;border-radius:50%;object-fit:cover;border:3px solid #d8efcf;background:#e6efe1;display:grid;place-items:center}.memory-journey-stop strong{display:block;font-size:.84rem}.memory-journey-stop span{display:block;margin-top:3px;color:#d8efcf;font:700 .68rem Arial}.memory-journey-favorite{color:#ffe38a!important}
@@ -1483,6 +1489,7 @@
       .memory-collapse-date{font-size:.67rem}.memory-collapse-title{font-size:.84rem}.memory-collapse-thumb{width:52px;height:44px}
       .memory-summary-favorite{top:16px;right:82px}
       .memory-journey-map{margin-top:8px;padding:13px}.memory-journey-stop{min-width:170px}.memory-journey-map h3{font-size:1rem}
+      .memory-grid{padding-left:23px}.memory-grid:before{left:8px}.memory-story-group:before{left:-21px}
       .memory-card-actions .btn,
       .memory-card-actions .memory-delete-btn{
         min-width:0;
@@ -7074,6 +7081,7 @@
       <div class="card span-7">
         <div class="eyebrow">Jullie tijdlijn</div>
         <h2>Reisverhaal</h2>
+        <div class="memory-story-actions"><button id="openTripBookFromStory" class="btn" type="button">📖 Fotoboek maken</button><span>Kies zelf verhalen en foto’s voor jullie boek.</span></div>
         <div class="toolbar">
           <button id="refreshMemories" class="btn secondary">Vernieuwen</button>
         </div>
@@ -7091,7 +7099,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v176</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v178</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>27 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -7099,10 +7107,10 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=176" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=178" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v176</strong><br>
+          <strong>Wijzigingen in v178</strong><br>
           De hotelweergave en Supabase-verbinding zijn hersteld. Een fout in de tijdelijke tijdreis-weergave kon de app vóór het laden van gegevens stoppen; die weergave is verwijderd. Bestaande reisgegevens, Dagboek van vandaag en Vertrekchecklist blijven behouden.<br><br>
           <strong>Eerdere wijzigingen in v165</strong><br>
           De weerinformatie heet nu overal Weerkaart. De knop ‘Vernieuw weer’ haalt de weersverwachting daadwerkelijk opnieuw op; een tijdelijke storing blijft duidelijk als weerstoring gemeld.<br><br>
@@ -7548,7 +7556,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||176;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||178;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7557,7 +7565,7 @@ async function checkTechnicalVersion(){
   }
 }
 
-const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||176;
+const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||178;
 const technicalCurrentVersion=document.getElementById("technicalCurrentVersion");
 if(technicalCurrentVersion) technicalCurrentVersion.textContent=`v${openedAppVersion}`;
 const technicalLink=document.querySelector(".technical-link");
@@ -17182,21 +17190,7 @@ if(document.readyState==="loading"){
     const favorites=(window.lastTripMemories||[]).filter(m=>tripFeatureState.favorites.includes(m.id));
     const most=Object.entries((costData||[]).filter(r=>!isDepositCost(r)).reduce((a,r)=>{a[r.category||"other"]=(a[r.category||"other"]||0)+(Number(r.amount_cents)||0);return a;},{})).sort((a,b)=>b[1]-a[1])[0];
     const hotelSplit=featureHotelSplit(); const nights=featureNights(); const photoCount=Object.values(window.lastTripPhotoMap||{}).reduce((sum,photos)=>sum+photos.length,0);
-    const checks=["Kamerfoto’s","Sleutel","Hondenvoer","Laadpas","Laatste kosten"];
-    const checked=tripFeatureState.departureChecks?.[departure?.id]||[];
     hub.innerHTML=`
-      <div class="trip-feature-card trip-diary-card">
-        <div class="legacy-kicker">DAGBOEK VAN VANDAAG</div><h2>Wat was vandaag leuk?</h2>
-        <input id="todayDiaryTitle" maxlength="90" placeholder="Titel, bijv. Wandeling bij het meer">
-        <textarea id="todayDiaryText" maxlength="600" placeholder="Wat wil je hierover onthouden?"></textarea>
-        <div class="trip-feature-actions"><label class="trip-file-label">📷 Foto <input id="todayDiaryPhoto" type="file" accept="image/*"></label><button id="saveTodayDiary" class="btn" type="button">Bewaar terugblik</button></div>
-        <small id="todayDiaryStatus">Wordt als moment opgeslagen voor ${current?.hotel||"vandaag"}.</small>
-      </div>
-      <div class="trip-feature-card ${departure?"trip-departure-active":""}">
-        <div class="legacy-kicker">${departure?"VERTREK VANDAAG":"SLIMME HERINNERING"}</div><h2>${departure?`${departure.hotel||departure.city}: niets vergeten?`:"Vertrekchecklist"}</h2>
-        <div class="trip-checklist">${checks.map(item=>`<label><input type="checkbox" data-departure-check="${esc(item)}" ${checked.includes(item)?"checked":""}> ${esc(item)}</label>`).join("")}</div>
-        <small>${departure?"Vink af wanneer jullie het geregeld hebben.":"Verschijnt extra duidelijk op de uitcheckdag."}</small>
-      </div>
       <div class="trip-feature-card">
         <div class="legacy-kicker">KOSTEN SLIMMER</div><h2>Budget & overzicht</h2>
         <div class="trip-budget-line"><strong>${featureEuro(total)}</strong><span>${budget?`${pct}% van ${featureEuro(budget)}`:"Stel een budget in"}</span></div>
@@ -17210,20 +17204,7 @@ if(document.readyState==="loading"){
         <div class="trip-road-meta"><span>⚡ ${((costData||[]).filter(r=>r.category==="charging").slice(0,1)[0]?.kwh||0).toLocaleString("nl-NL")} kWh laatst geladen</span><span>🐾 hondenpauze plannen</span></div>
         <button id="openRoadMode" class="btn secondary" type="button">Rustig scherm openen</button>
       </div>`;
-    hub.querySelectorAll("[data-departure-check]").forEach(box=>box.onchange=async()=>{
-      if(!departure) return; const nextChecks=new Set(tripFeatureState.departureChecks[departure.id]||[]);
-      box.checked?nextChecks.add(box.dataset.departureCheck):nextChecks.delete(box.dataset.departureCheck);
-      tripFeatureState.departureChecks[departure.id]=[...nextChecks]; await saveTripFeatures();
-    });
     hub.querySelector("#saveTripBudget").onclick=async()=>{ const raw=hub.querySelector("#tripBudgetInput").value.replace(".","").replace(",","."); tripFeatureState.budgetCents=Math.max(0,Math.round(Number(raw||0)*100)); await saveTripFeatures(); renderTripFeatureHub(); };
-    hub.querySelector("#saveTodayDiary").onclick=async()=>{
-      const title=hub.querySelector("#todayDiaryTitle").value.trim(); const note=hub.querySelector("#todayDiaryText").value.trim(); const file=hub.querySelector("#todayDiaryPhoto").files?.[0]; const status=hub.querySelector("#todayDiaryStatus");
-      if(!title){status.textContent="Geef deze terugblik eerst een titel.";hub.querySelector("#todayDiaryTitle").focus();return;}
-      const originalText=document.getElementById("memoryText"), originalTitle=document.getElementById("memoryTitle"), originalFiles=document.getElementById("memoryPhotos"), mode=document.getElementById("memoryLocationMode"), kind=document.getElementById("memoryEntryKind"), date=document.getElementById("memoryDate");
-      if(originalTitle) originalTitle.value=title;originalText.value=note; if(current?.stop) mode.value=current.stop;if(kind){kind.value="diary";kind.dispatchEvent(new Event("change"));}if(date) date.value=new Date().toISOString().slice(0,10);
-      if(file){const transfer=new DataTransfer();transfer.items.add(file);originalFiles.files=transfer.files;}
-      status.textContent="Terugblik opslaan…"; await saveMemoryWithPhotos(); status.textContent="✓ Terugblik bewaard in jullie reisverhaal."; hub.querySelector("#todayDiaryTitle").value=""; hub.querySelector("#todayDiaryText").value=""; hub.querySelector("#todayDiaryPhoto").value="";
-    };
     hub.querySelector("#openRoadMode").onclick=()=>openTripRoadMode(next);
   }
   function tripBookStorageKey(){return `vakantieapp:fotoboek:${currentTripId||"reis"}`;}
@@ -17267,6 +17248,7 @@ if(document.readyState==="loading"){
     if(config.costs)spreads.push(spread(`<div class="book-costs"><small>DE KOSTEN</small><h2>Reisoverzicht</h2><strong>${featureEuro(featureCostTotal())}</strong><p>Totaal van de kosten die in de app staan.</p></div>`,`<div class="book-closing"><small>EINDE VAN DE REIS</small><h2>Tot de volgende keer</h2><p>Een verzameling van plekken, verhalen en foto’s die van deze reis helemaal van jullie is.</p></div>`));
     book.document.write(`<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escText(config.title)}</title><style>*{box-sizing:border-box}body{margin:0;background:#d8e0d4;color:#173d31;font-family:Georgia,serif}.book-toolbar{position:sticky;top:0;z-index:10;padding:13px;background:#173d31;text-align:center}.book-toolbar button{border:0;border-radius:999px;padding:10px 18px;background:#f4e7c6;color:#173d31;font:800 14px Arial;cursor:pointer}.book{padding:28px 0 60px}.book-spread{position:relative;display:grid;grid-template-columns:1fr 34px 1fr;width:min(1260px,96vw);min-height:720px;margin:0 auto 38px;background:#fffdf7;box-shadow:0 18px 46px #18372755;overflow:hidden}.book-page{min-width:0;padding:54px;background:#fffdf7;overflow:hidden}.book-left{box-shadow:inset -18px 0 26px #71695518}.book-right{box-shadow:inset 18px 0 26px #71695518}.book-spine{background:linear-gradient(90deg,#bcb3a4,#fff,#a79c8b);box-shadow:inset 2px 0 5px #544c4033,inset -2px 0 5px #544c4022;z-index:1}.book-page small{font:800 11px Arial;letter-spacing:2px;color:#528467}.book-page h1,.book-page h2{margin:13px 0;color:#173d31}.book-page h1{font-size:clamp(48px,5vw,78px);line-height:.93}.book-page h2{font-size:clamp(32px,3.5vw,52px);line-height:1}.book-page p{font:17px/1.55 Arial;color:#476257}.book-cover-spread .book-left{background:#e8ddc3;display:grid;place-items:center;text-align:center}.inside-cover{max-width:280px}.inside-cover p{font-size:20px}.inside-quote{font:italic 17px Georgia!important}.book-cover{height:100%;min-height:610px;margin:-54px;background:#176147 center/cover;color:#fff;padding:54px;display:flex;flex-direction:column;justify-content:end}.book-cover h1{color:#fff}.book-cover p{color:#fff;font-weight:bold}.book-title-page,.hotel-intro,.book-highlights,.book-costs,.book-closing{height:100%;display:flex;flex-direction:column;justify-content:center}.hotel-intro{background:#edf4e9;margin:-54px;padding:54px}.hotel-intro blockquote{margin:20px 0 0;padding:16px;border-left:4px solid #6d9f70;background:#fff;font:italic 18px/1.45 Georgia}.book-page figure{height:100%;min-height:590px;margin:-54px;position:relative;background:#e4ece0}.book-page figure img{width:100%;height:100%;min-height:590px;display:block;object-fit:cover}.book-page figcaption{position:absolute;bottom:18px;left:18px;padding:7px 10px;background:#173d31cb;color:#fff;font:700 11px Arial;letter-spacing:1px}.book-empty{height:100%;min-height:590px;margin:-54px;display:grid;place-items:center;background:#e6eee2;color:#5a7467;font:700 15px Arial}.book-stats{height:100%;display:grid;align-content:center;grid-template-columns:1fr 1fr;gap:8px 20px}.book-stats small{grid-column:1/-1}.book-stats strong{font:700 46px Georgia;color:#176147;text-align:right}.book-stats span{align-self:end;padding-bottom:10px;font:700 14px Arial;color:#597066}.book-diary-entry{margin:18px 0;padding:0 0 16px;border-bottom:1px solid #dce4d9}.book-diary-entry p{margin:7px 0;white-space:pre-wrap}.book-note-page{height:100%;display:flex;justify-content:center;flex-direction:column;background:#f4e8c9;margin:-54px;padding:54px}.book-highlights{background:#f4e8c9;margin:-54px;padding:54px}.book-highlights p{margin:7px 0}.book-costs strong{font-size:54px;color:#176147}.book-closing{background:#176147;margin:-54px;padding:54px}.book-closing h2,.book-closing p{color:#fff}.book-closing small{color:#dbeed5}@media(max-width:700px){.book{padding-top:12px}.book-spread{grid-template-columns:1fr;min-height:auto;width:94vw;margin-bottom:22px}.book-spine{height:20px;background:linear-gradient(#a79c8b,#fff,#bcb3a4)}.book-page{min-height:430px;padding:34px}.book-cover,.hotel-intro,.book-note-page,.book-highlights,.book-closing{margin:-34px;padding:34px;min-height:430px}.book-page figure,.book-empty{margin:-34px;min-height:430px}.book-page figure img{min-height:430px}.book-page h1{font-size:46px}.book-page h2{font-size:34px}}@media print{@page{size:A4 landscape;margin:0}.book-toolbar{display:none}.book{padding:0}.book-spread{width:297mm;height:210mm;min-height:210mm;margin:0;box-shadow:none;break-after:page;page-break-after:always}.book-page{padding:14mm}.book-cover,.hotel-intro,.book-note-page,.book-highlights,.book-closing{margin:-14mm;padding:14mm;min-height:210mm}.book-page figure,.book-empty{margin:-14mm;min-height:210mm}.book-page figure img{min-height:210mm}}</style></head><body><div class="book-toolbar"><button onclick="window.print()">Bewaar / print dit boek als PDF</button></div><main class="book">${spreads.join("")}</main></body></html>`);book.document.close();
   }
+  document.getElementById("openTripBookFromStory")?.addEventListener("click",()=>openTripBookAtelier());
   function openTripBookPdf(){
     const book=window.open("","_blank"); if(!book){alert("Sta pop-ups toe om het reisboek te openen.");return;}
     const meta=tripMeta(), memories=(window.lastTripMemories||[]).slice().sort((a,b)=>String(a.created_at||"").localeCompare(String(b.created_at||""))), stops=tripStops(), total=featureCostTotal();
