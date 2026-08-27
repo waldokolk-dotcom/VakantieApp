@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="160">
+<meta name="app-version" content="162">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=160">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=160">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=162">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=162">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -6943,18 +6943,22 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v155</strong></div>
-          <div class="technical-item"><small>Publicatiedatum</small><strong>26 augustus 2026</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v162</strong></div>
+          <div class="technical-item"><small>Publicatiedatum</small><strong>27 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
         </div>
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=155" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=162" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v160</strong><br>
+          <strong>Wijzigingen in v162</strong><br>
+          Het technische scherm leest nu altijd de werkelijk geopende appversie en opent opnieuw laden op diezelfde versie.<br><br>
+          <strong>Eerdere wijzigingen in v161</strong><br>
+          Bewaar ook achteraf foto’s van bestaande Momenten en dagboekbijdragen in Apple Foto’s. Open de deelkaart en kies ‘Bewaar afbeelding’.<br><br>
+          <strong>Eerdere wijzigingen in v160</strong><br>
           Open je bij een dagboekbijdrage meerdere foto’s, dan kun je nu naar de volgende of vorige foto vegen of de pijlen gebruiken. Met ‘Alle bijdragen dichtvouwen’ klap je de hele dagboekreeks weer in.<br><br>
           <strong>Eerdere wijzigingen in v158</strong><br>
           Ook de dagboekinvoer op Vandaag heeft nu een eigen titelveld. Alle dagboekbijdragen klappen standaard in en tonen eerst alleen datum en titel.<br><br>
@@ -7375,7 +7379,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||160;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||162;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7384,10 +7388,15 @@ async function checkTechnicalVersion(){
   }
 }
 
+const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||162;
+const technicalCurrentVersion=document.getElementById("technicalCurrentVersion");
+if(technicalCurrentVersion) technicalCurrentVersion.textContent=`v${openedAppVersion}`;
+const technicalLink=document.querySelector(".technical-link");
+if(technicalLink) technicalLink.href=`https://waldokolk-dotcom.github.io/VakantieApp/?v=${openedAppVersion}`;
 document.getElementById("technicalCheckVersion")?.addEventListener("click",checkTechnicalVersion);
 document.getElementById("technicalReload")?.addEventListener("click",()=>{
   const url=new URL(location.href);
-  url.searchParams.set("v","140");
+  url.searchParams.set("v",String(openedAppVersion));
   url.searchParams.set("refresh",Date.now());
   location.replace(url.toString());
 });
@@ -8084,6 +8093,28 @@ async function saveImageFilesToPhone(files,statusElement){
     selected.length===1
       ? "✓ Download gestart. Open de foto en kies ‘Bewaar afbeelding’."
       : `✓ ${selected.length} downloads gestart. Bewaar de afbeeldingen daarna in Foto’s.`);
+}
+
+async function saveStoredMemoryPhotosToPhone(memoryId,statusElement){
+  const photos=(window.lastTripPhotoMap?.[memoryId]||[]).filter(photo=>photo?.original_url);
+  if(!photos.length){
+    setPhotoPhoneStatus(statusElement,"Er zijn geen foto’s bij dit moment beschikbaar.",true);
+    return;
+  }
+  setPhotoPhoneStatus(statusElement,"Foto’s klaarzetten voor Foto’s…");
+  try{
+    const files=(await Promise.all(photos.map(async(photo,index)=>{
+      const response=await fetch(photo.original_url);
+      if(!response.ok) throw new Error("Foto kon niet worden opgehaald.");
+      const blob=await response.blob();
+      const extension=(photo.file_name||"").split(".").pop()||blob.type.split("/").pop()||"jpg";
+      return new File([blob],photo.file_name||`vakantie-foto-${index+1}.${extension}`,{type:blob.type||"image/jpeg"});
+    }))).filter(Boolean);
+    await saveImageFilesToPhone(files,statusElement);
+  }catch(error){
+    console.error("Foto’s voor Apple Foto’s konden niet worden voorbereid",error);
+    setPhotoPhoneStatus(statusElement,"Foto’s voorbereiden lukt nu niet. Probeer het later opnieuw.",true);
+  }
 }
 
 async function loadRoomPhotosForStop(stopId){
@@ -12010,8 +12041,10 @@ async function loadMemories(){
           <button type="button" class="btn secondary memory-edit-btn" data-edit-memory="${esc(memory.id)}">✎ Tekst wijzigen</button>
           <button type="button" class="btn secondary memory-photo-btn" data-add-memory-photo="${esc(memory.id)}">＋ Foto toevoegen</button>
           <button type="button" class="btn secondary memory-photo-btn" data-replace-memory-photo="${esc(memory.id)}">↻ Foto's vervangen</button>
+          ${attached.length?`<button type="button" class="btn secondary" data-save-memory-to-phone="${esc(memory.id)}">📲 Bewaar foto${attached.length===1?"":"’s"} in Foto’s</button>`:""}
           <button type="button" class="memory-delete-btn" data-delete-memory="${esc(memory.id)}">🗑 Verwijder foto-moment</button>
         </div>
+        ${attached.length?`<span class="photo-phone-status memory-photo-phone-status" data-memory-phone-status="${esc(memory.id)}" role="status" aria-live="polite"></span>`:""}
       </div>
     </article>`;
   }).join("");
@@ -12030,6 +12063,12 @@ async function loadMemories(){
   });
   list.querySelectorAll("[data-replace-memory-photo]").forEach(button=>{
     button.addEventListener("click",()=>chooseMemoryPhotos(button.dataset.replaceMemoryPhoto,"replace"));
+  });
+  list.querySelectorAll("[data-save-memory-to-phone]").forEach(button=>{
+    button.addEventListener("click",()=>saveStoredMemoryPhotosToPhone(
+      button.dataset.saveMemoryToPhone,
+      list.querySelector(`[data-memory-phone-status="${CSS.escape(button.dataset.saveMemoryToPhone)}"]`)
+    ));
   });
   list.querySelectorAll("[data-memory-photo-src]").forEach(button=>{
     button.addEventListener("click",()=>openMemoryPhoto(button.dataset.memoryPhotoSrc));
@@ -16933,12 +16972,16 @@ if(document.readyState==="loading"){
       const entries=(window.lastTripMemories||[]).filter(memory=>memory.stop_id===stop).sort(compareDiaryEntries);
       const today=new Date().toLocaleDateString("nl-NL",{weekday:"long",day:"2-digit",month:"long"});
       const todayValue=new Date().toISOString().slice(0,10);
-      timeline.innerHTML=`<div class="legacy-kicker">DAGBOEKREEKS</div><h4>Jullie dagboek bij dit hotel</h4><div class="journey-diary-tools"><label class="journey-diary-sort">Volgorde<select data-diary-sort aria-label="Sorteervolgorde dagboek"><option value="newest" ${sortOrder==="newest"?"selected":""}>Nieuwste eerst</option><option value="oldest" ${sortOrder==="oldest"?"selected":""}>Oudste eerst</option></select></label><button type="button" class="btn secondary journey-diary-collapse" data-collapse-all-diary>Alle bijdragen dichtvouwen</button></div><div class="journey-diary-compose"><label>Datum<input class="journey-diary-date" data-diary-date type="date" value="${todayValue}"></label><label>Titel<input data-diary-title maxlength="90" placeholder="Bijv. Wandeling bij het meer"></label><label>Terugblik · ${esc(today)}<textarea placeholder="Wat wil je hierover onthouden?"></textarea></label><label class="journey-diary-photo">📷 Foto’s bij deze dag<input type="file" accept="image/*" multiple></label><div><button class="btn primary" type="button">Dag toevoegen</button><span aria-live="polite"></span></div></div>${entries.length?`<div class="trip-timeline-list">${entries.map(memory=>{const when=memory.created_at?new Date(memory.created_at).toLocaleString("nl-NL",{day:"2-digit",month:"long",hour:"2-digit",minute:"2-digit"}):"Moment";const content=diaryEntryContent(memory);const photos=window.lastTripPhotoMap?.[memory.id]||[];const photoLink=photos.length?`<button type="button" class="journey-timeline-photo" data-journey-memory-id="${esc(memory.id)}">📷 ${photos.length} foto${photos.length===1?"":"’s"}</button>`:"";return `<details class="trip-timeline-entry"><summary><time>${esc(when)}</time><strong>${esc(content.title)}</strong></summary><div class="trip-timeline-entry-body">${content.body?`<p>${esc(content.body)}</p>`:""}${photoLink}</div></details>`;}).join("")}</div>`:`<p class="trip-timeline-empty">Voeg hierboven jullie eerste dag bij dit hotel toe.</p>`}`;
+      timeline.innerHTML=`<div class="legacy-kicker">DAGBOEKREEKS</div><h4>Jullie dagboek bij dit hotel</h4><div class="journey-diary-tools"><label class="journey-diary-sort">Volgorde<select data-diary-sort aria-label="Sorteervolgorde dagboek"><option value="newest" ${sortOrder==="newest"?"selected":""}>Nieuwste eerst</option><option value="oldest" ${sortOrder==="oldest"?"selected":""}>Oudste eerst</option></select></label><button type="button" class="btn secondary journey-diary-collapse" data-collapse-all-diary>Alle bijdragen dichtvouwen</button></div><div class="journey-diary-compose"><label>Datum<input class="journey-diary-date" data-diary-date type="date" value="${todayValue}"></label><label>Titel<input data-diary-title maxlength="90" placeholder="Bijv. Wandeling bij het meer"></label><label>Terugblik · ${esc(today)}<textarea placeholder="Wat wil je hierover onthouden?"></textarea></label><label class="journey-diary-photo">📷 Foto’s bij deze dag<input type="file" accept="image/*" multiple></label><div><button class="btn primary" type="button">Dag toevoegen</button><span aria-live="polite"></span></div></div>${entries.length?`<div class="trip-timeline-list">${entries.map(memory=>{const when=memory.created_at?new Date(memory.created_at).toLocaleString("nl-NL",{day:"2-digit",month:"long",hour:"2-digit",minute:"2-digit"}):"Moment";const content=diaryEntryContent(memory);const photos=window.lastTripPhotoMap?.[memory.id]||[];const photoLink=photos.length?`<div class="journey-diary-photo-actions"><button type="button" class="journey-timeline-photo" data-journey-memory-id="${esc(memory.id)}">📷 ${photos.length} foto${photos.length===1?"":"’s"}</button><button type="button" class="journey-timeline-photo" data-save-diary-memory-to-phone="${esc(memory.id)}">📲 Bewaar in Foto’s</button><span class="photo-phone-status" data-diary-memory-phone-status="${esc(memory.id)}" role="status" aria-live="polite"></span></div>`:"";return `<details class="trip-timeline-entry"><summary><time>${esc(when)}</time><strong>${esc(content.title)}</strong></summary><div class="trip-timeline-entry-body">${content.body?`<p>${esc(content.body)}</p>`:""}${photoLink}</div></details>`;}).join("")}</div>`:`<p class="trip-timeline-empty">Voeg hierboven jullie eerste dag bij dit hotel toe.</p>`}`;
       timeline.querySelectorAll("[data-journey-memory-id]").forEach(button=>button.onclick=()=>{
         const photos=window.lastTripPhotoMap?.[button.dataset.journeyMemoryId]||[];
         const sources=photos.map(photo=>photo.original_url).filter(Boolean);
         openMemoryPhoto(sources[0],sources);
       });
+      timeline.querySelectorAll("[data-save-diary-memory-to-phone]").forEach(button=>button.onclick=()=>saveStoredMemoryPhotosToPhone(
+        button.dataset.saveDiaryMemoryToPhone,
+        timeline.querySelector(`[data-diary-memory-phone-status="${CSS.escape(button.dataset.saveDiaryMemoryToPhone)}"]`)
+      ));
       const sortSelect=timeline.querySelector("[data-diary-sort]");
       sortSelect.onchange=()=>{saveDiarySortOrder(sortSelect.value);renderTripFeatureJourneyTimelines();};
       timeline.querySelector("[data-collapse-all-diary]").onclick=()=>{
