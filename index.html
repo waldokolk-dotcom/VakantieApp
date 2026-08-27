@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="162">
+<meta name="app-version" content="163">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=162">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=162">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=163">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=163">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -3759,6 +3759,16 @@
     .hotel-info-panel h4{
       margin:0 0 11px;color:#175d42;font-size:14px
     }
+    .hotel-weather-panel{grid-column:1/-1;background:linear-gradient(135deg,#f1f8f1,#fffdf8)}
+    .hotel-weather-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:13px}
+    .hotel-weather-head h4{margin:0}.hotel-weather-head p{margin:4px 0 0;color:#718078;font-size:11px;line-height:1.4}
+    .hotel-weather-badge{flex:0 0 auto;border-radius:999px;background:#dcefe1;color:#176147;padding:6px 9px;font-size:10px;font-weight:900}
+    .hotel-weather-now{display:flex;align-items:center;gap:12px;padding:12px 13px;border:1px solid #dbe9d9;border-radius:14px;background:#fff;margin-bottom:11px}
+    .hotel-weather-now-icon{font-size:27px;line-height:1}.hotel-weather-now strong{display:block;color:#173d31;font-size:19px}.hotel-weather-now span{display:block;color:#61736a;font-size:11px;margin-top:2px}
+    .hotel-weather-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px}
+    .hotel-weather-day{min-width:0;text-align:center;border-radius:12px;background:#fff;padding:9px 4px;border:1px solid #e4ede0}
+    .hotel-weather-day strong,.hotel-weather-day span,.hotel-weather-day small{display:block}.hotel-weather-day strong{font-size:10px;color:#61736a;text-transform:capitalize}.hotel-weather-day span{font-size:18px;margin:5px 0}.hotel-weather-day small{font-size:10px;color:#173d31;font-weight:900;white-space:nowrap}
+    .hotel-weather-note{margin:2px 0 0;color:#718078;font-size:11px;line-height:1.45}
     .hotel-info-row{
       display:grid;
       grid-template-columns:132px 1fr;
@@ -3869,7 +3879,9 @@
       .hotel-detail-total{text-align:left}
       .hotel-detail-content{grid-template-columns:1fr}
       .hotel-info-panel.facilities{grid-column:auto}
+      .hotel-weather-panel{grid-column:auto}
       .hotel-info-row{grid-template-columns:112px 1fr}
+      .hotel-weather-days{grid-template-columns:repeat(4,minmax(0,1fr))}
       .hotel-room-grid{grid-template-columns:1fr}
     }
 
@@ -6943,7 +6955,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v162</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v163</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>27 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6951,10 +6963,12 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=162" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=163" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v162</strong><br>
+          <strong>Wijzigingen in v163</strong><br>
+          Ieder hotel heeft nu een eigen live weerkaart met de actuele situatie en, wanneer de verblijfsdata binnen zeven dagen vallen, de verwachting voor precies die dagen. Het fotoboek kreeg afwisselende, redactionele fotocollages.<br><br>
+          <strong>Eerdere wijzigingen in v162</strong><br>
           Het technische scherm leest nu altijd de werkelijk geopende appversie en opent opnieuw laden op diezelfde versie.<br><br>
           <strong>Eerdere wijzigingen in v161</strong><br>
           Bewaar ook achteraf foto’s van bestaande Momenten en dagboekbijdragen in Apple Foto’s. Open de deelkaart en kies ‘Bewaar afbeelding’.<br><br>
@@ -7379,7 +7393,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||162;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||163;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7388,7 +7402,7 @@ async function checkTechnicalVersion(){
   }
 }
 
-const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||162;
+const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||163;
 const technicalCurrentVersion=document.getElementById("technicalCurrentVersion");
 if(technicalCurrentVersion) technicalCurrentVersion.textContent=`v${openedAppVersion}`;
 const technicalLink=document.querySelector(".technical-link");
@@ -8454,6 +8468,14 @@ function renderHotelsTab(){
               Hoteltelefoon staat hierboven direct aanklikbaar.
             </div>
           </section>
+
+          <section class="hotel-info-panel hotel-weather-panel" data-hotel-weather="${esc(stop.id)}">
+            <div class="hotel-weather-head">
+              <div><h4>🌦️ Weer bij dit hotel</h4><p>Actueel weer en verwachting voor jullie verblijf laden…</p></div>
+              <span class="hotel-weather-badge">WEER LADEN</span>
+            </div>
+            <div class="hotel-weather-now"><div class="hotel-weather-now-icon">🌦️</div><div><strong>Even ophalen…</strong><span>De hotelkaart wordt zo aangevuld.</span></div></div>
+          </section>
         </div>
 
         ${stop.id==="zuid-tirol" ? `
@@ -8703,6 +8725,7 @@ function renderHotelsTab(){
   if(typeof window.renderTripFeatureHotelNotes==="function") window.renderTripFeatureHotelNotes();
 
   loadAllRoomPhotos();
+  loadHotelWeatherPanels();
 }
 
 function renderTripManager(){
@@ -13119,6 +13142,59 @@ function cachedWeather(hotel){
   catch(e){return null;}
 }
 
+function hotelForecastDays(stop,weather){
+  const dates=weather?.daily?.time||[];
+  if(!dates.length) return {indices:[],label:"Verwachting niet beschikbaar",note:"De weersverwachting kon niet worden gelezen."};
+  const first=dates[0],last=dates[dates.length-1];
+  const arrival=String(stop.arrival||"").slice(0,10),departure=String(stop.departure||"").slice(0,10);
+  const withinStay=arrival&&departure ? dates.map((date,index)=>({date,index})).filter(day=>day.date>=arrival&&day.date<=departure) : [];
+  if(withinStay.length){
+    return {indices:withinStay.map(day=>day.index),label:"Verwachting voor jullie verblijf",note:`${formatTripDate(arrival)} – ${formatTripDate(departure)}`};
+  }
+  if(arrival&&arrival>last){
+    return {indices:[],label:"Verwachting voor jullie verblijf",note:`Betrouwbare verwachting komt beschikbaar vanaf ongeveer zeven dagen voor ${formatTripDate(arrival)}.`};
+  }
+  if(departure&&departure<first){
+    return {indices:dates.map((_,index)=>index),label:"Weer op deze locatie",note:"Jullie verblijf ligt al in het verleden; hieronder staat de komende zeven dagen."};
+  }
+  return {indices:dates.map((_,index)=>index),label:"Komende zeven dagen",note:"Voor deze locatie."};
+}
+
+function renderHotelWeatherPanel(stop,weather){
+  const panel=document.querySelector(`[data-hotel-weather="${CSS.escape(stop.id)}"]`);
+  if(!panel||!weather?.daily?.time?.length) return;
+  const hotel=normalizeStopForLive(stop);
+  const currentTemp=Math.round(weather.current?.temperature_2m ?? weather.daily.temperature_2m_max?.[0] ?? 0);
+  const currentCode=weather.current?.weather_code ?? weather.daily.weather_code?.[0];
+  const currentIcon=weatherIcon(currentCode),currentText=weatherText(currentCode);
+  const forecast=hotelForecastDays(stop,weather);
+  const days=forecast.indices.map(index=>{
+    const date=weather.daily.time[index];
+    const label=index===0?"Vandaag":new Date(`${date}T12:00:00`).toLocaleDateString("nl-NL",{weekday:"short",day:"numeric"}).replace(".","");
+    const max=Math.round(weather.daily.temperature_2m_max?.[index]??0),min=Math.round(weather.daily.temperature_2m_min?.[index]??0);
+    const rain=Math.round(weather.daily.precipitation_probability_max?.[index]??0);
+    return `<div class="hotel-weather-day"><strong>${esc(label)}</strong><span>${weatherIcon(weather.daily.weather_code?.[index])}</span><small>${max}° / ${min}°</small><small>💧 ${rain}%</small></div>`;
+  }).join("");
+  const updated=new Date(weather._fetchedAt||Date.now()).toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"});
+  panel.innerHTML=`<div class="hotel-weather-head"><div><h4>🌦️ Weer bij ${esc(hotel.city||hotel.hotel)}</h4><p>${esc(forecast.label)} · bijgewerkt ${updated}</p></div><span class="hotel-weather-badge">LIVE</span></div><div class="hotel-weather-now"><div class="hotel-weather-now-icon">${currentIcon}</div><div><strong>${currentTemp}°C · ${esc(currentText)}</strong><span>Actueel op de hotellocatie · wind ${Math.round(weather.current?.wind_speed_10m??0)} km/u</span></div></div>${days?`<div class="hotel-weather-days">${days}</div>`:""}<p class="hotel-weather-note">${esc(forecast.note)}</p>`;
+}
+
+async function loadHotelWeatherPanels(){
+  const stops=tripStops();
+  await Promise.all(stops.map(async stop=>{
+    const hotel=normalizeStopForLive(stop),cached=cachedWeather(hotel);
+    if(cached) renderHotelWeatherPanel(stop,cached);
+    const cacheAge=Date.now()-new Date(cached?._fetchedAt||0).getTime();
+    if(cached&&cacheAge<15*60*1000) return;
+    try{renderHotelWeatherPanel(stop,await fetchLiveWeather(hotel));}
+    catch(error){
+      console.warn("Hotelweer laden mislukt",stop.id,error);
+      const panel=document.querySelector(`[data-hotel-weather="${CSS.escape(stop.id)}"]`);
+      if(panel&&!cached) panel.innerHTML=`<div class="hotel-weather-head"><div><h4>🌦️ Weer bij dit hotel</h4><p>Nu niet beschikbaar</p></div><span class="hotel-weather-badge">OPNIEUW PROBEREN</span></div><p class="hotel-weather-note">Controleer de internetverbinding en open deze hotelkaart later opnieuw.</p>`;
+    }
+  }));
+}
+
 function todayHourlyIndices(weather){
   const today=weather.daily?.time?.[0];
   const result=[];
@@ -16893,7 +16969,7 @@ if(document.readyState==="loading"){
     const hotelChapters=stops.map(stop=>{
       const entries=memories.filter(memory=>memory.stop_id===stop.id),photos=entries.flatMap(allPhotos),hero=photos[0];
       const opener=`<section class="page chapter ${hero?"has-photo":""}" ${hero?`style="background-image:linear-gradient(90deg,rgba(10,44,31,.75),rgba(10,44,31,.12)),url('${esc(hero.preview_url||hero.original_url)}')"`:""}><div><small>HOOFDSTUK</small><h1>${esc(stop.hotel||stop.city||"Onze stop")}</h1><p>${esc(stop.city||"")} · ${esc(formatTripDate(stop.arrival))} – ${esc(formatTripDate(stop.departure))}</p><p>${esc(tripFeatureState.hotelNotes?.[stop.id]?.walk||tripFeatureState.hotelNotes?.[stop.id]?.room||"")}</p></div></section>`;
-      const collagePages=chunks(photos.slice(1),6).map((set,index)=>`<section class="page"><div class="eyebrow">${esc(stop.city||stop.hotel)} · FOTO'S</div><div class="photo-grid ${set.length<4?"few":""}">${set.map(photo=>image(photo)).join("")}</div></section>`).join("");
+      const collagePages=chunks(photos.slice(1),6).map((set,index)=>`<section class="page"><div class="eyebrow">${esc(stop.city||stop.hotel)} · FOTO'S</div><div class="photo-grid ${set.length<4?"few":""} ${index%2===0?"editorial":"postcard"}">${set.map(photo=>image(photo)).join("")}</div></section>`).join("");
       const diaryPages=chunks(entries.filter(entry=>entry.text),4).map(set=>`<section class="page diary"><div class="eyebrow">DAGBOEK</div><h2>${esc(stop.city||stop.hotel)}</h2>${set.map(entry=>`<article><small>${esc(entry.created_at?new Date(entry.created_at).toLocaleDateString("nl-NL",{weekday:"long",day:"2-digit",month:"long"}):"")}</small><p>${esc(entry.text||"")}</p></article>`).join("")}</section>`).join("");
       return opener+collagePages+diaryPages;
     }).join("");
@@ -16901,7 +16977,9 @@ if(document.readyState==="loading"){
     const bookStats=`${featureNights()} nachten · ${memories.length} momenten · ${Object.values(window.lastTripPhotoMap||{}).reduce((sum,photos)=>sum+photos.length,0)} foto’s · ${Number(tripFeatureState.odometerKm)||0} km · ${featureEuro(total)}`;
     book.document.write(`<!doctype html><html lang="nl"><head><meta charset="utf-8"><title>${esc(meta.name||"Onze reis")}</title><style>*{box-sizing:border-box}body{margin:0;background:#dde5da;color:#173d31;font-family:Georgia,serif}.toolbar{position:sticky;top:0;z-index:4;padding:13px;text-align:center;background:#173d31}.toolbar button{border:0;border-radius:999px;background:#f5e9cb;color:#173d31;padding:10px 18px;font:700 14px Arial;cursor:pointer}.page{width:min(1120px,94vw);min-height:min(790px,72vw);margin:30px auto;background:#fffdf8;padding:64px;box-shadow:0 14px 42px #19342544;break-after:page;position:relative}.cover,.chapter{display:flex;align-items:end;background:#176147 center/cover;color:#fff;overflow:hidden}.cover:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,35,25,.84),rgba(8,35,25,.08))}.cover>*{position:relative}.cover h1,.chapter h1{font-size:clamp(42px,7vw,88px);line-height:.95;margin:14px 0}.cover .stats{max-width:610px;font:600 16px Arial;line-height:1.7}.eyebrow,small{font:800 13px Arial;letter-spacing:2px;color:#518b68}.cover small,.chapter small{color:#e0f2d8}.route{display:grid;place-items:center;text-align:center;background:#edf4e9}.route h1{font-size:56px}.route-line{max-width:800px;font:700 19px Arial;line-height:2.3}.route-line span{white-space:nowrap}.chapter{min-height:min(650px,64vw)}.chapter p{max-width:520px;font:18px Arial;line-height:1.5}.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}.photo-grid.few{grid-template-columns:repeat(2,1fr)}figure{margin:0;min-height:210px;background:#e4ece1;overflow:hidden}figure img{width:100%;height:100%;min-height:210px;object-fit:cover;display:block}figcaption{font:12px Arial;color:#668074;padding:6px}.diary article{border-left:4px solid #73a866;padding:10px 18px;margin:16px 0;background:#f3f7ee}.diary article p{font-size:22px;line-height:1.45;margin:7px 0}.highlights{background:#f5e9cb}.closing{display:grid;place-items:center;text-align:center;background:#176147;color:#fff}.closing h1{font-size:64px}.closing p{font:20px Arial;max-width:600px;line-height:1.6}@media(max-width:700px){.page{padding:30px;min-height:600px}.photo-grid{gap:7px}.cover h1,.chapter h1{font-size:44px}.route h1,.closing h1{font-size:38px}.diary article p{font-size:18px}}@media print{body{background:white}.toolbar{display:none}.page{width:280mm;height:198mm;min-height:198mm;margin:0;box-shadow:none;page-break-after:always}.photo-grid figure{min-height:42mm}figure img{min-height:42mm}}</style></head><body><div class="toolbar"><button onclick="window.print()">Bewaar dit fotoboek als PDF</button></div><section class="page cover" ${coverPhoto?`style="background-image:linear-gradient(90deg,rgba(8,35,25,.84),rgba(8,35,25,.08)),url('${esc(coverPhoto.preview_url||coverPhoto.original_url)}')"`:""}><div><small>REISBOEK</small><h1>${esc(meta.name||"Onze reis")}</h1><p>Waldo & Brigitte</p><p class="stats">${bookStats}</p></div></section><section class="page route"><div><div class="eyebrow">DE ROUTE</div><h1>Op weg</h1><p class="route-line">${route.map((place,index)=>`<span>${esc(place)}${index<route.length-1?" &nbsp;→&nbsp; ":""}</span>`).join("")}</p><p>${bookStats}</p></div></section>${hotelChapters}${highlightPage}<section class="page closing"><div><div class="eyebrow" style="color:#d9ebd3">EINDE VAN DE REIS</div><h1>Wat een mooie reis</h1><p>Herinneringen aan samen onderweg zijn, bijzondere plekken en heel veel foto’s om nog vaak doorheen te bladeren.</p></div></section></body></html>`);
     book.document.close();
-    book.document.head.insertAdjacentHTML("beforeend",`<style>.toolbar:before{content:"ALPENVERHAAL · FOTBOEKATELIER";display:block;margin:0 0 8px;color:#d9ebd3;font:800 11px Arial;letter-spacing:2px}.page:after{content:attr(data-page);position:absolute;right:30px;bottom:22px;color:#668074;font:700 11px Arial;letter-spacing:1px}.cover:after{display:none}.page:not(.cover):not(.closing){border-top:9px solid #e8d6a8}.chapter{border-top:0}.chapter:after{color:#e0f2d8}.photo-grid figure{border-radius:3px;box-shadow:0 8px 18px #173d3124}.diary article:first-of-type:first-letter{float:left;font-size:52px;line-height:.78;padding:6px 8px 0 0;color:#176147;font-weight:bold}.route:before{content:"✦";font-size:35px;color:#b78845}.highlights{background:linear-gradient(135deg,#f7e8c4,#fffdf8)}.closing:before{content:"WALDO & BRIGITTE";font:800 12px Arial;letter-spacing:3px;color:#d9ebd3}</style>`);
+    book.document.head.insertAdjacentHTML("beforeend",`<style>.toolbar:before{content:"ALPENVERHAAL · FOTBOEKATELIER"}</style>`);
+    book.document.head.insertAdjacentHTML("beforeend",`<style>.toolbar:before{content:"ALPENVERHAAL · FOTOB0EKATELIER";display:block;margin:0 0 8px;color:#d9ebd3;font:800 11px Arial;letter-spacing:2px}.page:after{content:attr(data-page);position:absolute;right:30px;bottom:22px;color:#668074;font:700 11px Arial;letter-spacing:1px}.cover:after{display:none}.page:not(.cover):not(.closing){border-top:9px solid #e8d6a8}.chapter{border-top:0}.chapter:after{color:#e0f2d8}.photo-grid figure{border-radius:3px;box-shadow:0 8px 18px #173d3124}.photo-grid.editorial{grid-template-columns:1.35fr 1fr 1fr}.photo-grid.editorial figure:first-child{grid-column:span 2;grid-row:span 2;min-height:438px}.photo-grid.editorial figure:first-child img{min-height:438px}.photo-grid.postcard figure:nth-child(3n+2){transform:translateY(24px)}.diary article:first-of-type:first-letter{float:left;font-size:52px;line-height:.78;padding:6px 8px 0 0;color:#176147;font-weight:bold}.route:before{content:"✦";font-size:35px;color:#b78845}.highlights{background:linear-gradient(135deg,#f7e8c4,#fffdf8)}.closing:before{content:"WALDO & BRIGITTE";font:800 12px Arial;letter-spacing:3px;color:#d9ebd3}@media(max-width:700px){.photo-grid.editorial figure:first-child{min-height:260px}.photo-grid.editorial figure:first-child img{min-height:260px}.photo-grid.postcard figure:nth-child(3n+2){transform:none}}@media print{.photo-grid.postcard figure:nth-child(3n+2){transform:translateY(6mm)}}</style>`);
+    book.document.head.insertAdjacentHTML("beforeend",`<style>.toolbar:before{content:"ALPENVERHAAL · FOTBOEKATELIER"}</style>`);
     book.document.querySelectorAll(".page").forEach((page,index)=>page.dataset.page=`${String(index+1).padStart(2,"0")} · ALPENVERHAAL`);
     const coverLabel=book.document.querySelector(".cover small");if(coverLabel) coverLabel.textContent="ALPENVERHAAL · FOTBOEKMODEL";
   }
