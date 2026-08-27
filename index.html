@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="157">
+<meta name="app-version" content="158">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=157">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=157">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=158">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=158">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -6919,7 +6919,9 @@
           <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=155" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v157</strong><br>
+          <strong>Wijzigingen in v158</strong><br>
+          Ook de dagboekinvoer op Vandaag heeft nu een eigen titelveld. Alle dagboekbijdragen klappen standaard in en tonen eerst alleen datum en titel.<br><br>
+          <strong>Eerdere wijzigingen in v157</strong><br>
           Het dagboek start nu met de nieuwste bijdrage bovenaan. Kies bij iedere dagboekreeks zelf Nieuwste eerst of Oudste eerst; die keuze blijft bewaard op dit apparaat. Iedere bijdrage heeft een titel en klapt pas open als je hem aantikt.<br><br>
           <strong>Eerdere wijzigingen in v155</strong><br>
           Bestaande laadbeurten zonder hotel worden automatisch gekoppeld aan het hotel van de laaddatum. Nieuwe laadbeurten hebben een hotelkeuze.<br><br>
@@ -7336,7 +7338,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||157;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||158;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -16709,7 +16711,8 @@ if(document.readyState==="loading"){
     hub.innerHTML=`
       <div class="trip-feature-card trip-diary-card">
         <div class="legacy-kicker">DAGBOEK VAN VANDAAG</div><h2>Wat was vandaag leuk?</h2>
-        <textarea id="todayDiaryText" maxlength="600" placeholder="Bijv. prachtige wandeling, heerlijk gegeten, grappig moment met de honden…"></textarea>
+        <input id="todayDiaryTitle" maxlength="90" placeholder="Titel, bijv. Wandeling bij het meer">
+        <textarea id="todayDiaryText" maxlength="600" placeholder="Wat wil je hierover onthouden?"></textarea>
         <div class="trip-feature-actions"><label class="trip-file-label">📷 Foto <input id="todayDiaryPhoto" type="file" accept="image/*"></label><button id="saveTodayDiary" class="btn" type="button">Bewaar terugblik</button></div>
         <small id="todayDiaryStatus">Wordt als moment opgeslagen voor ${current?.hotel||"vandaag"}.</small>
       </div>
@@ -16749,12 +16752,13 @@ if(document.readyState==="loading"){
     });
     hub.querySelector("#saveTripBudget").onclick=async()=>{ const raw=hub.querySelector("#tripBudgetInput").value.replace(".","").replace(",","."); tripFeatureState.budgetCents=Math.max(0,Math.round(Number(raw||0)*100)); await saveTripFeatures(); renderTripFeatureHub(); };
     hub.querySelector("#saveTodayDiary").onclick=async()=>{
-      const text=hub.querySelector("#todayDiaryText").value.trim(); const file=hub.querySelector("#todayDiaryPhoto").files?.[0]; const status=hub.querySelector("#todayDiaryStatus");
-      if(!text&&!file){status.textContent="Schrijf iets of kies een foto.";return;}
+      const title=hub.querySelector("#todayDiaryTitle").value.trim(); const note=hub.querySelector("#todayDiaryText").value.trim(); const file=hub.querySelector("#todayDiaryPhoto").files?.[0]; const status=hub.querySelector("#todayDiaryStatus");
+      if(!title){status.textContent="Geef deze terugblik eerst een titel.";hub.querySelector("#todayDiaryTitle").focus();return;}
+      const text=note?`${title}\n\n${note}`:title;
       const originalText=document.getElementById("memoryText"), originalFiles=document.getElementById("memoryPhotos"), mode=document.getElementById("memoryLocationMode");
       originalText.value=text||"Dagboekfoto"; if(current?.stop) mode.value=current.stop;
       if(file){const transfer=new DataTransfer();transfer.items.add(file);originalFiles.files=transfer.files;}
-      status.textContent="Terugblik opslaan…"; await saveMemoryWithPhotos(); status.textContent="✓ Terugblik bewaard bij Momenten."; hub.querySelector("#todayDiaryText").value=""; hub.querySelector("#todayDiaryPhoto").value="";
+      status.textContent="Terugblik opslaan…"; await saveMemoryWithPhotos(); status.textContent="✓ Terugblik bewaard bij Momenten."; hub.querySelector("#todayDiaryTitle").value=""; hub.querySelector("#todayDiaryText").value=""; hub.querySelector("#todayDiaryPhoto").value="";
     };
     hub.querySelector("#openRoadMode").onclick=()=>openTripRoadMode(next);
     hub.querySelector("#openFavorites").onclick=()=>openTripHighlights();
