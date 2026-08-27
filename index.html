@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="167">
+<meta name="app-version" content="172">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=167">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=167">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=172">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=172">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -1195,16 +1195,51 @@
     /* ===== Momenten & foto's ===== */
     .memory-grid{
       display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
+      grid-template-columns:1fr;
       gap:14px;
       margin-top:14px;
     }
+    .memory-story-group{
+      display:grid;
+      gap:8px;
+      padding:14px;
+      border:1px solid #dbe6d7;
+      border-radius:18px;
+      background:linear-gradient(135deg,#f5faf2,#fffdf8);
+    }
+    .memory-story-group>header{display:flex;align-items:end;justify-content:space-between;gap:12px;padding:0 3px 5px;border-bottom:2px solid #84b574}
+    .memory-story-group h3{margin:2px 0 0;font-size:1rem;text-transform:capitalize;color:#173d31}
+    .memory-story-group header small{font:800 .66rem Arial;letter-spacing:1px;text-transform:uppercase;color:#4c8065}
+    .memory-story-group>header>span{font:700 .72rem Arial;color:#668074;white-space:nowrap}
     .memory-card{
       overflow:hidden;
       background:#fff;
       border:1px solid #e7dfcf;
       border-radius:18px;
     }
+    .memory-collapse-toggle{
+      width:100%;
+      display:grid;
+      grid-template-columns:100px minmax(0,1fr) 58px 24px;
+      align-items:center;
+      gap:12px;
+      padding:12px 14px;
+      border:0;
+      border-bottom:1px solid #e7dfcf;
+      background:#fffdf8;
+      color:#173d31;
+      text-align:left;
+      cursor:pointer;
+    }
+    .memory-collapse-toggle:hover{background:#f5f8f0}
+    .memory-collapse-date{font-size:.72rem;font-weight:900;line-height:1.2;color:#4c7662}
+    .memory-collapse-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.94rem;font-weight:900}
+    .memory-collapse-thumb{width:58px;height:48px;border-radius:9px;overflow:hidden;background:#eaf0e8;display:grid;place-items:center;font-size:1.15rem}
+    .memory-collapse-thumb img{display:block;width:100%;height:100%;object-fit:cover}
+    .memory-collapse-chevron{font-size:1.2rem;font-weight:900;color:#397057;transition:transform .18s ease}
+    .memory-card.is-expanded .memory-collapse-chevron{transform:rotate(180deg)}
+    .memory-card-content{display:none}
+    .memory-card.is-expanded .memory-card-content{display:block}
     .memory-card-photo{
       width:100%;
       aspect-ratio:4/3;
@@ -1380,6 +1415,42 @@
       padding-top:10px;
       border-top:1px solid #eee8dc;
     }
+    .memory-edit-dialog{
+      position:fixed;
+      inset:0;
+      z-index:8000;
+      display:grid;
+      place-items:center;
+      padding:20px;
+      background:rgba(8,40,29,.7);
+    }
+    .memory-edit-dialog[hidden]{display:none}
+    .memory-edit-dialog-card{
+      width:min(760px,100%);
+      max-height:min(82dvh,760px);
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      padding:28px;
+      border-radius:24px;
+      background:#fffdf8;
+      box-shadow:0 24px 68px rgba(0,24,17,.42);
+      color:#173d31;
+    }
+    .memory-edit-dialog-card h2{margin:0;font-size:1.5rem}
+    .memory-edit-dialog-card p{margin:0;color:#64766d}
+    .memory-edit-dialog-card textarea{
+      width:100%;
+      min-height:280px;
+      resize:vertical;
+      padding:15px;
+      border:1px solid #cbd9c6;
+      border-radius:15px;
+      background:#fff;
+      color:#173d31;
+      font:1rem/1.5 inherit;
+    }
+    .memory-edit-dialog-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
     .memory-delete-btn{
       border:1px solid #e7c6bd;
       background:#fff8f5;
@@ -1403,6 +1474,8 @@
         align-items:stretch;
         gap:8px;
       }
+      .memory-collapse-toggle{grid-template-columns:84px minmax(0,1fr) 52px 18px;gap:8px;padding:10px}
+      .memory-collapse-date{font-size:.67rem}.memory-collapse-title{font-size:.84rem}.memory-collapse-thumb{width:52px;height:44px}
       .memory-card-actions .btn,
       .memory-card-actions .memory-delete-btn{
         min-width:0;
@@ -1413,6 +1486,10 @@
         text-align:center;
         white-space:normal;
       }
+      .memory-edit-dialog{align-items:end;padding:0}
+      .memory-edit-dialog-card{width:100%;max-height:90dvh;padding:22px 18px;border-radius:24px 24px 0 0}
+      .memory-edit-dialog-card textarea{min-height:42dvh;font-size:1rem}
+      .memory-edit-dialog-actions .btn{flex:1;min-height:48px}
       .memory-card-actions [data-replace-memory-photo],
       .memory-card-actions .memory-delete-btn{
         grid-column:1 / -1;
@@ -5815,7 +5892,7 @@
       <button data-view="omgeving">🗺️ Omgeving</button>
       <button data-view="kosten">€ Kosten</button>
       <button data-view="meenemen">🧳 Meenemen</button>
-      <button data-view="momenten">📷 Momenten</button>
+      <button data-view="momenten">📖 Reisverhaal</button>
       <button data-view="reizen">🧭 Reis beheren</button>
       <button data-view="technisch">⚙️ Technisch</button>
     </nav>
@@ -6909,8 +6986,8 @@
   <section id="momenten" class="view">
     <div class="grid">
       <div class="card span-5">
-        <div class="eyebrow">Momenten</div>
-        <h2>Foto of herinnering maken</h2>
+        <div class="eyebrow">Reisverhaal</div>
+        <h2>Nieuw moment of dagboekverhaal</h2>
         <button id="memoryPhotoQuickButton" class="btn memory-photo-quick" type="button">📷 Meteen een foto maken</button>
         <p class="section-intro">
           Kies een foto, glimlach en korte tekst. De herinnering wordt automatisch opgeslagen onder de gebruiker van dit toestel.
@@ -6919,6 +6996,17 @@
         <div class="form-grid">
           <label class="full">Wat wil je onthouden?
             <textarea id="memoryText" rows="4" placeholder="Bijv. prachtige wandeling, heerlijk gegeten, grappig moment met de honden…"></textarea>
+          </label>
+
+          <label>Soort bijdrage
+            <select id="memoryEntryKind">
+              <option value="moment">📷 Kort moment</option>
+              <option value="diary">✍️ Dagboekverhaal</option>
+            </select>
+          </label>
+
+          <label>Datum
+            <input id="memoryDate" type="date">
           </label>
 
           <label>Locatie
@@ -6934,7 +7022,7 @@
             </small>
           </label>
 
-          <label>Sfeer
+          <label id="memoryMoodField">Sfeer van dit moment
             <select id="memoryMood">
               <option value="">Geen keuze</option>
               <option value="blij">😊 Blij</option>
@@ -6965,7 +7053,7 @@
           </div>
 
           <div class="full">
-            <button id="saveMemory" class="btn">Moment opslaan</button>
+            <button id="saveMemory" class="btn">Opslaan in reisverhaal</button>
           </div>
         </div>
 
@@ -6973,8 +7061,8 @@
       </div>
 
       <div class="card span-7">
-        <div class="eyebrow">Onze herinneringen</div>
-        <h2>Momenten & foto's</h2>
+        <div class="eyebrow">Jullie tijdlijn</div>
+        <h2>Reisverhaal</h2>
         <div class="toolbar">
           <button id="refreshMemories" class="btn secondary">Vernieuwen</button>
         </div>
@@ -6992,7 +7080,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v167</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v172</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>27 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -7000,11 +7088,11 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=167" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=172" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v167</strong><br>
-          Het fotoboek heeft nu luxe dubbelpagina’s: één grote beeldvullende foto links en een verzorgde collage rechts, met een herkenbare boeknaad zoals een gedrukt reisalbum.<br><br>
+          <strong>Wijzigingen in v172</strong><br>
+          Dagboek en Momenten zijn samengebracht als Reisverhaal. Kies bij een nieuwe bijdrage kort moment of dagboekverhaal, datum en hotel. Alles verschijnt samen, gegroepeerd per dag en plek; de menubalken heten nu overal Reisverhaal.<br><br>
           <strong>Eerdere wijzigingen in v165</strong><br>
           De weerinformatie heet nu overal Weerkaart. De knop ‘Vernieuw weer’ haalt de weersverwachting daadwerkelijk opnieuw op; een tijdelijke storing blijft duidelijk als weerstoring gemeld.<br><br>
           <strong>Eerdere wijzigingen in v164</strong><br>
@@ -7449,7 +7537,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||167;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||172;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7458,7 +7546,7 @@ async function checkTechnicalVersion(){
   }
 }
 
-const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||167;
+const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||172;
 const technicalCurrentVersion=document.getElementById("technicalCurrentVersion");
 if(technicalCurrentVersion) technicalCurrentVersion.textContent=`v${openedAppVersion}`;
 const technicalLink=document.querySelector(".technical-link");
@@ -12082,7 +12170,14 @@ async function loadMemories(){
     return;
   }
 
-  list.innerHTML=(memories||[]).map(memory=>{
+  const storyGroups=[];
+  (memories||[]).forEach(memory=>{
+    const day=memory.created_at ? new Date(memory.created_at).toLocaleDateString("nl-NL",{weekday:"long",day:"2-digit",month:"long",year:"numeric"}) : "Zonder datum";
+    const place=displayMemoryLocation(memory.stop_id)||"Onderweg";
+    const last=storyGroups[storyGroups.length-1];
+    if(!last||last.day!==day||last.place!==place) storyGroups.push({day,place,items:[memory]});else last.items.push(memory);
+  });
+  list.innerHTML=storyGroups.map(group=>`<section class="memory-story-group"><header><div><small>${esc(group.place)}</small><h3>${esc(group.day)}</h3></div><span>${group.items.length} bijdrage${group.items.length===1?"":"n"}</span></header>${group.items.map(memory=>{
     const attached=photoMap[memory.id]||[];
 
     let media='';
@@ -12108,9 +12203,20 @@ async function loadMemories(){
       attached.length ? `${attached.length} foto${attached.length===1?"":"\'s"}` : ""
     ].filter(Boolean).join(" · ");
 
+    const rawTitle=String(memory.text||"Moment").trim().split(/\n|(?<=[.!?])\s/)[0]||"Moment";
+    const compactTitle=rawTitle.length>58?`${rawTitle.slice(0,55).trimEnd()}…`:rawTitle;
+    const thumbnail=attached[0]?.preview_url||attached[0]?.original_url||"";
+
     return `<article class="memory-card">
-      ${media}
-      <div class="memory-card-body">
+      <button type="button" class="memory-collapse-toggle" data-toggle-memory="${esc(memory.id)}" aria-expanded="false" aria-controls="memory-content-${esc(memory.id)}">
+        <span class="memory-collapse-date">${esc(created||"Moment")}</span>
+        <strong class="memory-collapse-title">${esc(compactTitle)}</strong>
+        <span class="memory-collapse-thumb">${thumbnail?`<img src="${esc(thumbnail)}" alt="" loading="lazy" decoding="async">`:"📷"}</span>
+        <span class="memory-collapse-chevron" aria-hidden="true">⌄</span>
+      </button>
+      <div class="memory-card-content" id="memory-content-${esc(memory.id)}">
+        ${media}
+        <div class="memory-card-body">
         <div class="memory-card-head">
           <span class="memory-author">🛏️ ${esc(memory.created_by||"Onbekend")}</span>
           <span class="memory-date">${esc(created)}</span>
@@ -12127,8 +12233,18 @@ async function loadMemories(){
         </div>
         ${attached.length?`<span class="photo-phone-status memory-photo-phone-status" data-memory-phone-status="${esc(memory.id)}" role="status" aria-live="polite"></span>`:""}
       </div>
+      </div>
     </article>`;
-  }).join("");
+  }).join("")}</section>`).join("");
+
+  list.querySelectorAll("[data-toggle-memory]").forEach(toggle=>{
+    toggle.addEventListener("click",()=>{
+      const card=toggle.closest(".memory-card");
+      const expanded=!card.classList.contains("is-expanded");
+      card.classList.toggle("is-expanded",expanded);
+      toggle.setAttribute("aria-expanded",String(expanded));
+    });
+  });
 
   list.querySelectorAll("[data-delete-memory]").forEach(button=>{
     button.addEventListener("click",()=>deleteMemory(button.dataset.deleteMemory));
@@ -12247,6 +12363,25 @@ function openMemoryPhoto(src,sources){
   viewer.querySelector("button")?.focus();
 }
 
+function openMemoryEditDialog(initialText){
+  return new Promise(resolve=>{
+    const dialog=document.createElement("section");
+    dialog.className="memory-edit-dialog";
+    dialog.setAttribute("role","dialog");
+    dialog.setAttribute("aria-modal","true");
+    dialog.setAttribute("aria-label","Tekst van moment wijzigen");
+    dialog.innerHTML=`<div class="memory-edit-dialog-card"><div><div class="legacy-kicker">MOMENT WIJZIGEN</div><h2>Schrijf of pas jullie herinnering aan</h2></div><p>Dit ruime veld is voor een korte terugblik én een langer verhaal.</p><textarea maxlength="5000" aria-label="Tekst van dit moment">${esc(initialText||"")}</textarea><div class="memory-edit-dialog-actions"><button type="button" class="btn secondary" data-memory-edit-cancel>Annuleren</button><button type="button" class="btn primary" data-memory-edit-save>Opslaan</button></div></div>`;
+    document.body.appendChild(dialog);
+    const textarea=dialog.querySelector("textarea");
+    const finish=value=>{dialog.remove();resolve(value);};
+    dialog.querySelector("[data-memory-edit-cancel]").onclick=()=>finish(null);
+    dialog.querySelector("[data-memory-edit-save]").onclick=()=>finish(textarea.value);
+    dialog.addEventListener("click",event=>{if(event.target===dialog) finish(null);});
+    dialog.addEventListener("keydown",event=>{if(event.key==="Escape") finish(null);if((event.ctrlKey||event.metaKey)&&event.key==="Enter"){event.preventDefault();finish(textarea.value);}});
+    textarea.focus();textarea.setSelectionRange(textarea.value.length,textarea.value.length);
+  });
+}
+
 async function editMemory(memoryId){
   if(!client || !memoryId) return;
   const {data:memory,error}=await client.from("memories")
@@ -12259,7 +12394,7 @@ async function editMemory(memoryId){
     return;
   }
 
-  const textValue=prompt("Wijzig de tekst van dit moment:",memory.text||"");
+  const textValue=await openMemoryEditDialog(memory.text||"");
   if(textValue===null) return;
 
   const button=document.querySelector(`[data-edit-memory="${CSS.escape(memoryId)}"]`);
@@ -15232,7 +15367,10 @@ async function saveMemoryWithPhotos(){
 
   const textValue=document.getElementById("memoryText").value.trim();
   const stop=await resolveMemoryLocation();
-  const mood=document.getElementById("memoryMood").value || null;
+  const entryKind=document.getElementById("memoryEntryKind")?.value||"moment";
+  const mood=entryKind==="diary" ? "Dagboek" : (document.getElementById("memoryMood").value || null);
+  const selectedDate=document.getElementById("memoryDate")?.value||"";
+  const createdAt=selectedDate ? new Date(`${selectedDate}T${new Date().toTimeString().slice(0,8)}`).toISOString() : new Date().toISOString();
   const files=[...(document.getElementById("memoryPhotos").files||[])];
   const msg=document.getElementById("memoryFormMsg");
   const button=document.getElementById("saveMemory");
@@ -15244,7 +15382,7 @@ async function saveMemoryWithPhotos(){
 
   button.disabled=true;
   button.textContent="Opslaan…";
-  msg.innerHTML='<div class="notice">Moment opslaan als <strong>'+esc(actorName())+'</strong>…</div>';
+  msg.innerHTML='<div class="notice">Bijdrage opslaan als <strong>'+esc(actorName())+'</strong>…</div>';
 
   try{
     const {data:memory,error:memoryError}=await client
@@ -15255,6 +15393,7 @@ async function saveMemoryWithPhotos(){
         mood:mood,
         text:textValue || "Foto-moment",
         created_by:actorName(),
+        created_at:createdAt,
         updated_at:new Date().toISOString()
       })
       .select()
@@ -15318,7 +15457,7 @@ async function saveMemoryWithPhotos(){
     document.getElementById("memoryPhotos").value="";
 
     msg.innerHTML=
-      '<div class="notice"><span class="ok">✓ Moment opgeslagen door '+
+      '<div class="notice"><span class="ok">✓ '+(entryKind==="diary"?"Dagboekverhaal":"Moment")+' opgeslagen door '+
       esc(actorName())+
       (files.length ? ` · ${uploaded}/${files.length} foto${files.length===1?"":"\'s"} opgeslagen` : "")+
       '.</span></div>';
@@ -15329,12 +15468,21 @@ async function saveMemoryWithPhotos(){
     msg.innerHTML='<div class="notice"><span class="error">Opslaan mislukt: '+esc(err.message)+'</span></div>';
   }finally{
     button.disabled=false;
-    button.textContent="Moment opslaan";
+    button.textContent="Opslaan in reisverhaal";
   }
 }
 
 document.getElementById("saveMemory")?.addEventListener("click",saveMemoryWithPhotos);
 document.getElementById("refreshMemories")?.addEventListener("click",loadMemories);
+const memoryDateInput=document.getElementById("memoryDate");
+if(memoryDateInput&&!memoryDateInput.value) memoryDateInput.value=new Date().toISOString().slice(0,10);
+document.getElementById("memoryEntryKind")?.addEventListener("change",event=>{
+  const diary=event.target.value==="diary";
+  const moodField=document.getElementById("memoryMoodField");
+  if(moodField) moodField.hidden=diary;
+  const text=document.getElementById("memoryText");
+  if(text) text.placeholder=diary?"Schrijf jullie terugblik van deze dag…":"Bijv. prachtige wandeling, heerlijk gegeten, grappig moment met de honden…";
+});
 
 const memoryPhotosInput=document.getElementById("memoryPhotos");
 const memoryPhotoQuickButton=document.getElementById("memoryPhotoQuickButton");
@@ -16904,7 +17052,7 @@ if(document.readyState==="loading"){
   <nav class="mobile-app-nav" id="mobileAppNav" aria-label="Mobiele navigatie">
     <button type="button" data-mobile-view="reis"><span>✣</span><b>Reis</b></button>
     <button type="button" data-mobile-view="vandaag"><span>⌂</span><b>Vandaag</b></button>
-    <button type="button" data-mobile-view="momenten"><span>📷</span><b>Foto’s</b></button>
+    <button type="button" data-mobile-view="momenten"><span>📖</span><b>Verhaal</b></button>
     <button type="button" data-mobile-view="omgeving"><span>🗺️</span><b>Omgeving</b></button>
     <button type="button" data-mobile-view="meenemen"><span>🧳</span><b>Meenemen</b></button>
     <button type="button" id="mobileMoreBtn"><span>☰</span><b>Meer</b></button>
@@ -16928,7 +17076,7 @@ if(document.readyState==="loading"){
         <button type="button" data-mobile-feature="book"><span>📖</span><b>Fotoboek</b></button>
         <button type="button" data-mobile-view="hotels"><span>🏨</span><b>Hotels</b></button>
         <button type="button" data-mobile-view="kosten"><span>€</span><b>Kosten</b></button>
-        <button type="button" data-mobile-view="momenten"><span>📷</span><b>Momenten</b></button>
+        <button type="button" data-mobile-view="momenten"><span>📖</span><b>Reisverhaal</b></button>
         <button type="button" data-mobile-view="reizen"><span>🧭</span><b>Reis beheren</b></button>
         <button type="button" data-mobile-view="technisch"><span>⚙️</span><b>Technisch</b></button>
       </div>
@@ -17051,15 +17199,56 @@ if(document.readyState==="loading"){
       const title=hub.querySelector("#todayDiaryTitle").value.trim(); const note=hub.querySelector("#todayDiaryText").value.trim(); const file=hub.querySelector("#todayDiaryPhoto").files?.[0]; const status=hub.querySelector("#todayDiaryStatus");
       if(!title){status.textContent="Geef deze terugblik eerst een titel.";hub.querySelector("#todayDiaryTitle").focus();return;}
       const text=note?`${title}\n\n${note}`:title;
-      const originalText=document.getElementById("memoryText"), originalFiles=document.getElementById("memoryPhotos"), mode=document.getElementById("memoryLocationMode");
-      originalText.value=text||"Dagboekfoto"; if(current?.stop) mode.value=current.stop;
+      const originalText=document.getElementById("memoryText"), originalFiles=document.getElementById("memoryPhotos"), mode=document.getElementById("memoryLocationMode"), kind=document.getElementById("memoryEntryKind"), date=document.getElementById("memoryDate");
+      originalText.value=text||"Dagboekfoto"; if(current?.stop) mode.value=current.stop;if(kind){kind.value="diary";kind.dispatchEvent(new Event("change"));}if(date) date.value=new Date().toISOString().slice(0,10);
       if(file){const transfer=new DataTransfer();transfer.items.add(file);originalFiles.files=transfer.files;}
-      status.textContent="Terugblik opslaan…"; await saveMemoryWithPhotos(); status.textContent="✓ Terugblik bewaard bij Momenten."; hub.querySelector("#todayDiaryTitle").value=""; hub.querySelector("#todayDiaryText").value=""; hub.querySelector("#todayDiaryPhoto").value="";
+      status.textContent="Terugblik opslaan…"; await saveMemoryWithPhotos(); status.textContent="✓ Terugblik bewaard in jullie reisverhaal."; hub.querySelector("#todayDiaryTitle").value=""; hub.querySelector("#todayDiaryText").value=""; hub.querySelector("#todayDiaryPhoto").value="";
     };
     hub.querySelector("#openRoadMode").onclick=()=>openTripRoadMode(next);
     hub.querySelector("#openFavorites").onclick=()=>openTripHighlights();
     hub.querySelector("#saveTripOdo").onclick=async()=>{tripFeatureState.odometerKm=Math.max(0,Math.round(Number(hub.querySelector("#tripOdoInput").value||0)));await saveTripFeatures();renderTripFeatureHub();};
-    hub.querySelector("#openTripBook").onclick=()=>openTripBookPdf();
+    hub.querySelector("#openTripBook").onclick=()=>openTripBookAtelier();
+  }
+  function tripBookStorageKey(){return `vakantieapp:fotoboek:${currentTripId||"reis"}`;}
+  function tripBookPhotoKey(memory,index){return `${memory.id}:${index}`;}
+  function defaultTripBookConfig(){
+    const memories=(window.lastTripMemories||[]),stops=tripStops();
+    return {title:tripMeta().name||"Onze reis",subtitle:"Waldo & Brigitte",route:true,diary:true,highlights:true,costs:true,stops:stops.map(stop=>stop.id),memories:memories.map(memory=>memory.id),photos:memories.flatMap(memory=>(window.lastTripPhotoMap?.[memory.id]||[]).map((_,index)=>tripBookPhotoKey(memory,index))),cover:""};
+  }
+  function loadTripBookConfig(){try{return {...defaultTripBookConfig(),...JSON.parse(localStorage.getItem(tripBookStorageKey())||"{}")} }catch(error){return defaultTripBookConfig();}}
+  function saveTripBookConfig(config){try{localStorage.setItem(tripBookStorageKey(),JSON.stringify(config));}catch(error){console.warn("Fotoboekkeuze niet lokaal bewaard",error);}}
+  function openTripBookAtelier(){
+    const memories=(window.lastTripMemories||[]).slice().sort((a,b)=>String(a.created_at||"").localeCompare(String(b.created_at||""))),stops=tripStops(),config=loadTripBookConfig();
+    const photos=memories.flatMap(memory=>(window.lastTripPhotoMap?.[memory.id]||[]).map((photo,index)=>({memory,photo,index,key:tripBookPhotoKey(memory,index)})));
+    let modal=document.getElementById("tripBookAtelier");if(!modal){modal=document.createElement("section");modal.id="tripBookAtelier";modal.className="trip-book-atelier";modal.setAttribute("role","dialog");modal.setAttribute("aria-modal","true");document.body.appendChild(modal);}
+    const stopRows=stops.map(stop=>`<label class="trip-book-choice"><input type="checkbox" data-book-stop value="${esc(stop.id)}" ${config.stops.includes(stop.id)?"checked":""}><span><strong>${esc(stop.city||stop.hotel||"Hotel")}</strong><small>${esc(stop.hotel||"")}</small></span></label>`).join("");
+    const momentRows=memories.map(memory=>{const photoCount=(window.lastTripPhotoMap?.[memory.id]||[]).length;return `<label class="trip-book-choice"><input type="checkbox" data-book-memory value="${esc(memory.id)}" ${config.memories.includes(memory.id)?"checked":""}><span><strong>${esc((memory.text||"Foto-moment").split(/\n/)[0].slice(0,78))}</strong><small>${photoCount} foto${photoCount===1?"":"’s"} · ${esc(memory.stop_id||"onderweg")}</small></span></label>`;}).join("")||"<p>Nog geen momenten om toe te voegen.</p>";
+    const photoRows=photos.map(({memory,photo,index,key})=>`<label class="trip-book-photo-choice"><input type="checkbox" data-book-photo value="${esc(key)}" ${config.photos.includes(key)?"checked":""}><img src="${esc(photo.preview_url||photo.original_url)}" alt=""><span>${esc((memory.text||"Foto").split(/\n/)[0].slice(0,30))}</span></label>`).join("")||"<p>Nog geen foto’s beschikbaar.</p>";
+    modal.innerHTML=`<div class="trip-book-atelier-card"><button class="trip-book-close" type="button" aria-label="Fotoboekatelier sluiten">×</button><div class="legacy-kicker">JULLIE EIGEN FOTBOEK</div><h2>Stel het boek zelf samen</h2><p>Kies wat erin komt. Daarna opent een echt boek met twee tegenoverliggende pagina’s.</p><div class="trip-book-fields"><label>Titel op de kaft<input data-book-title maxlength="70" value="${esc(config.title)}"></label><label>Ondertitel<input data-book-subtitle maxlength="70" value="${esc(config.subtitle)}"></label></div><div class="trip-book-section"><h3>Hoofdstukken</h3><div class="trip-book-toggles"><label><input type="checkbox" data-book-section="route" ${config.route?"checked":""}> Route</label><label><input type="checkbox" data-book-section="diary" ${config.diary?"checked":""}> Dagboekteksten</label><label><input type="checkbox" data-book-section="highlights" ${config.highlights?"checked":""}> Favorieten</label><label><input type="checkbox" data-book-section="costs" ${config.costs?"checked":""}> Kostenoverzicht</label></div></div><div class="trip-book-columns"><section><h3>Hotels</h3>${stopRows}</section><section><h3>Momenten</h3><div class="trip-book-select-actions"><button type="button" data-book-select="moments">Alles</button><button type="button" data-book-clear="moments">Geen</button></div><div class="trip-book-scroll">${momentRows}</div></section></div><section class="trip-book-section"><h3>Foto’s</h3><p class="trip-book-help">Vink afzonderlijke foto’s uit als ze niet in het boek mogen.</p><div class="trip-book-select-actions"><button type="button" data-book-select="photos">Alle foto’s</button><button type="button" data-book-clear="photos">Geen foto’s</button></div><div class="trip-book-photo-grid">${photoRows}</div></section><div class="trip-book-actions"><button class="btn secondary" type="button" data-book-save>Keuzes bewaren</button><button class="btn primary" type="button" data-book-preview>📖 Open mijn boek</button></div></div>`;
+    modal.hidden=false;
+    const read=()=>({title:modal.querySelector("[data-book-title]").value.trim()||"Onze reis",subtitle:modal.querySelector("[data-book-subtitle]").value.trim(),route:modal.querySelector('[data-book-section="route"]').checked,diary:modal.querySelector('[data-book-section="diary"]').checked,highlights:modal.querySelector('[data-book-section="highlights"]').checked,costs:modal.querySelector('[data-book-section="costs"]').checked,stops:[...modal.querySelectorAll("[data-book-stop]:checked")].map(el=>el.value),memories:[...modal.querySelectorAll("[data-book-memory]:checked")].map(el=>el.value),photos:[...modal.querySelectorAll("[data-book-photo]:checked")].map(el=>el.value)});
+    modal.querySelector(".trip-book-close").onclick=()=>modal.hidden=true;
+    modal.querySelectorAll("[data-book-select]").forEach(button=>button.onclick=()=>modal.querySelectorAll(button.dataset.bookSelect==="photos"?"[data-book-photo]":"[data-book-memory]").forEach(input=>input.checked=true));
+    modal.querySelectorAll("[data-book-clear]").forEach(button=>button.onclick=()=>modal.querySelectorAll(button.dataset.bookClear==="photos"?"[data-book-photo]":"[data-book-memory]").forEach(input=>input.checked=false));
+    modal.querySelector("[data-book-save]").onclick=()=>{saveTripBookConfig(read());modal.querySelector("[data-book-save]").textContent="✓ Bewaard";};
+    modal.querySelector("[data-book-preview]").onclick=()=>{const choice=read();saveTripBookConfig(choice);openConfiguredTripBook(choice);};
+  }
+  function openConfiguredTripBook(config){
+    const book=window.open("","_blank");if(!book){alert("Sta pop-ups toe om het fotoboek te openen.");return;}
+    const meta=tripMeta(),allMemories=(window.lastTripMemories||[]).slice().sort((a,b)=>String(a.created_at||"").localeCompare(String(b.created_at||""))),stops=tripStops().filter(stop=>config.stops.includes(stop.id));
+    const selectedMemories=allMemories.filter(memory=>config.memories.includes(memory.id));
+    const photosFor=memory=>(window.lastTripPhotoMap?.[memory.id]||[]).filter((_,index)=>config.photos.includes(tripBookPhotoKey(memory,index)));
+    const allPhotos=selectedMemories.flatMap(photosFor),cover=allPhotos[0],favorites=selectedMemories.filter(memory=>tripFeatureState.favorites.includes(memory.id));
+    const escText=value=>esc(String(value||""));const photo=(item,caption="")=>item?`<figure><img src="${escText(item.preview_url||item.original_url)}" alt=""><figcaption>${escText(caption)}</figcaption></figure>`:"<div class=\"book-empty\">Hier is ruimte voor een foto.</div>";
+    const spread=(left,right,klass="")=>`<section class="book-spread ${klass}"><article class="book-page book-left">${left}</article><i class="book-spine" aria-hidden="true"></i><article class="book-page book-right">${right}</article></section>`;
+    const route=[meta.home||"Thuis",...stops.map(stop=>stop.city||stop.hotel),meta.home||"Thuis"];
+    const spreads=[];
+    spreads.push(spread(`<div class="inside-cover"><small>JULLIE REIS</small><p>${escText(config.subtitle||"Samen onderweg")}</p><p class="inside-quote">Een boek om later weer helemaal in de reis te stappen.</p></div>`,`<div class="book-cover" ${cover?`style="background-image:linear-gradient(0deg,rgba(8,40,29,.8),rgba(8,40,29,.12)),url('${escText(cover.preview_url||cover.original_url)}')"`:""}><small>FOTOBOEK</small><h1>${escText(config.title)}</h1><p>${escText(config.subtitle||"Waldo & Brigitte")}</p></div>`,"book-cover-spread"));
+    if(config.route)spreads.push(spread(`<div class="book-title-page"><small>DE ROUTE</small><h2>Onderweg</h2><p>${route.map(escText).join(" → ")}</p></div>`,`<div class="book-stats"><small>DE REIS IN CIJFERS</small><strong>${featureNights()}</strong><span>nachten</span><strong>${selectedMemories.length}</strong><span>momenten</span><strong>${allPhotos.length}</strong><span>gekozen foto’s</span></div>`));
+    stops.forEach(stop=>{const entries=selectedMemories.filter(memory=>memory.stop_id===stop.id),photos=entries.flatMap(photosFor),note=tripFeatureState.hotelNotes?.[stop.id]||{};if(!entries.length&&!photos.length)return;const hero=photos[0];spreads.push(spread(`<div class="hotel-intro"><small>HOOFDSTUK</small><h2>${escText(stop.city||stop.hotel)}</h2><p>${escText(stop.hotel||"")}</p><p>${escText(formatTripDate(stop.arrival))} – ${escText(formatTripDate(stop.departure))}</p>${note.walk?`<blockquote>“${escText(note.walk)}”</blockquote>`:""}</div>`,photo(hero,stop.city||stop.hotel),"book-hotel-spread"));for(let index=1;index<photos.length;index+=2)spreads.push(spread(photo(photos[index],stop.city||""),photo(photos[index+1],stop.city||""),"book-photo-spread"));if(config.diary&&entries.some(entry=>entry.text)){const diary=entries.filter(entry=>entry.text).map(entry=>`<section class="book-diary-entry"><small>${escText(entry.created_at?new Date(entry.created_at).toLocaleDateString("nl-NL",{weekday:"long",day:"2-digit",month:"long",year:"numeric"}):"Moment")}</small><p>${escText(entry.text)}</p></section>`).join("");spreads.push(spread(`<div class="book-diary"><small>DAGBOEK</small><h2>${escText(stop.city||stop.hotel)}</h2>${diary}</div>`,`<div class="book-note-page"><small>ONZE NOTITIES</small><p>${escText(note.room||"Ruimte voor een herinnering aan deze fijne plek.")}</p><p>${escText(note.food||"")}</p></div>`));}});
+    if(config.highlights)spreads.push(spread(`<div class="book-highlights"><small>ONZE FAVORIETEN</small><h2>Momenten om te koesteren</h2>${favorites.map(memory=>`<p>★ ${escText((memory.text||"Favoriet moment").split(/\n/)[0])}</p>`).join("")||"<p>Kies in de app een ster bij jullie favoriete momenten.</p>"}</div>`,photo(favorites.flatMap(photosFor)[0],"Favoriet moment"),"book-highlight-spread"));
+    if(config.costs)spreads.push(spread(`<div class="book-costs"><small>DE KOSTEN</small><h2>Reisoverzicht</h2><strong>${featureEuro(featureCostTotal())}</strong><p>Totaal van de kosten die in de app staan.</p></div>`,`<div class="book-closing"><small>EINDE VAN DE REIS</small><h2>Tot de volgende keer</h2><p>Een verzameling van plekken, verhalen en foto’s die van deze reis helemaal van jullie is.</p></div>`));
+    book.document.write(`<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escText(config.title)}</title><style>*{box-sizing:border-box}body{margin:0;background:#d8e0d4;color:#173d31;font-family:Georgia,serif}.book-toolbar{position:sticky;top:0;z-index:10;padding:13px;background:#173d31;text-align:center}.book-toolbar button{border:0;border-radius:999px;padding:10px 18px;background:#f4e7c6;color:#173d31;font:800 14px Arial;cursor:pointer}.book{padding:28px 0 60px}.book-spread{position:relative;display:grid;grid-template-columns:1fr 34px 1fr;width:min(1260px,96vw);min-height:720px;margin:0 auto 38px;background:#fffdf7;box-shadow:0 18px 46px #18372755;overflow:hidden}.book-page{min-width:0;padding:54px;background:#fffdf7;overflow:hidden}.book-left{box-shadow:inset -18px 0 26px #71695518}.book-right{box-shadow:inset 18px 0 26px #71695518}.book-spine{background:linear-gradient(90deg,#bcb3a4,#fff,#a79c8b);box-shadow:inset 2px 0 5px #544c4033,inset -2px 0 5px #544c4022;z-index:1}.book-page small{font:800 11px Arial;letter-spacing:2px;color:#528467}.book-page h1,.book-page h2{margin:13px 0;color:#173d31}.book-page h1{font-size:clamp(48px,5vw,78px);line-height:.93}.book-page h2{font-size:clamp(32px,3.5vw,52px);line-height:1}.book-page p{font:17px/1.55 Arial;color:#476257}.book-cover-spread .book-left{background:#e8ddc3;display:grid;place-items:center;text-align:center}.inside-cover{max-width:280px}.inside-cover p{font-size:20px}.inside-quote{font:italic 17px Georgia!important}.book-cover{height:100%;min-height:610px;margin:-54px;background:#176147 center/cover;color:#fff;padding:54px;display:flex;flex-direction:column;justify-content:end}.book-cover h1{color:#fff}.book-cover p{color:#fff;font-weight:bold}.book-title-page,.hotel-intro,.book-highlights,.book-costs,.book-closing{height:100%;display:flex;flex-direction:column;justify-content:center}.hotel-intro{background:#edf4e9;margin:-54px;padding:54px}.hotel-intro blockquote{margin:20px 0 0;padding:16px;border-left:4px solid #6d9f70;background:#fff;font:italic 18px/1.45 Georgia}.book-page figure{height:100%;min-height:590px;margin:-54px;position:relative;background:#e4ece0}.book-page figure img{width:100%;height:100%;min-height:590px;display:block;object-fit:cover}.book-page figcaption{position:absolute;bottom:18px;left:18px;padding:7px 10px;background:#173d31cb;color:#fff;font:700 11px Arial;letter-spacing:1px}.book-empty{height:100%;min-height:590px;margin:-54px;display:grid;place-items:center;background:#e6eee2;color:#5a7467;font:700 15px Arial}.book-stats{height:100%;display:grid;align-content:center;grid-template-columns:1fr 1fr;gap:8px 20px}.book-stats small{grid-column:1/-1}.book-stats strong{font:700 46px Georgia;color:#176147;text-align:right}.book-stats span{align-self:end;padding-bottom:10px;font:700 14px Arial;color:#597066}.book-diary-entry{margin:18px 0;padding:0 0 16px;border-bottom:1px solid #dce4d9}.book-diary-entry p{margin:7px 0;white-space:pre-wrap}.book-note-page{height:100%;display:flex;justify-content:center;flex-direction:column;background:#f4e8c9;margin:-54px;padding:54px}.book-highlights{background:#f4e8c9;margin:-54px;padding:54px}.book-highlights p{margin:7px 0}.book-costs strong{font-size:54px;color:#176147}.book-closing{background:#176147;margin:-54px;padding:54px}.book-closing h2,.book-closing p{color:#fff}.book-closing small{color:#dbeed5}@media(max-width:700px){.book{padding-top:12px}.book-spread{grid-template-columns:1fr;min-height:auto;width:94vw;margin-bottom:22px}.book-spine{height:20px;background:linear-gradient(#a79c8b,#fff,#bcb3a4)}.book-page{min-height:430px;padding:34px}.book-cover,.hotel-intro,.book-note-page,.book-highlights,.book-closing{margin:-34px;padding:34px;min-height:430px}.book-page figure,.book-empty{margin:-34px;min-height:430px}.book-page figure img{min-height:430px}.book-page h1{font-size:46px}.book-page h2{font-size:34px}}@media print{@page{size:A4 landscape;margin:0}.book-toolbar{display:none}.book{padding:0}.book-spread{width:297mm;height:210mm;min-height:210mm;margin:0;box-shadow:none;break-after:page;page-break-after:always}.book-page{padding:14mm}.book-cover,.hotel-intro,.book-note-page,.book-highlights,.book-closing{margin:-14mm;padding:14mm;min-height:210mm}.book-page figure,.book-empty{margin:-14mm;min-height:210mm}.book-page figure img{min-height:210mm}}</style></head><body><div class="book-toolbar"><button onclick="window.print()">Bewaar / print dit boek als PDF</button></div><main class="book">${spreads.join("")}</main></body></html>`);book.document.close();
   }
   function openTripBookPdf(){
     const book=window.open("","_blank"); if(!book){alert("Sta pop-ups toe om het reisboek te openen.");return;}
@@ -17202,6 +17391,7 @@ if(document.readyState==="loading"){
     });
   }
   const tripFeatureStyle=document.createElement("style");tripFeatureStyle.textContent=`.trip-feature-hub{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:26px 0}.trip-feature-card{background:#fffdf8;border:1px solid #e5dcc7;border-radius:20px;padding:20px;color:#173d31}.trip-feature-card h2{font-size:22px;margin:6px 0 12px}.trip-feature-card textarea,.trip-feature-card input,.trip-hotel-notes textarea{box-sizing:border-box;width:100%;border:1px solid #ded5c3;border-radius:11px;padding:10px;font:inherit;margin:5px 0 10px;background:#fff}.trip-feature-card textarea{min-height:86px;resize:vertical}.trip-feature-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.trip-file-label{font-weight:800;color:#176147;cursor:pointer}.trip-file-label input{display:none}.trip-checklist{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.trip-checklist label{font-size:13px;font-weight:700}.trip-budget-line{display:flex;justify-content:space-between;gap:8px}.trip-budget-line span,.trip-feature-card small,.trip-road-card p,.trip-favorite-card p{color:#718078}.trip-budget-track{height:9px;border-radius:99px;background:#e9eee4;margin:12px 0;overflow:hidden}.trip-budget-track i{display:block;height:100%;background:#19805a;border-radius:inherit}.trip-road-meta{display:grid;gap:6px;font-size:13px;margin:12px 0}.trip-hotel-notes label{display:block;font-size:12px;font-weight:800}.trip-hotel-notes textarea{min-height:62px;resize:vertical}.trip-hotel-timeline{margin:18px 0 0;padding:20px 22px;border:1px solid #d7e5d2;border-radius:18px;background:linear-gradient(135deg,#f8fcf5,#fffdf8)}.trip-hotel-timeline h4{font-size:21px;margin:5px 0 16px}.trip-timeline-list{position:relative;margin-left:7px;border-left:3px solid #8abd78}.trip-timeline-list article{position:relative;display:grid;grid-template-columns:110px 1fr;gap:13px;padding:0 0 18px 20px}.trip-timeline-list article:before{content:"";position:absolute;width:11px;height:11px;border-radius:50%;background:#197252;border:3px solid #f8fcf5;left:-9px;top:2px}.trip-timeline-list time{font-size:11px;font-weight:900;color:#4d7462}.trip-timeline-list strong{font-size:12px;color:#257653;text-transform:capitalize}.trip-timeline-list p{margin:3px 0 0;line-height:1.45;color:#173d31}.trip-timeline-empty{margin:0;color:#718078}.trip-road-modal{position:fixed;inset:0;z-index:1500;background:rgba(6,38,29,.88);display:grid;place-items:center;padding:20px}.trip-road-modal[hidden]{display:none}.trip-road-modal>div{width:min(440px,100%);background:#f7f3e8;color:#173d31;padding:30px;border-radius:26px}.trip-road-modal button{float:right;border:0;background:none;font-size:32px;color:#173d31}@media(max-width:700px){.trip-feature-hub{grid-template-columns:1fr}.trip-checklist{grid-template-columns:1fr}.trip-timeline-list article{grid-template-columns:1fr;gap:3px}}`;document.head.appendChild(tripFeatureStyle);
+  const tripBookStyle=document.createElement("style");tripBookStyle.textContent=`.trip-book-atelier{position:fixed;inset:0;z-index:7000;display:grid;place-items:center;padding:18px;background:#0d3028cc}.trip-book-atelier[hidden]{display:none}.trip-book-atelier-card{position:relative;width:min(1050px,100%);max-height:calc(100dvh - 36px);overflow:auto;padding:30px;border-radius:26px;background:#fffdf8;color:#173d31;box-shadow:0 24px 70px #001b14aa}.trip-book-atelier-card h2{margin:5px 0 8px;font-size:30px}.trip-book-atelier-card h3{margin:0 0 10px;font-size:16px}.trip-book-atelier-card>p,.trip-book-help{margin:0 0 20px;color:#60796d}.trip-book-close{position:absolute;right:14px;top:9px;border:0;background:transparent;color:#173d31;font-size:34px;cursor:pointer}.trip-book-fields,.trip-book-columns{display:grid;grid-template-columns:1fr 1fr;gap:14px}.trip-book-fields label{font-size:12px;font-weight:900;color:#29754f}.trip-book-fields input{display:block;width:100%;margin-top:5px;padding:11px;border:1px solid #d1ddcc;border-radius:12px;background:#fff;font:inherit;color:#173d31}.trip-book-section{margin-top:21px;padding-top:18px;border-top:1px solid #dfebd9}.trip-book-toggles{display:flex;flex-wrap:wrap;gap:10px}.trip-book-toggles label,.trip-book-choice{display:flex;gap:9px;align-items:flex-start;padding:9px;border-radius:11px;background:#f1f6ed;font:700 13px Arial;cursor:pointer}.trip-book-choice{margin:6px 0;background:#fff;border:1px solid #e0e9dc}.trip-book-choice small{display:block;margin-top:3px;color:#718378;font:12px Arial}.trip-book-scroll{max-height:190px;overflow:auto;padding-right:4px}.trip-book-select-actions{display:flex;gap:7px;margin:0 0 7px}.trip-book-select-actions button{border:0;border-radius:999px;padding:6px 10px;background:#e4efe0;color:#176147;font:800 12px Arial;cursor:pointer}.trip-book-photo-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}.trip-book-photo-choice{position:relative;min-width:0;border:1px solid #dce7d8;border-radius:11px;overflow:hidden;background:#fff;cursor:pointer}.trip-book-photo-choice input{position:absolute;top:6px;left:6px;width:18px;height:18px;z-index:1;accent-color:#176147}.trip-book-photo-choice img{display:block;width:100%;aspect-ratio:1.25;object-fit:cover;background:#e4ece1}.trip-book-photo-choice span{display:block;padding:5px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:700 10px Arial;color:#476257}.trip-book-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:22px}@media(max-width:700px){.trip-book-atelier{align-items:end;padding:0}.trip-book-atelier-card{max-height:94dvh;padding:25px 17px;border-radius:24px 24px 0 0}.trip-book-atelier-card h2{font-size:25px}.trip-book-fields,.trip-book-columns{grid-template-columns:1fr}.trip-book-photo-grid{grid-template-columns:repeat(3,1fr)}.trip-book-actions{position:sticky;bottom:-25px;margin:18px -17px -25px;padding:12px 17px;background:#fffdf8;border-top:1px solid #dfe8db}.trip-book-actions .btn{flex:1;padding:12px 8px}}`;document.head.appendChild(tripBookStyle);
   const journeyTimelineStyle=document.createElement("style");journeyTimelineStyle.textContent=`.journey-hotel-timeline-wrap{min-width:0}.trip-journey-timeline{margin:16px 0 0;padding:22px;border:1px solid #d7e5d2;border-radius:26px;background:#fffdf8;box-shadow:0 14px 28px rgba(10,68,48,.12)}.trip-journey-timeline h4{font-size:21px;margin:5px 0 16px}.journey-diary-sort{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-5px 0 16px;font-size:12px;font-weight:900;color:#29754f}.journey-diary-sort select{min-width:145px;max-width:100%;padding:9px 11px;border:1px solid #d1ddcc;border-radius:12px;background:#fff;font:inherit;color:#173d31}.journey-diary-compose{margin:0 0 22px;padding:14px;border-radius:16px;background:#edf4e9}.journey-diary-compose label{display:block;font-size:12px;font-weight:900;color:#29754f}.journey-diary-compose textarea,.journey-diary-compose input:not([type="file"]),.journey-diary-date{box-sizing:border-box;display:block;width:100%;margin:7px 0 10px;padding:11px;border:1px solid #d1ddcc;border-radius:12px;background:#fff;font:inherit;color:#173d31}.journey-diary-compose textarea{min-height:82px;resize:vertical}.journey-diary-photo{margin:2px 0 11px;color:#176147;cursor:pointer}.journey-diary-photo input{display:block;max-width:100%;margin-top:5px;font:inherit}.journey-diary-compose>div{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.journey-diary-compose span{font-size:12px;font-weight:800;color:#287354}.trip-timeline-entry{border-bottom:1px solid #dce8d7}.trip-timeline-entry:last-child{border-bottom:0}.trip-timeline-entry summary{display:grid;grid-template-columns:110px 1fr;gap:13px;padding:13px 3px;cursor:pointer;list-style:none}.trip-timeline-entry summary::-webkit-details-marker{display:none}.trip-timeline-entry summary:after{content:"⌄";font-weight:900;color:#287354}.trip-timeline-entry[open] summary:after{transform:rotate(180deg)}.trip-timeline-entry time{font-size:11px;font-weight:900;color:#4d7462}.trip-timeline-entry strong{font-size:14px;color:#173d31}.trip-timeline-entry-body{padding:0 20px 16px 123px}.trip-timeline-entry-body p{margin:0;line-height:1.5;color:#173d31;white-space:pre-wrap}.journey-timeline-photo{margin-top:8px;border:0;border-radius:10px;padding:6px 9px;background:#e9f3e5;color:#176147;font:800 12px inherit;cursor:pointer}@media(max-width:700px){.trip-journey-timeline{padding:18px}.journey-diary-sort{align-items:flex-start;flex-direction:column}.journey-diary-sort select{width:100%}.trip-timeline-entry summary{grid-template-columns:1fr 24px;gap:3px}.trip-timeline-entry summary time{grid-column:1}.trip-timeline-entry strong{grid-column:1}.trip-timeline-entry summary:after{grid-column:2;grid-row:1 / span 2;align-self:center}.trip-timeline-entry-body{padding:0 0 15px}.trip-timeline-list article{grid-template-columns:1fr;gap:3px}}`;document.head.appendChild(journeyTimelineStyle);
   setTimeout(()=>{installTripFeatureHub();loadTripFeatures();renderTripFeatureJourneyTimelines();},900);
   const usabilityStyle=document.createElement("style");usabilityStyle.textContent=`
@@ -17246,6 +17436,9 @@ if(document.readyState==="loading"){
     const style=document.createElement("style");
     style.textContent=`.app-guide-button{position:fixed;right:22px;bottom:22px;z-index:1200;border:0;border-radius:999px;padding:12px 16px;background:#176147;color:#fffdf8;box-shadow:0 10px 24px rgba(5,48,33,.28);font:800 14px inherit;cursor:pointer}.app-guide{position:fixed;inset:0;z-index:1600;display:grid;place-items:center;padding:18px;background:rgba(7,43,31,.58)}.app-guide[hidden]{display:none}.app-guide-card{position:relative;width:min(690px,100%);max-height:min(760px,90vh);overflow:auto;border-radius:28px;padding:28px;background:#fffdf8;color:#173d31;box-shadow:0 24px 80px rgba(4,30,21,.4)}.app-guide-card h2{margin:5px 38px 8px 0;font-size:28px}.app-guide-card p{margin:0 0 18px;color:#61776d;line-height:1.5}.app-guide-close{position:absolute;right:18px;top:15px;border:0;background:transparent;color:#173d31;font-size:30px;cursor:pointer}.app-guide-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.app-guide-go{min-height:100px;padding:15px;border:1px solid #d9e4d5;border-radius:17px;background:#f4f8f0;color:#173d31;text-align:left;font:inherit;cursor:pointer}.app-guide-go strong,.app-guide-go span{display:block}.app-guide-go strong{margin:5px 0;font-size:16px}.app-guide-go span{color:#637b70;font-size:13px;line-height:1.35}.app-guide-go:hover,.app-guide-go:focus-visible{outline:3px solid #9fcf91;background:#e8f3e3}.app-guide-pulse{outline:4px solid #e7b84f!important;outline-offset:8px;transition:outline .2s}@media(max-width:700px){.app-guide-button{right:16px;bottom:86px;padding:11px 14px;font-size:13px}.app-guide-card{padding:22px 18px;border-radius:24px}.app-guide-card h2{font-size:24px}.app-guide-grid{grid-template-columns:1fr}.app-guide-go{min-height:76px}}`;
     document.head.appendChild(style);
+    const mobileGuidePosition=document.createElement("style");
+    mobileGuidePosition.textContent="@media(max-width:700px){.app-guide-button{bottom:142px!important}}";
+    document.head.appendChild(mobileGuidePosition);
     const button=document.createElement("button");button.id="appGuideButton";button.className="app-guide-button";button.type="button";button.textContent="✦ Wegwijzer";button.setAttribute("aria-haspopup","dialog");
     const guide=document.createElement("section");guide.id="appGuide";guide.className="app-guide";guide.hidden=true;guide.setAttribute("role","dialog");guide.setAttribute("aria-modal","true");guide.setAttribute("aria-label","Wegwijzer van de Vakantie-app");
     guide.innerHTML=`<div class="app-guide-card"><button class="app-guide-close" type="button" aria-label="Wegwijzer sluiten">×</button><div class="legacy-kicker">SNEL WEGWIJS</div><h2>Wat wil je nu doen?</h2><p>De belangrijkste nieuwe onderdelen staan hieronder. Tik of klik; de app brengt je direct naar de juiste plek.</p><div class="app-guide-grid"><button class="app-guide-go" data-guide-view="vandaag" data-guide-target="#tripFeatureHub"><strong>✍️ Vandaag vastleggen</strong><span>Dagboek, foto, vertrekchecklist en budget.</span></button><button class="app-guide-go" data-guide-view="momenten" data-guide-target="#memoryPhotoQuickButton"><strong>📷 Foto of moment toevoegen</strong><span>Maak een foto, voeg tekst toe of kies een favoriet.</span></button><button class="app-guide-go" data-guide-view="reis" data-guide-target="#journeyHotelGrid"><strong>🗓️ Dagboek per hotel</strong><span>Schrijf voor een eigen datum in de tijdlijn onder jullie hotels.</span></button><button class="app-guide-go" data-guide-view="hotels" data-guide-target="#hotelsTabList"><strong>🏨 Hotelnotities</strong><span>Bewaar kamer-, wandeling- en restauranttips per verblijf.</span></button><button class="app-guide-go" data-guide-view="kosten" data-guide-target="#costCategoryTotals"><strong>€ Kosten en laden</strong><span>Bekijk totalen en koppel laadkosten aan een hotel.</span></button><button class="app-guide-go" data-guide-view="vandaag" data-guide-target="#openTripBook"><strong>📖 Fotoboek en onderweg</strong><span>Open het fotoboekatelier of het rustige reisscherm.</span></button></div></div>`;
