@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="165">
+<meta name="app-version" content="167">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=165">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=165">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=167">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=167">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -938,6 +938,7 @@
       right:14px;
       top:14px;
       z-index:500;
+      border:0;
       background:rgba(255,255,255,.92);
       color:#65756c;
       padding:9px 12px;
@@ -945,7 +946,10 @@
       font-size:12px;
       font-weight:900;
       box-shadow:0 2px 8px rgba(0,0,0,.08);
+      cursor:pointer;
+      touch-action:manipulation;
     }
+    .gps-badge:focus-visible{outline:3px solid #f8bb3f;outline-offset:3px}
     .altimeter-status{
       margin-top:10px;
       color:#bfd6cd;
@@ -6107,7 +6111,7 @@
 
         <div class="altimeter-map-wrap">
           <div id="altimeterMap"></div>
-          <div id="gpsBadge" class="gps-badge">GPS uit</div>
+          <button id="gpsBadge" class="gps-badge" type="button" aria-label="GPS inschakelen">GPS uit · tik om in te schakelen</button>
         </div>
       </div>
 
@@ -6988,7 +6992,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v165</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v167</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>27 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -6996,10 +7000,12 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=165" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=167" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v165</strong><br>
+          <strong>Wijzigingen in v167</strong><br>
+          Het fotoboek heeft nu luxe dubbelpagina’s: één grote beeldvullende foto links en een verzorgde collage rechts, met een herkenbare boeknaad zoals een gedrukt reisalbum.<br><br>
+          <strong>Eerdere wijzigingen in v165</strong><br>
           De weerinformatie heet nu overal Weerkaart. De knop ‘Vernieuw weer’ haalt de weersverwachting daadwerkelijk opnieuw op; een tijdelijke storing blijft duidelijk als weerstoring gemeld.<br><br>
           <strong>Eerdere wijzigingen in v164</strong><br>
           Ieder hotel toont nu altijd een volledig zevendaags weerbericht. De bron staat zichtbaar vermeld: Open-Meteo met actuele weermodellen, nooit een hotelwebsite.<br><br>
@@ -7443,7 +7449,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||165;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||167;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7452,7 +7458,7 @@ async function checkTechnicalVersion(){
   }
 }
 
-const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||165;
+const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||167;
 const technicalCurrentVersion=document.getElementById("technicalCurrentVersion");
 if(technicalCurrentVersion) technicalCurrentVersion.textContent=`v${openedAppVersion}`;
 const technicalLink=document.querySelector(".technical-link");
@@ -8524,7 +8530,7 @@ function renderHotelsTab(){
               <div><h4>🌦️ Weerkaart</h4><p>Actueel weer en verwachting voor jullie verblijf laden…</p></div>
               <span class="hotel-weather-badge">WEER LADEN</span>
             </div>
-            <div class="hotel-weather-now"><div class="hotel-weather-now-icon">🌦️</div><div><strong>Even ophalen…</strong><span>De hotelkaart wordt zo aangevuld.</span></div></div>
+            <div class="hotel-weather-now"><div class="hotel-weather-now-icon">🌦️</div><div><strong>Even ophalen…</strong><span>De weerkaart wordt zo aangevuld.</span></div></div>
           </section>
         </div>
 
@@ -12663,7 +12669,11 @@ function initAltimeterMap(){
 }
 
 function updateGpsBadge(text){
-  document.getElementById("gpsBadge").textContent=text;
+  const badge=document.getElementById("gpsBadge");
+  if(!badge) return;
+  const isActive=text==="GPS aan" || text==="GPS actief";
+  badge.textContent=isActive ? "GPS aan · tik om te stoppen" : `${text} · tik om in te schakelen`;
+  badge.setAttribute("aria-label",isActive?"GPS stoppen":"GPS inschakelen");
 }
 
 
@@ -12833,6 +12843,7 @@ function startAltimeter(){
 setupDepartureChecklist();
 setTimeout(initAltimeterMap,150);
 document.getElementById("startAltimeter").addEventListener("click",startAltimeter);
+document.getElementById("gpsBadge")?.addEventListener("click",startAltimeter);
 
 
 
@@ -16803,6 +16814,15 @@ function setupMobileNavigation(){
   const nav=document.getElementById("mobileAppNav");
   const sheet=document.getElementById("mobileMoreSheet");
   const moreBtn=document.getElementById("mobileMoreBtn");
+  const navToggle=document.getElementById("mobileNavToggle");
+
+  function setMobileNavOpen(open){
+    if(!nav || !navToggle) return;
+    nav.classList.toggle("mobile-nav-open",open);
+    navToggle.setAttribute("aria-expanded",String(open));
+    navToggle.setAttribute("aria-label",open?"Menu sluiten":"Menu openen");
+    navToggle.innerHTML=open?"× <span>Sluiten</span>":"☰ <span>Menu</span>";
+  }
 
   function markMobileActive(view){
     if(!nav) return;
@@ -16815,6 +16835,7 @@ function setupMobileNavigation(){
 
   function openMobileView(view){
     sheet.hidden=true;
+    setMobileNavOpen(false);
     showView(view);
     markMobileActive(view);
     if(view==="omgeving") refreshEnvironmentWhenVisible();
@@ -16826,6 +16847,7 @@ function setupMobileNavigation(){
   });
 
   moreBtn?.addEventListener("click",()=>{sheet.hidden=false});
+  navToggle?.addEventListener("click",()=>setMobileNavOpen(!nav?.classList.contains("mobile-nav-open")));
   document.getElementById("mobileMoreClose")?.addEventListener("click",()=>{sheet.hidden=true});
   sheet?.querySelector(".mobile-more-backdrop")?.addEventListener("click",()=>{sheet.hidden=true});
 
@@ -16852,6 +16874,7 @@ function setupMobileNavigation(){
 
   document.addEventListener("keydown",event=>{
     if(event.key==="Escape" && sheet && !sheet.hidden){sheet.hidden=true;moreBtn?.focus();}
+    else if(event.key==="Escape" && nav?.classList.contains("mobile-nav-open")){setMobileNavOpen(false);navToggle?.focus();}
   });
 
   document.querySelectorAll(".legacy-nav [data-view]").forEach(btn=>{
@@ -16865,6 +16888,7 @@ function setupMobileNavigation(){
 
   window.addEventListener("resize",()=>{
     if(!isMobile()) sheet.hidden=true;
+    if(!isMobile()) setMobileNavOpen(false);
   });
 }
 
@@ -16885,6 +16909,7 @@ if(document.readyState==="loading"){
     <button type="button" data-mobile-view="meenemen"><span>🧳</span><b>Meenemen</b></button>
     <button type="button" id="mobileMoreBtn"><span>☰</span><b>Meer</b></button>
   </nav>
+  <button id="mobileNavToggle" class="mobile-nav-toggle" type="button" aria-label="Menu openen" aria-expanded="false">☰ <span>Menu</span></button>
 
   <div class="mobile-more-sheet" id="mobileMoreSheet" hidden>
     <button class="mobile-more-backdrop" type="button" aria-label="Sluiten"></button>
@@ -17048,7 +17073,7 @@ if(document.readyState==="loading"){
     const hotelChapters=stops.map(stop=>{
       const entries=memories.filter(memory=>memory.stop_id===stop.id),photos=entries.flatMap(allPhotos),hero=photos[0];
       const opener=`<section class="page chapter ${hero?"has-photo":""}" ${hero?`style="background-image:linear-gradient(90deg,rgba(10,44,31,.75),rgba(10,44,31,.12)),url('${esc(hero.preview_url||hero.original_url)}')"`:""}><div><small>HOOFDSTUK</small><h1>${esc(stop.hotel||stop.city||"Onze stop")}</h1><p>${esc(stop.city||"")} · ${esc(formatTripDate(stop.arrival))} – ${esc(formatTripDate(stop.departure))}</p><p>${esc(tripFeatureState.hotelNotes?.[stop.id]?.walk||tripFeatureState.hotelNotes?.[stop.id]?.room||"")}</p></div></section>`;
-      const collagePages=chunks(photos.slice(1),6).map((set,index)=>`<section class="page"><div class="eyebrow">${esc(stop.city||stop.hotel)} · FOTO'S</div><div class="photo-grid ${set.length<4?"few":""} ${index%2===0?"editorial":"postcard"}">${set.map(photo=>image(photo)).join("")}</div></section>`).join("");
+      const collagePages=chunks(photos.slice(1),5).map((set,index)=>`<section class="page photo-spread"><div class="photo-spread-left">${image(set[0],`${stop.city||stop.hotel} · ${index+1}`)}</div><div class="photo-spread-spine" aria-hidden="true"></div><div class="photo-spread-right">${set.slice(1).map(photo=>image(photo)).join("")||`<div class="photo-spread-note">Hier komen jullie volgende mooie foto’s.</div>`}</div></section>`).join("");
       const diaryPages=chunks(entries.filter(entry=>entry.text),4).map(set=>`<section class="page diary"><div class="eyebrow">DAGBOEK</div><h2>${esc(stop.city||stop.hotel)}</h2>${set.map(entry=>`<article><small>${esc(entry.created_at?new Date(entry.created_at).toLocaleDateString("nl-NL",{weekday:"long",day:"2-digit",month:"long"}):"")}</small><p>${esc(entry.text||"")}</p></article>`).join("")}</section>`).join("");
       return opener+collagePages+diaryPages;
     }).join("");
@@ -17059,6 +17084,8 @@ if(document.readyState==="loading"){
     book.document.head.insertAdjacentHTML("beforeend",`<style>.toolbar:before{content:"ALPENVERHAAL · FOTBOEKATELIER"}</style>`);
     book.document.head.insertAdjacentHTML("beforeend",`<style>.toolbar:before{content:"ALPENVERHAAL · FOTOB0EKATELIER";display:block;margin:0 0 8px;color:#d9ebd3;font:800 11px Arial;letter-spacing:2px}.page:after{content:attr(data-page);position:absolute;right:30px;bottom:22px;color:#668074;font:700 11px Arial;letter-spacing:1px}.cover:after{display:none}.page:not(.cover):not(.closing){border-top:9px solid #e8d6a8}.chapter{border-top:0}.chapter:after{color:#e0f2d8}.photo-grid figure{border-radius:3px;box-shadow:0 8px 18px #173d3124}.photo-grid.editorial{grid-template-columns:1.35fr 1fr 1fr}.photo-grid.editorial figure:first-child{grid-column:span 2;grid-row:span 2;min-height:438px}.photo-grid.editorial figure:first-child img{min-height:438px}.photo-grid.postcard figure:nth-child(3n+2){transform:translateY(24px)}.diary article:first-of-type:first-letter{float:left;font-size:52px;line-height:.78;padding:6px 8px 0 0;color:#176147;font-weight:bold}.route:before{content:"✦";font-size:35px;color:#b78845}.highlights{background:linear-gradient(135deg,#f7e8c4,#fffdf8)}.closing:before{content:"WALDO & BRIGITTE";font:800 12px Arial;letter-spacing:3px;color:#d9ebd3}@media(max-width:700px){.photo-grid.editorial figure:first-child{min-height:260px}.photo-grid.editorial figure:first-child img{min-height:260px}.photo-grid.postcard figure:nth-child(3n+2){transform:none}}@media print{.photo-grid.postcard figure:nth-child(3n+2){transform:translateY(6mm)}}</style>`);
     book.document.head.insertAdjacentHTML("beforeend",`<style>.toolbar:before{content:"ALPENVERHAAL · FOTBOEKATELIER"}</style>`);
+    book.document.head.insertAdjacentHTML("beforeend",`<style>.photo-spread{display:grid;grid-template-columns:1fr 18px 1fr;gap:0;padding:18px;background:#f4f1e8;overflow:hidden}.photo-spread figure{width:100%;height:100%;min-height:0;background:#dfe5df;box-shadow:none}.photo-spread figure img{width:100%;height:100%;min-height:0;object-fit:cover}.photo-spread-left{min-height:calc(min(790px,72vw) - 36px);padding-right:9px}.photo-spread-right{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:9px;padding-left:9px;min-height:0}.photo-spread-spine{position:relative;background:linear-gradient(90deg,#e2ddd2,#fff,#d4cdc0);box-shadow:inset 2px 0 4px #5d554333,inset -2px 0 4px #5d554322}.photo-spread-spine:after{content:"";position:absolute;inset:0 7px;background:linear-gradient(90deg,transparent,#fff8,transparent)}.photo-spread-note{display:grid;place-items:center;grid-column:1/-1;background:#e9eee5;color:#61736a;text-align:center;padding:30px;font:600 16px Arial;line-height:1.5}.photo-spread-left figcaption{position:absolute;left:34px;bottom:27px;color:#fff;background:#173d31cc;padding:7px 10px;font:700 11px Arial;letter-spacing:1px}@media(max-width:700px){.photo-spread{grid-template-columns:1fr;padding:12px;gap:8px}.photo-spread-left{min-height:330px;padding:0}.photo-spread-right{min-height:240px;padding:0}.photo-spread-spine{display:none}}@media print{.photo-spread{padding:6mm;grid-template-columns:1fr 5mm 1fr}.photo-spread-left{min-height:186mm}.photo-spread-right{gap:3mm}.photo-spread-left figcaption{left:8mm;bottom:8mm}}</style>`);
+    book.document.head.insertAdjacentHTML("beforeend",`<style>.photo-spread-left figure{position:relative}</style>`);
     book.document.querySelectorAll(".page").forEach((page,index)=>page.dataset.page=`${String(index+1).padStart(2,"0")} · ALPENVERHAAL`);
     const coverLabel=book.document.querySelector(".cover small");if(coverLabel) coverLabel.textContent="ALPENVERHAAL · FOTBOEKMODEL";
   }
@@ -17184,8 +17211,15 @@ if(document.readyState==="loading"){
     .trip-road-modal article{padding:12px 0;border-bottom:1px solid #d9e3d5}
     .trip-road-modal article:last-child{border-bottom:0}
     @media(max-width:620px){
-      body{padding-bottom:calc(100px + env(safe-area-inset-bottom))}
-      .mobile-app-nav{bottom:max(8px,env(safe-area-inset-bottom));padding:8px 5px}
+      /* Iedere knop onderin moet boven de vaste balk kunnen worden gescrold. */
+      body{padding-bottom:calc(156px + env(safe-area-inset-bottom));scroll-padding-bottom:calc(156px + env(safe-area-inset-bottom))}
+      .view{padding-bottom:calc(56px + env(safe-area-inset-bottom))}
+      .leaflet-bottom{bottom:calc(92px + env(safe-area-inset-bottom))}
+      .route-link,.route-generate,.env-route-btn{scroll-margin-bottom:calc(150px + env(safe-area-inset-bottom))}
+      .mobile-app-nav{bottom:max(8px,env(safe-area-inset-bottom));padding:8px 5px;transform:translateY(calc(100% + 18px));opacity:0;pointer-events:none;transition:transform .2s ease,opacity .2s ease}
+      .mobile-app-nav.mobile-nav-open{transform:translateY(0);opacity:1;pointer-events:auto}
+      .mobile-nav-toggle{position:fixed;right:14px;bottom:max(14px,calc(10px + env(safe-area-inset-bottom)));z-index:4100;min-height:48px;padding:0 16px;border:1px solid #d4c9b5;border-radius:999px;background:#176147;color:#fffdf8;box-shadow:0 10px 24px rgba(23,61,49,.25);font:800 14px inherit;cursor:pointer;touch-action:manipulation}
+      .mobile-nav-toggle[aria-expanded="true"]{bottom:calc(92px + env(safe-area-inset-bottom));background:#fffdf8;color:#176147}
       .mobile-app-nav button{min-height:58px;padding:6px 1px}
       .mobile-app-nav button b{font-size:10px}
       .mobile-more-panel{max-height:calc(100dvh - 100px - env(safe-area-inset-bottom));overflow-y:auto;-webkit-overflow-scrolling:touch}
