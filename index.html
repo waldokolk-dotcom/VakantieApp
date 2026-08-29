@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="186">
+<meta name="app-version" content="187">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=186">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=186">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=187">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=187">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -5235,7 +5235,9 @@
       .legacy-brand{display:grid;grid-template-columns:48px minmax(0,1fr);gap:6px 12px}
       .legacy-brand-text{align-self:center}
       .legacy-brand-tech{display:inline-flex;grid-column:2;width:max-content;align-items:center;gap:5px;border:0;border-radius:10px;background:#e8f3e7;color:#155c38;padding:6px 9px;font:850 12px/1 system-ui,sans-serif;cursor:pointer}
-      .legacy-user{min-width:96px !important;padding:12px !important}
+      .legacy-user{min-width:50px !important;width:50px!important;height:50px!important;padding:0!important;overflow:hidden;font-size:0!important;justify-content:center!important}
+      .legacy-user span{display:none!important}
+      .legacy-user::before{content:"🛏️";font-size:21px;line-height:1}
     }
 
     .legacy-brand-tech{display:none}
@@ -7136,7 +7138,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v186</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v187</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>27 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -7144,10 +7146,10 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=186" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=187" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v186</strong><br>
+          <strong>Wijzigingen in v187</strong><br>
           Kilometerstanden zijn nu helder per reisdag: kies eerst een dag op de Reiskaart, voer de gereden kilometers in en bewaar. Bij ‘Jullie hele route’ zie je het totaal. De kijkversie toont de kilometerstand zonder invoerknoppen.<br><br>
           <strong>Eerdere wijzigingen in v183</strong><br>
           In de reiskijker werken de pijlen bij de hele route weer: tik op rechts voor de volgende reisdag en gebruik daarna beide pijlen om door de dagen te gaan. Met ‘Volledige app’ rechtsboven ga je direct terug naar jullie eigen app.<br><br>
@@ -7605,7 +7607,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||186;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||187;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7614,7 +7616,7 @@ async function checkTechnicalVersion(){
   }
 }
 
-const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||186;
+const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||187;
 const technicalCurrentVersion=document.getElementById("technicalCurrentVersion");
 if(technicalCurrentVersion) technicalCurrentVersion.textContent=`v${openedAppVersion}`;
 const technicalLink=document.querySelector(".technical-link");
@@ -17609,9 +17611,12 @@ if(document.readyState==="loading"){
       .travel-share-note{margin-top:16px!important;padding:11px 12px;border-radius:12px;background:#f5f0de;color:#6a5b35!important;font-size:12px}
       .travel-map-full-app{border:0;border-radius:999px;padding:9px 12px;background:#176147;color:#fff;font:800 12px Arial;cursor:pointer;white-space:nowrap}
       /* De kijklink is alleen om mee te lezen: geen enkele bedieningsknop tonen. */
-      body.travel-guest button{display:none!important}
+      body.travel-guest button:not([data-toggle-memory]){display:none!important}
       body.travel-guest .legacy-header{padding-bottom:8px!important}body.travel-guest .legacy-nav button:not([data-view="reiskaart"]):not([data-view="momenten"]):not([data-view="hotels"]){display:none!important}body.travel-guest [data-mobile-view]:not([data-mobile-view="reiskaart"]):not([data-mobile-view="momenten"]):not([data-mobile-view="hotels"]){display:none!important}body.travel-guest #shareTravelFromMap,body.travel-guest #shareTravelFromStory,body.travel-guest .travel-map-km-controls,body.travel-guest .travel-map-gps-status,body.travel-guest #momenten .grid>.card:first-child,body.travel-guest .memory-story-actions .btn:not(#shareTravelFromStory),body.travel-guest .memory-story-actions span,body.travel-guest .journey-edit-actions,body.travel-guest .hotel-edit-actions,body.travel-guest .hotel-detail-card button:not(.journey-timeline-photo){display:none!important}
       body.travel-guest:before{content:"Kijk mee met onze reis";display:block;padding:8px 14px;background:#176147;color:#fffdf8;text-align:center;font:800 13px Arial;letter-spacing:.02em}
+      /* Een gast hoeft niet te navigeren: alle reisverhalen staan direct onder de kaart. */
+      body.travel-guest #momenten.view{display:block!important;margin-top:18px}
+      body.travel-guest #momenten .grid>.card:nth-child(2){grid-column:1/-1!important}
       @media(max-width:700px){.travel-map-share{padding:8px 10px;font-size:11px}.travel-share-modal{align-items:end;padding:0}.travel-share-card{border-radius:24px 24px 0 0;padding:24px 18px;max-height:90dvh;overflow:auto}.travel-share-actions{grid-template-columns:1fr}.travel-share-actions button.preview{grid-column:auto}}
     `;
     document.head.appendChild(style);
@@ -17633,7 +17638,7 @@ if(document.readyState==="loading"){
       document.body.classList.add("travel-guest");
       // Ook knoppen die later door kaarten of hulpmiddelen worden toegevoegd
       // blijven uit de pure kijkweergave weg.
-      const hideGuestButtons=()=>document.querySelectorAll("button").forEach(button=>button.style.setProperty("display","none","important"));
+      const hideGuestButtons=()=>document.querySelectorAll("button:not([data-toggle-memory])").forEach(button=>button.style.setProperty("display","none","important"));
       hideGuestButtons();
       new MutationObserver(hideGuestButtons).observe(document.body,{childList:true,subtree:true});
       const leaveButton=document.createElement("button");
@@ -17644,6 +17649,7 @@ if(document.readyState==="loading"){
       showView=function(viewId){originalShowView(permittedViews.has(viewId)?viewId:"reiskaart");};
       setTimeout(()=>showView("reiskaart"),500);
       setTimeout(()=>showView("reiskaart"),1800);
+      setTimeout(()=>loadMemories(),900);
     }
   })();
 
