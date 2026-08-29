@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="185">
+<meta name="app-version" content="186">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=185">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=185">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=186">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=186">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -5227,14 +5227,18 @@
       .legacy-nav{
         min-width:0;
         justify-content:flex-start !important;
-        overflow-x:auto !important;
-        overflow-y:hidden;
-        gap:12px !important;
-        scrollbar-width:thin;
+        overflow:hidden !important;
+        gap:7px !important;
       }
-      .legacy-nav button{flex:0 0 auto}
+      .legacy-nav button{flex:0 0 auto;font-size:13px!important}
+      .legacy-nav [data-view="technisch"]{display:none!important}
+      .legacy-brand{display:grid;grid-template-columns:48px minmax(0,1fr);gap:6px 12px}
+      .legacy-brand-text{align-self:center}
+      .legacy-brand-tech{display:inline-flex;grid-column:2;width:max-content;align-items:center;gap:5px;border:0;border-radius:10px;background:#e8f3e7;color:#155c38;padding:6px 9px;font:850 12px/1 system-ui,sans-serif;cursor:pointer}
       .legacy-user{min-width:96px !important;padding:12px !important}
     }
+
+    .legacy-brand-tech{display:none}
 
     @media(max-width:620px){
       html,body{
@@ -5918,19 +5922,20 @@
     <div class="legacy-brand">
       <div class="legacy-sun">☀</div>
       <div class="legacy-brand-text" id="activeTripBrand">Vakantie 2026</div>
+      <button id="technicalBrandButton" class="legacy-brand-tech" type="button">⚙ Technisch</button>
     </div>
 
     <nav class="nav legacy-nav">
-      <button data-view="reis" class="active">✣ Onze reis</button>
+      <button data-view="reis" class="active">✣ Reis</button>
       <button data-view="technisch">⚙️ Technisch</button>
       <button data-view="vandaag">⌂ Vandaag</button>
       <button data-view="hotels">🏨 Hotels</button>
       <button data-view="omgeving">🗺️ Omgeving</button>
-      <button data-view="reiskaart">🗺️ Reiskaart</button>
+      <button data-view="reiskaart">🗺️ Kaart</button>
       <button data-view="kosten">€ Kosten</button>
-      <button data-view="meenemen">🧳 Meenemen</button>
-      <button data-view="momenten">📖 Reisverhaal</button>
-      <button data-view="reizen">🧭 Reis beheren</button>
+      <button data-view="meenemen">🧳 Tas</button>
+      <button data-view="momenten">📖 Verhaal</button>
+      <button data-view="reizen">🧭 Beheer</button>
     </nav>
 
     <button id="userButton" class="legacy-user" type="button" title="Profiel wisselen">🛏️ <span id="userButtonName">Waldo</span></button>
@@ -7131,7 +7136,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v185</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v186</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>27 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -7139,10 +7144,10 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=185" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=186" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v185</strong><br>
+          <strong>Wijzigingen in v186</strong><br>
           Kilometerstanden zijn nu helder per reisdag: kies eerst een dag op de Reiskaart, voer de gereden kilometers in en bewaar. Bij ‘Jullie hele route’ zie je het totaal. De kijkversie toont de kilometerstand zonder invoerknoppen.<br><br>
           <strong>Eerdere wijzigingen in v183</strong><br>
           In de reiskijker werken de pijlen bij de hele route weer: tik op rechts voor de volgende reisdag en gebruik daarna beide pijlen om door de dagen te gaan. Met ‘Volledige app’ rechtsboven ga je direct terug naar jullie eigen app.<br><br>
@@ -7529,6 +7534,7 @@ function showView(id){
   },80);
 }
 document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>showView(b.dataset.view));
+document.getElementById("technicalBrandButton")?.addEventListener("click",()=>showView("technisch"));
 
 // Snelkoppelingen op laptop: ga direct naar de juiste plek zonder door alle tabbladen te zoeken.
 document.querySelectorAll("[data-open-view]").forEach(button=>button.addEventListener("click",()=>{
@@ -7599,7 +7605,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||185;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||186;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7608,7 +7614,7 @@ async function checkTechnicalVersion(){
   }
 }
 
-const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||185;
+const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||186;
 const technicalCurrentVersion=document.getElementById("technicalCurrentVersion");
 if(technicalCurrentVersion) technicalCurrentVersion.textContent=`v${openedAppVersion}`;
 const technicalLink=document.querySelector(".technical-link");
@@ -17602,6 +17608,8 @@ if(document.readyState==="loading"){
       .travel-share-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}.travel-share-actions button{min-height:46px;border:0;border-radius:13px;padding:10px;background:#176147;color:#fff;font:800 14px Arial;cursor:pointer}.travel-share-actions button.secondary{background:#e8f2e5;color:#176147}.travel-share-actions button.preview{grid-column:1/-1;background:#fff;border:1px solid #cfe0ca}
       .travel-share-note{margin-top:16px!important;padding:11px 12px;border-radius:12px;background:#f5f0de;color:#6a5b35!important;font-size:12px}
       .travel-map-full-app{border:0;border-radius:999px;padding:9px 12px;background:#176147;color:#fff;font:800 12px Arial;cursor:pointer;white-space:nowrap}
+      /* De kijklink is alleen om mee te lezen: geen enkele bedieningsknop tonen. */
+      body.travel-guest button{display:none!important}
       body.travel-guest .legacy-header{padding-bottom:8px!important}body.travel-guest .legacy-nav button:not([data-view="reiskaart"]):not([data-view="momenten"]):not([data-view="hotels"]){display:none!important}body.travel-guest [data-mobile-view]:not([data-mobile-view="reiskaart"]):not([data-mobile-view="momenten"]):not([data-mobile-view="hotels"]){display:none!important}body.travel-guest #shareTravelFromMap,body.travel-guest #shareTravelFromStory,body.travel-guest .travel-map-km-controls,body.travel-guest .travel-map-gps-status,body.travel-guest #momenten .grid>.card:first-child,body.travel-guest .memory-story-actions .btn:not(#shareTravelFromStory),body.travel-guest .memory-story-actions span,body.travel-guest .journey-edit-actions,body.travel-guest .hotel-edit-actions,body.travel-guest .hotel-detail-card button:not(.journey-timeline-photo){display:none!important}
       body.travel-guest:before{content:"Kijk mee met onze reis";display:block;padding:8px 14px;background:#176147;color:#fffdf8;text-align:center;font:800 13px Arial;letter-spacing:.02em}
       @media(max-width:700px){.travel-map-share{padding:8px 10px;font-size:11px}.travel-share-modal{align-items:end;padding:0}.travel-share-card{border-radius:24px 24px 0 0;padding:24px 18px;max-height:90dvh;overflow:auto}.travel-share-actions{grid-template-columns:1fr}.travel-share-actions button.preview{grid-column:auto}}
@@ -17623,6 +17631,11 @@ if(document.readyState==="loading"){
     document.getElementById("shareTravelFromStory")?.addEventListener("click",open);
     if(guestMode()){
       document.body.classList.add("travel-guest");
+      // Ook knoppen die later door kaarten of hulpmiddelen worden toegevoegd
+      // blijven uit de pure kijkweergave weg.
+      const hideGuestButtons=()=>document.querySelectorAll("button").forEach(button=>button.style.setProperty("display","none","important"));
+      hideGuestButtons();
+      new MutationObserver(hideGuestButtons).observe(document.body,{childList:true,subtree:true});
       const leaveButton=document.createElement("button");
       leaveButton.id="leaveTravelGuest";leaveButton.className="travel-map-full-app";leaveButton.type="button";leaveButton.textContent="Volledige app";leaveButton.title="Open jullie volledige Vakantie-app";
       leaveButton.onclick=()=>{const url=new URL(location.href);url.searchParams.delete("kijk");url.searchParams.delete("reis");location.assign(url.toString());};
