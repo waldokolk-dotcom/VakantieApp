@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="184">
+<meta name="app-version" content="185">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=184">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=184">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=185">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=185">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -5922,6 +5922,7 @@
 
     <nav class="nav legacy-nav">
       <button data-view="reis" class="active">✣ Onze reis</button>
+      <button data-view="technisch">⚙️ Technisch</button>
       <button data-view="vandaag">⌂ Vandaag</button>
       <button data-view="hotels">🏨 Hotels</button>
       <button data-view="omgeving">🗺️ Omgeving</button>
@@ -5930,7 +5931,6 @@
       <button data-view="meenemen">🧳 Meenemen</button>
       <button data-view="momenten">📖 Reisverhaal</button>
       <button data-view="reizen">🧭 Reis beheren</button>
-      <button data-view="technisch">⚙️ Technisch</button>
     </nav>
 
     <button id="userButton" class="legacy-user" type="button" title="Profiel wisselen">🛏️ <span id="userButtonName">Waldo</span></button>
@@ -7131,7 +7131,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v184</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v185</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>27 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -7139,10 +7139,10 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=184" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=185" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v184</strong><br>
+          <strong>Wijzigingen in v185</strong><br>
           Kilometerstanden zijn nu helder per reisdag: kies eerst een dag op de Reiskaart, voer de gereden kilometers in en bewaar. Bij ‘Jullie hele route’ zie je het totaal. De kijkversie toont de kilometerstand zonder invoerknoppen.<br><br>
           <strong>Eerdere wijzigingen in v183</strong><br>
           In de reiskijker werken de pijlen bij de hele route weer: tik op rechts voor de volgende reisdag en gebruik daarna beide pijlen om door de dagen te gaan. Met ‘Volledige app’ rechtsboven ga je direct terug naar jullie eigen app.<br><br>
@@ -7599,7 +7599,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||184;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||185;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7608,7 +7608,7 @@ async function checkTechnicalVersion(){
   }
 }
 
-const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||184;
+const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||185;
 const technicalCurrentVersion=document.getElementById("technicalCurrentVersion");
 if(technicalCurrentVersion) technicalCurrentVersion.textContent=`v${openedAppVersion}`;
 const technicalLink=document.querySelector(".technical-link");
