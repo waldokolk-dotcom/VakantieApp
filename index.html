@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="178">
+<meta name="app-version" content="184">
   <title>Vakantie 2026</title>
   <meta name="theme-color" content="#155c38">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VakantieApp B&amp;W">
-  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=178">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=178">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png?v=184">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=184">
 <!-- v52 mobile navigation -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -4593,6 +4593,7 @@
     }
     .cost-category-total{
       display:flex;
+      width:100%;
       align-items:center;
       justify-content:space-between;
       gap:12px;
@@ -4601,10 +4602,21 @@
       background:rgba(255,255,255,.72);
       border:1px solid rgba(215,208,190,.8);
       font-weight:750;
+      text-align:left;
+      cursor:pointer;
+      font:inherit;
+    }
+    .cost-category-total:hover,.cost-category-total[aria-pressed="true"]{
+      background:#e8f2e4;
+      border-color:#72a36f;
     }
     .cost-category-total span{display:block;font-size:.88rem;color:#496b5d}
     .cost-category-total b{display:block;font-size:.98rem;white-space:nowrap;color:#154b3b}
     .cost-category-total small{margin-left:auto;color:#60776b;font-size:.78rem;font-weight:750}
+    .cost-category-item{overflow:hidden;border-radius:11px}
+    .cost-category-detail{display:grid;gap:6px;padding:8px 10px 10px;background:#f2f7ef;border:1px solid #72a36f;border-top:0}
+    .cost-category-detail-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:7px 2px;border-bottom:1px solid #d9e6d5;font-size:.82rem}
+    .cost-category-detail-row:last-child{border-bottom:0}.cost-category-detail-row small{display:block;margin:2px 0 0;color:#718078}.cost-category-detail-row b{white-space:nowrap;color:#154b3b}
     @media(max-width:820px){
       .cost-overview{grid-template-columns:1fr}
     }
@@ -5887,6 +5899,15 @@
       .app-laptop-shortcuts{grid-template-columns:repeat(3,minmax(0,1fr))}
       .app-laptop-shortcuts-intro{grid-column:1/-1}
     }
+    /* Compacte telefoons en smalle tablets: nooit de brede desktopnavigatie. */
+    @media (min-width:621px) and (max-width:900px){
+      .legacy-nav{display:none!important}
+      body{padding-bottom:104px}
+      .mobile-app-nav{display:grid!important;position:fixed;left:8px;right:8px;bottom:8px;z-index:4000;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;padding:7px;border:1px solid rgba(214,205,185,.95);border-radius:20px;background:rgba(255,253,247,.96);box-shadow:0 12px 34px rgba(28,59,43,.20)}
+      .mobile-app-nav button{display:flex;min-width:0;min-height:54px;padding:5px 2px;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;border-radius:14px;background:transparent;color:#66756d}
+      .mobile-app-nav button span{font-size:18px;line-height:1}.mobile-app-nav button b{font-size:9px;line-height:1.05}
+      .mobile-more-sheet:not([hidden]){display:block}.mobile-nav-toggle{display:none!important}
+    }
 </style>
 </head>
 <body>
@@ -5904,6 +5925,7 @@
       <button data-view="vandaag">⌂ Vandaag</button>
       <button data-view="hotels">🏨 Hotels</button>
       <button data-view="omgeving">🗺️ Omgeving</button>
+      <button data-view="reiskaart">🗺️ Reiskaart</button>
       <button data-view="kosten">€ Kosten</button>
       <button data-view="meenemen">🧳 Meenemen</button>
       <button data-view="momenten">📖 Reisverhaal</button>
@@ -6997,6 +7019,15 @@
     </div>
   </section>
 
+  <section id="reiskaart" class="view">
+    <div class="travel-map-app">
+      <div class="travel-map-top"><div><div class="legacy-kicker">JULLIE REIS IN BEELD</div><h2>Reiskaart</h2></div><div class="travel-map-top-actions"><button id="shareTravelFromMap" class="travel-map-share" type="button">↗ Deel reis</button><button class="travel-map-more" type="button" aria-label="Meer kaartopties">•••</button></div></div>
+      <div class="travel-map-tabs" role="tablist"><button type="button" data-travel-map-mode="route" aria-selected="true">⌇ Route</button><button type="button" data-travel-map-mode="day" aria-selected="false">▣ Dag</button><button type="button" data-travel-map-mode="memories" aria-selected="false">♡ Herinneringen</button></div>
+      <div id="travelMapCanvas" class="travel-map-canvas" aria-label="Kaart van jullie vakantie"></div>
+      <section class="travel-map-day"><div class="travel-map-day-head"><button type="button" data-travel-day-change="prev" aria-label="Vorige dag">‹</button><strong id="travelMapDayTitle">Jullie reis</strong><button type="button" data-travel-day-change="next" aria-label="Volgende dag">›</button></div><div id="travelMapDayKm" class="travel-map-km">🚗 Voeg gereden kilometers toe bij de dag</div><div class="travel-map-km-controls"><label for="travelMapKmInput">Gereden km<input id="travelMapKmInput" type="number" min="0" step="0.1" inputmode="decimal" placeholder="Bijv. 286"></label><button id="saveTravelMapKm" type="button">Bewaar</button><button id="travelMapGpsBtn" type="button">📍 Meet met gps</button></div><p id="travelMapGpsStatus" class="travel-map-gps-status">Voer kilometers zelf in, of meet ze terwijl deze pagina open is.</p><div id="travelMapTimeline" class="travel-map-timeline"></div></section>
+    </div>
+  </section>
+
   <section id="momenten" class="view">
     <div class="grid">
       <div class="card span-5">
@@ -7081,7 +7112,8 @@
       <div class="card span-7">
         <div class="eyebrow">Jullie tijdlijn</div>
         <h2>Reisverhaal</h2>
-        <div class="memory-story-actions"><button id="openTripBookFromStory" class="btn" type="button">📖 Fotoboek maken</button><span>Kies zelf verhalen en foto’s voor jullie boek.</span></div>
+        <div class="memory-story-actions"><button id="openTripBookFromStory" class="btn" type="button">📖 Fotoboek maken</button><button id="shareTravelFromStory" class="btn secondary" type="button">↗ Deel reis</button><span>Kies zelf verhalen en foto’s voor jullie boek.</span></div>
+        <section id="memoryJourneyMap" class="memory-journey-map" aria-live="polite"></section>
         <div class="toolbar">
           <button id="refreshMemories" class="btn secondary">Vernieuwen</button>
         </div>
@@ -7099,7 +7131,7 @@
         <h2>Technisch</h2>
         <p class="section-intro">Hier zie je welke versie op dit toestel is geopend en of de gedeelde verbinding werkt.</p>
         <div class="technical-grid">
-          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v178</strong></div>
+          <div class="technical-item"><small>Huidige versie</small><strong id="technicalCurrentVersion">v184</strong></div>
           <div class="technical-item"><small>Publicatiedatum</small><strong>27 augustus 2026</strong></div>
           <div class="technical-item"><small>Supabase</small><strong id="technicalSupabaseStatus">Controleren…</strong></div>
           <div class="technical-item"><small>Online versie</small><strong id="technicalVersionStatus">Nog niet gecontroleerd</strong></div>
@@ -7107,11 +7139,17 @@
         <div class="technical-actions">
           <button class="btn" id="technicalCheckVersion" type="button">Controleer nieuwe versie</button>
           <button class="btn secondary" id="technicalReload" type="button">Pagina opnieuw laden</button>
-          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=178" target="_blank" rel="noopener">Open vaste weblink</a>
+          <a class="btn secondary technical-link" href="https://waldokolk-dotcom.github.io/VakantieApp/?v=184" target="_blank" rel="noopener">Open vaste weblink</a>
         </div>
         <div class="notice technical-notice">
-          <strong>Wijzigingen in v178</strong><br>
-          De hotelweergave en Supabase-verbinding zijn hersteld. Een fout in de tijdelijke tijdreis-weergave kon de app vóór het laden van gegevens stoppen; die weergave is verwijderd. Bestaande reisgegevens, Dagboek van vandaag en Vertrekchecklist blijven behouden.<br><br>
+          <strong>Wijzigingen in v184</strong><br>
+          Kilometerstanden zijn nu helder per reisdag: kies eerst een dag op de Reiskaart, voer de gereden kilometers in en bewaar. Bij ‘Jullie hele route’ zie je het totaal. De kijkversie toont de kilometerstand zonder invoerknoppen.<br><br>
+          <strong>Eerdere wijzigingen in v183</strong><br>
+          In de reiskijker werken de pijlen bij de hele route weer: tik op rechts voor de volgende reisdag en gebruik daarna beide pijlen om door de dagen te gaan. Met ‘Volledige app’ rechtsboven ga je direct terug naar jullie eigen app.<br><br>
+          <strong>Eerdere wijzigingen in v182</strong><br>
+          Nodig iemand uit voor jullie reis via WhatsApp. De ontvanger opent een rustige kijkweergave met de Reiskaart, hotels, foto’s en reisverhalen; kosten en beheer staan niet in die weergave. Bij de volgende publicatie krijgt iedere uitnodiging een eigen deelcode die je kunt intrekken.<br><br>
+          <strong>Eerdere wijzigingen in v181</strong><br>
+          Reiskaart op telefoon groter en rustiger, met hotelpins en route. Voer gereden kilometers per reisdag in of meet ze met gps terwijl de app open is. De mobiele menubalk blijft zichtbaar; Technisch staat onder Meer. Kostenposten klappen per categorie open met de losse uitgaven eronder.<br><br>
           <strong>Eerdere wijzigingen in v165</strong><br>
           De weerinformatie heet nu overal Weerkaart. De knop ‘Vernieuw weer’ haalt de weersverwachting daadwerkelijk opnieuw op; een tijdelijke storing blijft duidelijk als weerstoring gemeld.<br><br>
           <strong>Eerdere wijzigingen in v164</strong><br>
@@ -7298,7 +7336,8 @@ let costData = [];
 let automaticChecklistEnsuredForTrip=null;
 
 let tripCatalog={};
-let currentTripId=localStorage.getItem("vakantie_current_trip") || "vakantie-2026";
+const requestedSharedTrip=new URLSearchParams(location.search).get("kijk")==="reis" ? new URLSearchParams(location.search).get("reis") : null;
+let currentTripId=(requestedSharedTrip && /^[a-z0-9-]{1,80}$/i.test(requestedSharedTrip) ? requestedSharedTrip : null) || localStorage.getItem("vakantie_current_trip") || "vakantie-2026";
 let tripSystemRows=[];
 let legacyJourneyRouteHTML=null;
 let legacyJourneyHotelGridHTML=null;
@@ -7484,6 +7523,10 @@ function showView(id){
       });
   }
   if(id==="technisch") updateTechnicalStatus();
+  if(id==="reiskaart") setTimeout(()=>{
+    renderTravelMap();
+    setTimeout(()=>travelMap?.invalidateSize({pan:false}),220);
+  },80);
 }
 document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>showView(b.dataset.view));
 
@@ -7556,7 +7599,7 @@ async function checkTechnicalVersion(){
     const match=html.match(/<meta\s+name=["']app-version["']\s+content=["'](\d+)["']/i);
     if(!match) throw new Error("Geen versie-informatie gevonden");
     const online=Number(match[1]);
-    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||178;
+    const current=Number(document.querySelector('meta[name="app-version"]')?.content)||184;
     status.textContent=online>current ? "Nieuwe versie v"+online+" beschikbaar" : "Je gebruikt de nieuwste versie";
     status.className=online>current ? "technical-warn" : "technical-ok";
   }catch(err){
@@ -7565,7 +7608,7 @@ async function checkTechnicalVersion(){
   }
 }
 
-const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||178;
+const openedAppVersion=Number(document.querySelector('meta[name="app-version"]')?.content)||184;
 const technicalCurrentVersion=document.getElementById("technicalCurrentVersion");
 if(technicalCurrentVersion) technicalCurrentVersion.textContent=`v${openedAppVersion}`;
 const technicalLink=document.querySelector(".technical-link");
@@ -11000,6 +11043,8 @@ async function saveChargeSession(){
 
 
 let activeCostStopFilter=null;
+let activeCostCategoryFilter=null;
+const categoryLabelsForFilter={hotel:"Hotels",restaurant:"Restaurants",groceries:"Boodschappen",charging:"Laden",parking:"Parkeren",toll:"Tol",activity:"Activiteiten",dogs:"Honden",other:"Overig"};
 
 function stopDisplayName(stopId){
   const stop=tripStops().find(s=>s.id===stopId);
@@ -11027,6 +11072,12 @@ function openCostsForStop(stopId){
 
 function clearCostStopFilter(){
   activeCostStopFilter=null;
+  activeCostCategoryFilter=null;
+  renderCosts();
+}
+
+function toggleCostCategoryFilter(category){
+  activeCostCategoryFilter=activeCostCategoryFilter===category?null:category;
   renderCosts();
 }
 
@@ -11035,13 +11086,16 @@ function updateCostFilterBanner(){
   const label=document.getElementById("costFilterLabel");
   if(!banner || !label) return;
 
-  if(!activeCostStopFilter){
+  if(!activeCostStopFilter && !activeCostCategoryFilter){
     banner.hidden=true;
     return;
   }
 
   banner.hidden=false;
-  label.textContent="Alleen kosten voor "+stopDisplayName(activeCostStopFilter);
+  const parts=[];
+  if(activeCostCategoryFilter) parts.push("Alleen "+(categoryLabelsForFilter[activeCostCategoryFilter]||activeCostCategoryFilter));
+  if(activeCostStopFilter) parts.push("bij "+stopDisplayName(activeCostStopFilter));
+  label.textContent=parts.join(" ");
 }
 
 function renderCosts(){
@@ -11084,24 +11138,37 @@ function renderCosts(){
   const customCategories=Object.keys(categoryTotals)
     .filter(category=>category!=="fuel" && !categoryOrder.includes(category))
     .sort((a,b)=>(categoryLabels[a]||a).localeCompare(categoryLabels[b]||b,"nl"));
+  const inlineRowsForCategory=category=>costData
+    .filter(row=>!isDepositCost(row) && String(row.category||"other")===category)
+    .sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")))
+    .map(row=>`<div class="cost-category-detail-row">
+      <span><strong>${esc(visibleCostDescription(row.description)||"Kostenpost")}</strong><small>${esc(row.date||"Geen datum")} · ${esc(stopDisplayName(row.stop_id))}</small></span>
+      <b>${euro(row.amount_cents)}</b>
+    </div>`).join("") || '<div class="cost-category-detail-row"><span>Geen kosten in deze post.</span></div>';
   categoryTotalsEl.innerHTML=[...categoryOrder,...customCategories]
     .map(category=>[category,categoryTotals[category]||0])
     .map(([category,amount])=>
-      `<div class="cost-category-total"><span>${esc(categoryLabels[category]||category)}</span>${category==="charging" ? `<small>${chargingEnergy.toLocaleString("nl-NL",{maximumFractionDigits:1})} kWh</small>` : ""}<b>${euro(amount)}</b></div>`
+      `<div class="cost-category-item"><button class="cost-category-total" type="button" data-cost-category="${esc(category)}" aria-pressed="${activeCostCategoryFilter===category}" aria-expanded="${activeCostCategoryFilter===category}"><span>${esc(categoryLabels[category]||category)}</span>${category==="charging" ? `<small>${chargingEnergy.toLocaleString("nl-NL",{maximumFractionDigits:1})} kWh</small>` : ""}<b>${euro(amount)}</b></button>${activeCostCategoryFilter===category ? `<div class="cost-category-detail">${inlineRowsForCategory(category)}</div>` : ""}</div>`
     ).join("");
+  categoryTotalsEl.querySelectorAll("[data-cost-category]").forEach(button=>button.onclick=()=>toggleCostCategoryFilter(button.dataset.costCategory));
 
   updateHotelCostCards();
 
   const el=document.getElementById("costList");
   updateCostFilterBanner();
+  el.hidden=Boolean(activeCostCategoryFilter);
 
-  const visibleCosts=activeCostStopFilter
-    ? costData.filter(row=>row.stop_id===activeCostStopFilter && !isDepositCost(row))
-    : costData.filter(row=>!isDepositCost(row));
+  if(activeCostCategoryFilter) return;
+
+  const visibleCosts=costData.filter(row=>
+    !isDepositCost(row) &&
+    (!activeCostStopFilter || row.stop_id===activeCostStopFilter) &&
+    (!activeCostCategoryFilter || String(row.category||"other")===activeCostCategoryFilter)
+  );
 
   if(!visibleCosts.length){
-    el.innerHTML=activeCostStopFilter
-      ? '<div class="empty">Nog geen kosten voor dit hotel.</div>'
+    el.innerHTML=(activeCostStopFilter||activeCostCategoryFilter)
+      ? '<div class="empty">Geen kosten in deze selectie.</div>'
       : '<div class="empty">Nog geen kosten.</div>';
     return;
   }
@@ -12177,6 +12244,7 @@ async function loadMemories(){
     }
   }
   window.lastTripPhotoMap=photoMap;
+  renderMemoryJourneyMap(memories,photoMap);
   if(typeof window.renderTripFeatureJourneyTimelines==="function") window.renderTripFeatureJourneyTimelines();
 
   document.getElementById("kpiMemories").textContent=(memories||[]).length;
@@ -13325,11 +13393,24 @@ function setTodayHotelUI(hotel){
   };
 }
 
+const HOTEL_COORDINATE_FALLBACKS={
+  "zuid-tirol":{lat:46.5156,lon:11.5021,timezone:"Europe/Rome",elevation:880}
+};
+
 async function resolveHotelCoordinates(hotel){
-  const cacheKey="vakantie_coords_"+hotel.stop;
+  // Reisstops gebruiken `id`; de Vandaag-kaarten gebruiken `stop`.
+  // Zonder deze keuze belandden alle kaartstops in dezelfde cache-regel.
+  const hotelKey=hotel.stop || hotel.id || hotel.geocode;
+  const cacheKey="vakantie_coords_"+hotelKey;
   const cached=localStorage.getItem(cacheKey);
   if(cached){
     try{return JSON.parse(cached);}catch(e){}
+  }
+
+  if(HOTEL_COORDINATE_FALLBACKS[hotelKey]){
+    const coords=HOTEL_COORDINATE_FALLBACKS[hotelKey];
+    localStorage.setItem(cacheKey,JSON.stringify(coords));
+    return coords;
   }
 
   const url="https://geocoding-api.open-meteo.com/v1/search?"+
@@ -17093,7 +17174,7 @@ if(document.readyState==="loading"){
     <button type="button" data-mobile-view="reis"><span>✣</span><b>Reis</b></button>
     <button type="button" data-mobile-view="vandaag"><span>⌂</span><b>Vandaag</b></button>
     <button type="button" data-mobile-view="momenten"><span>📖</span><b>Verhaal</b></button>
-    <button type="button" data-mobile-view="omgeving"><span>🗺️</span><b>Omgeving</b></button>
+    <button type="button" data-mobile-view="reiskaart"><span>🗺️</span><b>Reiskaart</b></button>
     <button type="button" data-mobile-view="meenemen"><span>🧳</span><b>Meenemen</b></button>
     <button type="button" id="mobileMoreBtn"><span>☰</span><b>Meer</b></button>
   </nav>
@@ -17191,18 +17272,18 @@ if(document.readyState==="loading"){
     const most=Object.entries((costData||[]).filter(r=>!isDepositCost(r)).reduce((a,r)=>{a[r.category||"other"]=(a[r.category||"other"]||0)+(Number(r.amount_cents)||0);return a;},{})).sort((a,b)=>b[1]-a[1])[0];
     const hotelSplit=featureHotelSplit(); const nights=featureNights(); const photoCount=Object.values(window.lastTripPhotoMap||{}).reduce((sum,photos)=>sum+photos.length,0);
     hub.innerHTML=`
-      <div class="trip-feature-card">
+      <div class="trip-feature-card trip-budget-card">
         <div class="legacy-kicker">KOSTEN SLIMMER</div><h2>Budget & overzicht</h2>
         <div class="trip-budget-line"><strong>${featureEuro(total)}</strong><span>${budget?`${pct}% van ${featureEuro(budget)}`:"Stel een budget in"}</span></div>
         <div class="trip-budget-track"><i style="width:${pct}%"></i></div>
-        <div class="trip-feature-actions"><input id="tripBudgetInput" inputmode="decimal" placeholder="Budget in euro" value="${budget?(budget/100).toFixed(2).replace('.',','):''}"><button id="saveTripBudget" class="btn secondary" type="button">Bewaar</button></div>
-        <small>${most?`Grootste post: ${esc(most[0])} · ${featureEuro(most[1])}`:"Nog geen kosten opgeslagen."}${hotelSplit.length?` · ${hotelSplit.map(item=>`${esc(item.name)} ${featureEuro(item.total)}`).join(" · ")}`:""}</small>
+        <div class="trip-card-footer trip-budget-footer"><div class="trip-feature-actions"><input id="tripBudgetInput" inputmode="decimal" placeholder="Budget in euro" value="${budget?(budget/100).toFixed(2).replace('.',','):''}"><button id="saveTripBudget" class="btn secondary" type="button">Bewaar</button></div>
+        <small>${most?`Grootste post: ${esc(most[0])} · ${featureEuro(most[1])}`:"Nog geen kosten opgeslagen."}${hotelSplit.length?` · ${hotelSplit.map(item=>`${esc(item.name)} ${featureEuro(item.total)}`).join(" · ")}`:""}</small></div>
       </div>
       <div class="trip-feature-card trip-road-card">
         <div class="legacy-kicker">ONDERWEG-MODUS</div><h2>${next?`Volgende stop: ${next.hotel||next.city}`:"Reisoverzicht"}</h2>
         <p>${next?`${next.city||next.place||""} · aankomst ${formatTripDate(next.arrival)}`:"Alle stops zijn bereikt."}</p>
         <div class="trip-road-meta"><span>⚡ ${((costData||[]).filter(r=>r.category==="charging").slice(0,1)[0]?.kwh||0).toLocaleString("nl-NL")} kWh laatst geladen</span><span>🐾 hondenpauze plannen</span></div>
-        <button id="openRoadMode" class="btn secondary" type="button">Rustig scherm openen</button>
+        <div class="trip-card-footer trip-road-footer"><button id="openRoadMode" class="btn secondary" type="button">Rustig scherm openen</button></div>
       </div>`;
     hub.querySelector("#saveTripBudget").onclick=async()=>{ const raw=hub.querySelector("#tripBudgetInput").value.replace(".","").replace(",","."); tripFeatureState.budgetCents=Math.max(0,Math.round(Number(raw||0)*100)); await saveTripFeatures(); renderTripFeatureHub(); };
     hub.querySelector("#openRoadMode").onclick=()=>openTripRoadMode(next);
@@ -17400,6 +17481,27 @@ if(document.readyState==="loading"){
   const tripFeatureStyle=document.createElement("style");tripFeatureStyle.textContent=`.trip-feature-hub{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:26px 0}.trip-feature-card{background:#fffdf8;border:1px solid #e5dcc7;border-radius:20px;padding:20px;color:#173d31}.trip-feature-card h2{font-size:22px;margin:6px 0 12px}.trip-feature-card textarea,.trip-feature-card input,.trip-hotel-notes textarea{box-sizing:border-box;width:100%;border:1px solid #ded5c3;border-radius:11px;padding:10px;font:inherit;margin:5px 0 10px;background:#fff}.trip-feature-card textarea{min-height:86px;resize:vertical}.trip-feature-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.trip-file-label{font-weight:800;color:#176147;cursor:pointer}.trip-file-label input{display:none}.trip-checklist{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.trip-checklist label{font-size:13px;font-weight:700}.trip-budget-line{display:flex;justify-content:space-between;gap:8px}.trip-budget-line span,.trip-feature-card small,.trip-road-card p,.trip-favorite-card p{color:#718078}.trip-budget-track{height:9px;border-radius:99px;background:#e9eee4;margin:12px 0;overflow:hidden}.trip-budget-track i{display:block;height:100%;background:#19805a;border-radius:inherit}.trip-road-meta{display:grid;gap:6px;font-size:13px;margin:12px 0}.trip-hotel-notes label{display:block;font-size:12px;font-weight:800}.trip-hotel-notes textarea{min-height:62px;resize:vertical}.trip-hotel-timeline{margin:18px 0 0;padding:20px 22px;border:1px solid #d7e5d2;border-radius:18px;background:linear-gradient(135deg,#f8fcf5,#fffdf8)}.trip-hotel-timeline h4{font-size:21px;margin:5px 0 16px}.trip-timeline-list{position:relative;margin-left:7px;border-left:3px solid #8abd78}.trip-timeline-list article{position:relative;display:grid;grid-template-columns:110px 1fr;gap:13px;padding:0 0 18px 20px}.trip-timeline-list article:before{content:"";position:absolute;width:11px;height:11px;border-radius:50%;background:#197252;border:3px solid #f8fcf5;left:-9px;top:2px}.trip-timeline-list time{font-size:11px;font-weight:900;color:#4d7462}.trip-timeline-list strong{font-size:12px;color:#257653;text-transform:capitalize}.trip-timeline-list p{margin:3px 0 0;line-height:1.45;color:#173d31}.trip-timeline-empty{margin:0;color:#718078}.trip-road-modal{position:fixed;inset:0;z-index:1500;background:rgba(6,38,29,.88);display:grid;place-items:center;padding:20px}.trip-road-modal[hidden]{display:none}.trip-road-modal>div{width:min(440px,100%);background:#f7f3e8;color:#173d31;padding:30px;border-radius:26px}.trip-road-modal button{float:right;border:0;background:none;font-size:32px;color:#173d31}@media(max-width:700px){.trip-feature-hub{grid-template-columns:1fr}.trip-checklist{grid-template-columns:1fr}.trip-timeline-list article{grid-template-columns:1fr;gap:3px}}`;document.head.appendChild(tripFeatureStyle);
   const tripBookStyle=document.createElement("style");tripBookStyle.textContent=`.trip-book-atelier{position:fixed;inset:0;z-index:7000;display:grid;place-items:center;padding:18px;background:#0d3028cc}.trip-book-atelier[hidden]{display:none}.trip-book-atelier-card{position:relative;width:min(1050px,100%);max-height:calc(100dvh - 36px);overflow:auto;padding:30px;border-radius:26px;background:#fffdf8;color:#173d31;box-shadow:0 24px 70px #001b14aa}.trip-book-atelier-card h2{margin:5px 0 8px;font-size:30px}.trip-book-atelier-card h3{margin:0 0 10px;font-size:16px}.trip-book-atelier-card>p,.trip-book-help{margin:0 0 20px;color:#60796d}.trip-book-close{position:absolute;right:14px;top:9px;border:0;background:transparent;color:#173d31;font-size:34px;cursor:pointer}.trip-book-fields,.trip-book-columns{display:grid;grid-template-columns:1fr 1fr;gap:14px}.trip-book-fields label{font-size:12px;font-weight:900;color:#29754f}.trip-book-fields input{display:block;width:100%;margin-top:5px;padding:11px;border:1px solid #d1ddcc;border-radius:12px;background:#fff;font:inherit;color:#173d31}.trip-book-section{margin-top:21px;padding-top:18px;border-top:1px solid #dfebd9}.trip-book-toggles{display:flex;flex-wrap:wrap;gap:10px}.trip-book-toggles label,.trip-book-choice{display:flex;gap:9px;align-items:flex-start;padding:9px;border-radius:11px;background:#f1f6ed;font:700 13px Arial;cursor:pointer}.trip-book-choice{margin:6px 0;background:#fff;border:1px solid #e0e9dc}.trip-book-choice small{display:block;margin-top:3px;color:#718378;font:12px Arial}.trip-book-scroll{max-height:190px;overflow:auto;padding-right:4px}.trip-book-select-actions{display:flex;gap:7px;margin:0 0 7px}.trip-book-select-actions button{border:0;border-radius:999px;padding:6px 10px;background:#e4efe0;color:#176147;font:800 12px Arial;cursor:pointer}.trip-book-photo-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}.trip-book-photo-choice{position:relative;min-width:0;border:1px solid #dce7d8;border-radius:11px;overflow:hidden;background:#fff;cursor:pointer}.trip-book-photo-choice input{position:absolute;top:6px;left:6px;width:18px;height:18px;z-index:1;accent-color:#176147}.trip-book-photo-choice img{display:block;width:100%;aspect-ratio:1.25;object-fit:cover;background:#e4ece1}.trip-book-photo-choice span{display:block;padding:5px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:700 10px Arial;color:#476257}.trip-book-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:22px}@media(max-width:700px){.trip-book-atelier{align-items:end;padding:0}.trip-book-atelier-card{max-height:94dvh;padding:25px 17px;border-radius:24px 24px 0 0}.trip-book-atelier-card h2{font-size:25px}.trip-book-fields,.trip-book-columns{grid-template-columns:1fr}.trip-book-photo-grid{grid-template-columns:repeat(3,1fr)}.trip-book-actions{position:sticky;bottom:-25px;margin:18px -17px -25px;padding:12px 17px;background:#fffdf8;border-top:1px solid #dfe8db}.trip-book-actions .btn{flex:1;padding:12px 8px}}`;document.head.appendChild(tripBookStyle);
   const journeyTimelineStyle=document.createElement("style");journeyTimelineStyle.textContent=`.journey-hotel-timeline-wrap{min-width:0}.trip-journey-timeline{margin:16px 0 0;padding:22px;border:1px solid #d7e5d2;border-radius:26px;background:#fffdf8;box-shadow:0 14px 28px rgba(10,68,48,.12)}.trip-journey-timeline h4{font-size:21px;margin:5px 0 16px}.journey-diary-sort{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-5px 0 16px;font-size:12px;font-weight:900;color:#29754f}.journey-diary-sort select{min-width:145px;max-width:100%;padding:9px 11px;border:1px solid #d1ddcc;border-radius:12px;background:#fff;font:inherit;color:#173d31}.journey-diary-compose{margin:0 0 22px;padding:14px;border-radius:16px;background:#edf4e9}.journey-diary-compose label{display:block;font-size:12px;font-weight:900;color:#29754f}.journey-diary-compose textarea,.journey-diary-compose input:not([type="file"]),.journey-diary-date{box-sizing:border-box;display:block;width:100%;margin:7px 0 10px;padding:11px;border:1px solid #d1ddcc;border-radius:12px;background:#fff;font:inherit;color:#173d31}.journey-diary-compose textarea{min-height:82px;resize:vertical}.journey-diary-photo{margin:2px 0 11px;color:#176147;cursor:pointer}.journey-diary-photo input{display:block;max-width:100%;margin-top:5px;font:inherit}.journey-diary-compose>div{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.journey-diary-compose span{font-size:12px;font-weight:800;color:#287354}.trip-timeline-entry{border-bottom:1px solid #dce8d7}.trip-timeline-entry:last-child{border-bottom:0}.trip-timeline-entry summary{display:grid;grid-template-columns:110px 1fr;gap:13px;padding:13px 3px;cursor:pointer;list-style:none}.trip-timeline-entry summary::-webkit-details-marker{display:none}.trip-timeline-entry summary:after{content:"⌄";font-weight:900;color:#287354}.trip-timeline-entry[open] summary:after{transform:rotate(180deg)}.trip-timeline-entry time{font-size:11px;font-weight:900;color:#4d7462}.trip-timeline-entry strong{font-size:14px;color:#173d31}.trip-timeline-entry-body{padding:0 20px 16px 123px}.trip-timeline-entry-body p{margin:0;line-height:1.5;color:#173d31;white-space:pre-wrap}.journey-timeline-photo{margin-top:8px;border:0;border-radius:10px;padding:6px 9px;background:#e9f3e5;color:#176147;font:800 12px inherit;cursor:pointer}@media(max-width:700px){.trip-journey-timeline{padding:18px}.journey-diary-sort{align-items:flex-start;flex-direction:column}.journey-diary-sort select{width:100%}.trip-timeline-entry summary{grid-template-columns:1fr 24px;gap:3px}.trip-timeline-entry summary time{grid-column:1}.trip-timeline-entry strong{grid-column:1}.trip-timeline-entry summary:after{grid-column:2;grid-row:1 / span 2;align-self:center}.trip-timeline-entry-body{padding:0 0 15px}.trip-timeline-list article{grid-template-columns:1fr;gap:3px}}`;document.head.appendChild(journeyTimelineStyle);
+  let travelMap=null,travelMapLayer=null,travelMapMode="route",travelMapStopIndex=0;
+  function travelMapEntries(stop){return (window.lastTripMemories||[]).filter(memory=>memory.stop_id===stop?.id);}
+  function travelMapLabel(stop){return stop?.city||stop?.hotel||"Stop";}
+  async function renderTravelMap(){const host=document.getElementById("travelMapCanvas");if(!host||typeof L==="undefined")return;const stops=tripStops();if(!stops.length){host.innerHTML="<div class=\"empty\">Voeg eerst hotels toe aan jullie reis.</div>";return;}travelMapStopIndex=Math.max(0,Math.min(travelMapStopIndex,stops.length-1));const title=document.getElementById("travelMapDayTitle"),timeline=document.getElementById("travelMapTimeline"),km=document.getElementById("travelMapDayKm");const stop=stops[travelMapStopIndex];title.textContent=travelMapMode==="route"?"Jullie hele route":travelMapLabel(stop);const entries=travelMapMode==="route"?(window.lastTripMemories||[]):travelMapEntries(stop);const enteredKm=travelMapMode==="route"?stops.reduce((sum,item)=>sum+readTravelKm(item),0):readTravelKm(stop);km.textContent=enteredKm?`🚗 ${enteredKm.toLocaleString("nl-NL",{maximumFractionDigits:1})} km gereden${travelMapMode==="route"?" in totaal":" op deze reisdag"}`:`🚗 Nog geen kilometers ingevoerd${travelMapMode==="route"?"":" voor deze reisdag"}`;timeline.innerHTML=entries.length?entries.slice(0,6).map((memory,index)=>{const photos=window.lastTripPhotoMap?.[memory.id]||[];const when=memory.created_at?new Date(memory.created_at).toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"}):"";return `<button class="travel-map-entry" type="button" data-travel-memory="${esc(memory.id)}"><time>${esc(when)}</time>${photos[0]?`<img src="${esc(photos[0].preview_url||photos[0].original_url)}" alt="">`:`<span class="travel-map-photo-empty">📷</span>`}<span><b>${esc((memory.text||"Moment").split(/\\n/)[0].slice(0,54))}</b><small>${esc(displayMemoryLocation(memory.stop_id)||travelMapLabel(stop))}</small></span><i>›</i></button>`;}).join(""):"<p class=\"travel-map-empty\">Nog geen momenten op deze dag.</p>";timeline.querySelectorAll("[data-travel-memory]").forEach(button=>button.onclick=()=>{showView("momenten");setTimeout(()=>document.querySelector(`[data-memory-id=\"${CSS.escape(button.dataset.travelMemory)}\"]`)?.scrollIntoView({behavior:"smooth",block:"center"}),200);});if(!travelMap){travelMap=L.map(host,{zoomControl:false,attributionControl:false}).setView([47.5,10.5],6);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18}).addTo(travelMap);L.control.zoom({position:"bottomright"}).addTo(travelMap);}travelMapLayer?.clearLayers();travelMapLayer=L.layerGroup().addTo(travelMap);const located=[];for(const item of stops){try{const coords=await resolveHotelCoordinates(item);if(coords?.lat&&coords?.lon)located.push({item,coords});}catch(error){console.warn("Stop kon niet op Reiskaart",error);}}if(!located.length)return;L.polyline(located.map(point=>[point.coords.lat,point.coords.lon]),{color:"#176147",weight:4,opacity:.9}).addTo(travelMapLayer);located.forEach((point,index)=>{const selected=index===travelMapStopIndex;const photo=travelMapEntries(point.item).flatMap(memory=>window.lastTripPhotoMap?.[memory.id]||[])[0];const icon=L.divIcon({className:"travel-map-pin-wrap",html:`<button class="travel-map-pin ${selected?"selected":""}">${photo?`<img src="${esc(photo.preview_url||photo.original_url)}" alt="">`:`<b>${index+1}</b>`}</button>`,iconSize:[42,42],iconAnchor:[21,21]});L.marker([point.coords.lat,point.coords.lon],{icon}).addTo(travelMapLayer).on("click",()=>{travelMapStopIndex=index;travelMapMode="day";renderTravelMap();});});travelMap.fitBounds(L.latLngBounds(located.map(point=>[point.coords.lat,point.coords.lon])),{padding:[34,34],maxZoom:8});}
+  let travelGpsWatchId=null,travelGpsLastPoint=null,travelGpsKm=0;
+  function travelKmKey(stop=tripStops()[travelMapStopIndex]){return `vakantieapp-km:${currentTripId||"local"}:${stop?.id||travelMapStopIndex}`;}
+  function readTravelKm(stop){return Number(localStorage.getItem(travelKmKey(stop))||0);}
+  function saveTravelKm(value){const km=Math.max(0,Number(value)||0);localStorage.setItem(travelKmKey(),String(km));return km;}
+  function setTravelKmMessage(message){const status=document.getElementById("travelMapGpsStatus");if(status) status.textContent=message;}
+  function refreshTravelKmControls(){const input=document.getElementById("travelMapKmInput"),summary=document.getElementById("travelMapDayKm");if(!input||!summary) return;const km=readTravelKm();input.value=km||"";if(km) summary.textContent=`🚗 ${km.toLocaleString("nl-NL",{maximumFractionDigits:1})} km gereden`;}
+  function gpsDistanceKm(a,b){const rad=value=>value*Math.PI/180;const lat1=rad(a.lat),lat2=rad(b.lat),dLat=lat2-lat1,dLon=rad(b.lon-a.lon);const h=Math.sin(dLat/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2;return 6371*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h));}
+  function stopTravelGps(){if(travelGpsWatchId!==null) navigator.geolocation?.clearWatch(travelGpsWatchId);travelGpsWatchId=null;travelGpsLastPoint=null;const button=document.getElementById("travelMapGpsBtn");if(button) button.textContent="📍 Meet met gps";setTravelKmMessage("Gps-meting gestopt. De gemeten kilometers zijn bewaard.");}
+  function startTravelGps(){if(!navigator.geolocation){setTravelKmMessage("Deze telefoon ondersteunt geen gps in de browser.");return;}if(travelGpsWatchId!==null){stopTravelGps();return;}travelGpsKm=readTravelKm();const button=document.getElementById("travelMapGpsBtn");if(button) button.textContent="■ Stop gps";setTravelKmMessage("Gps-signaal zoeken… laat deze pagina open tijdens het rijden.");travelGpsWatchId=navigator.geolocation.watchPosition(position=>{const next={lat:position.coords.latitude,lon:position.coords.longitude};if(travelGpsLastPoint){const part=gpsDistanceKm(travelGpsLastPoint,next);if(part>0.003&&part<2){travelGpsKm=saveTravelKm(travelGpsKm+part);refreshTravelKmControls();setTravelKmMessage(`Gps meet mee: ${travelGpsKm.toLocaleString("nl-NL",{maximumFractionDigits:1})} km`);}}travelGpsLastPoint=next;},()=>{setTravelKmMessage("Gps kon niet starten. Geef locatie-toegang op je telefoon en probeer opnieuw.");stopTravelGps();},{enableHighAccuracy:true,maximumAge:5000,timeout:20000});}
+  const baseRenderTravelMap=renderTravelMap;
+  renderTravelMap=async function(){await baseRenderTravelMap();refreshTravelKmControls();};
+  document.getElementById("saveTravelMapKm")?.addEventListener("click",()=>{const value=saveTravelKm(document.getElementById("travelMapKmInput")?.value);refreshTravelKmControls();setTravelKmMessage(`${value.toLocaleString("nl-NL",{maximumFractionDigits:1})} km bewaard bij deze reisdag.`);});
+  document.getElementById("travelMapGpsBtn")?.addEventListener("click",startTravelGps);
+  function travelMapDrivingRoute(located){return fetch(`https://router.project-osrm.org/route/v1/driving/${located.map(point=>`${point.coords.lon},${point.coords.lat}`).join(";")}?overview=full&geometries=geojson`).then(response=>response.ok?response.json():null).then(data=>data?.routes?.[0]?.geometry?.coordinates?.map(point=>[point[1],point[0]])||located.map(point=>[point.coords.lat,point.coords.lon])).catch(()=>located.map(point=>[point.coords.lat,point.coords.lon]));}
+  document.querySelectorAll("[data-travel-map-mode]").forEach(button=>button.onclick=()=>{travelMapMode=button.dataset.travelMapMode;document.querySelectorAll("[data-travel-map-mode]").forEach(item=>item.setAttribute("aria-selected",String(item===button)));renderTravelMap();});document.querySelectorAll("[data-travel-day-change]").forEach(button=>button.onclick=()=>{const direction=button.dataset.travelDayChange==="next"?1:-1;if(travelMapMode==="route"){travelMapMode="day";travelMapStopIndex=direction>0?Math.min(1,Math.max(0,tripStops().length-1)):0;document.querySelectorAll("[data-travel-map-mode]").forEach(item=>item.setAttribute("aria-selected",String(item.dataset.travelMapMode==="day")));}else{travelMapStopIndex=Math.max(0,Math.min(tripStops().length-1,travelMapStopIndex+direction));}renderTravelMap();});
+  const travelMapStyle=document.createElement("style");travelMapStyle.textContent=`.travel-map-app{max-width:760px;margin:0 auto;background:#fffdf8;border-radius:26px;overflow:hidden;color:#173d31;box-shadow:0 14px 32px #173d3126}.travel-map-top{display:flex;align-items:center;justify-content:space-between;padding:21px 20px 8px}.travel-map-top h2{margin:4px 0 0;font-size:29px}.travel-map-more{border:0;background:transparent;font:900 22px Arial;color:#4c6b5d}.travel-map-tabs{display:flex;gap:7px;padding:0 20px 12px}.travel-map-tabs button{border:0;border-radius:11px;padding:8px 11px;background:#edf2ea;color:#547166;font:800 12px Arial;cursor:pointer}.travel-map-tabs button[aria-selected=true]{background:#176147;color:#fff}.travel-map-canvas{height:440px;background:#dcebd6}.travel-map-pin-wrap{background:none;border:0}.travel-map-pin{display:grid;place-items:center;width:42px;height:42px;border:3px solid #fff;border-radius:50%;background:#176147;color:#fff;box-shadow:0 4px 12px #173d3166;overflow:hidden;font:900 14px Arial}.travel-map-pin.selected{outline:3px solid #e8c76a}.travel-map-pin img{width:100%;height:100%;object-fit:cover}.travel-map-day{padding:13px 15px 17px;background:#fffdf8}.travel-map-day-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.travel-map-day-head button{border:0;background:transparent;color:#176147;font-size:26px;cursor:pointer}.travel-map-day-head strong{font-size:14px}.travel-map-km{margin:9px 0;padding:9px 10px;border-radius:11px;background:#edf4e9;font:800 12px Arial;color:#176147}.travel-map-timeline{display:grid;gap:7px}.travel-map-entry{display:grid;grid-template-columns:37px 54px 1fr 18px;gap:8px;align-items:center;width:100%;border:0;border-radius:12px;padding:7px;background:#fff;color:#173d31;text-align:left;box-shadow:0 2px 9px #173d3112;cursor:pointer}.travel-map-entry time{font:800 10px Arial;color:#5a806d}.travel-map-entry img,.travel-map-photo-empty{width:54px;height:39px;border-radius:7px;object-fit:cover;background:#e4ece0;display:grid;place-items:center}.travel-map-entry b,.travel-map-entry small{display:block}.travel-map-entry b{font-size:12px}.travel-map-entry small{margin-top:3px;color:#718078;font-size:10px}.travel-map-entry i{font-style:normal;font-size:20px;color:#708078}.travel-map-empty{color:#718078;font-size:13px}.leaflet-control-zoom a{color:#176147!important}@media(max-width:700px){.travel-map-app{border-radius:0}.travel-map-top{padding-top:15px}.travel-map-canvas{height:330px}.travel-map-tabs{overflow:auto;padding-bottom:10px}.travel-map-tabs button{white-space:nowrap}}`;document.head.appendChild(travelMapStyle);
+  const tripFeatureLayoutStyle=document.createElement("style");tripFeatureLayoutStyle.textContent=`@media(min-width:701px){.trip-feature-hub>.trip-feature-card{display:flex;flex-direction:column;min-height:320px}.trip-card-footer{margin-top:auto;padding-top:14px}.trip-budget-footer small{display:block;min-height:42px;margin-top:10px}.trip-road-footer{min-height:74px;display:flex;align-items:flex-start}.trip-road-footer .btn{margin:0}}@media(max-width:700px){.trip-feature-hub>.trip-feature-card{display:block}.trip-card-footer{padding-top:10px}.trip-budget-footer small{display:block;margin-top:9px}}`;document.head.appendChild(tripFeatureLayoutStyle);
   setTimeout(()=>{installTripFeatureHub();loadTripFeatures();renderTripFeatureJourneyTimelines();},900);
   const usabilityStyle=document.createElement("style");usabilityStyle.textContent=`
     :focus-visible{outline:3px solid #e4ad41;outline-offset:3px}
@@ -17413,10 +17515,11 @@ if(document.readyState==="loading"){
       .view{padding-bottom:calc(56px + env(safe-area-inset-bottom))}
       .leaflet-bottom{bottom:calc(92px + env(safe-area-inset-bottom))}
       .route-link,.route-generate,.env-route-btn{scroll-margin-bottom:calc(150px + env(safe-area-inset-bottom))}
-      .mobile-app-nav{bottom:max(8px,env(safe-area-inset-bottom));padding:8px 5px;transform:translateY(calc(100% + 18px));opacity:0;pointer-events:none;transition:transform .2s ease,opacity .2s ease}
-      .mobile-app-nav.mobile-nav-open{transform:translateY(0);opacity:1;pointer-events:auto}
-      .mobile-nav-toggle{position:fixed;right:14px;bottom:max(14px,calc(10px + env(safe-area-inset-bottom)));z-index:4100;min-height:48px;padding:0 16px;border:1px solid #d4c9b5;border-radius:999px;background:#176147;color:#fffdf8;box-shadow:0 10px 24px rgba(23,61,49,.25);font:800 14px inherit;cursor:pointer;touch-action:manipulation}
-      .mobile-nav-toggle[aria-expanded="true"]{bottom:calc(92px + env(safe-area-inset-bottom));background:#fffdf8;color:#176147}
+      /* De balk blijft altijd als een zwevende balk in beeld. De oude
+         uitklapknop kon onder de telefoonrand terechtkomen. */
+      .mobile-app-nav{bottom:max(8px,env(safe-area-inset-bottom));padding:8px 5px;transform:none;opacity:1;pointer-events:auto}
+      .mobile-app-nav.mobile-nav-open{transform:none;opacity:1;pointer-events:auto}
+      .mobile-nav-toggle{display:none}
       .mobile-app-nav button{min-height:58px;padding:6px 1px}
       .mobile-app-nav button b{font-size:10px}
       .mobile-more-panel{max-height:calc(100dvh - 100px - env(safe-area-inset-bottom));overflow-y:auto;-webkit-overflow-scrolling:touch}
@@ -17435,7 +17538,101 @@ if(document.readyState==="loading"){
       .trip-road-modal button{min-width:44px;min-height:44px;margin:-9px -8px 0 8px}
     }
   `;document.head.appendChild(usabilityStyle);
+  const mobilePolishStyle=document.createElement("style");
+  mobilePolishStyle.textContent=`@media(max-width:700px){
+    html,body,.shell{max-width:100%;overflow-x:hidden}
+    .legacy-header{min-height:62px!important;padding:6px 2px 7px!important}
+    .legacy-brand-text{font-size:22px!important}
+    .travel-map-app{border-radius:18px;margin:0 -2px}
+    .travel-map-top{padding:13px 15px 5px}.travel-map-top h2{font-size:25px}
+    .travel-map-tabs{padding:0 15px 9px;scrollbar-width:none}.travel-map-tabs::-webkit-scrollbar{display:none}
+    .travel-map-canvas{height:min(58dvh,430px);min-height:365px}
+    .travel-map-day{padding:11px 13px 112px}
+    .mobile-app-nav{left:10px;right:10px;border-radius:18px;box-shadow:0 10px 28px rgba(28,59,43,.24)}
+    .mobile-app-nav button{min-height:55px}.mobile-app-nav button b{font-size:9px}
+  }`;
+  document.head.appendChild(mobilePolishStyle);
+  const travelMapLayoutStyle=document.createElement("style");
+  travelMapLayoutStyle.textContent=`
+    .travel-map-km-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;margin:9px 0}
+    .travel-map-km-controls label{display:grid;gap:4px;font:800 11px Arial;color:#557165}
+    .travel-map-km-controls input{width:100%;min-height:38px;padding:8px 10px;border:1px solid #d8e3d3;border-radius:10px;background:#fff;font:700 14px Arial;color:#173d31}
+    .travel-map-km-controls button{min-height:38px;padding:0 11px;border:0;border-radius:10px;background:#176147;color:#fff;font:800 12px Arial;cursor:pointer}
+    #travelMapGpsBtn{grid-column:1/-1;background:#e8f2e4;color:#176147;border:1px solid #cde0c8}
+    .travel-map-gps-status{margin:0 0 11px;color:#6c7c75;font:12px/1.35 Arial}
+    @media(min-width:701px){
+      #reiskaart.view.active{max-width:1220px;margin:0 auto}
+      .travel-map-app{max-width:1220px;display:grid;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:auto auto minmax(560px,68vh);border-radius:28px}
+      .travel-map-top{grid-column:1;grid-row:1}.travel-map-tabs{grid-column:1;grid-row:2}.travel-map-canvas{grid-column:1;grid-row:3;height:auto;min-height:560px}
+      .travel-map-day{grid-column:2;grid-row:1 / span 3;padding:24px 20px;border-left:1px solid #dce6d8;overflow:auto}
+      .travel-map-timeline{margin-top:14px}.travel-map-entry{grid-template-columns:42px 66px 1fr 18px;padding:9px}.travel-map-entry img,.travel-map-photo-empty{width:66px;height:48px}
+    }
+    @media(max-width:420px){.travel-map-km-controls{grid-template-columns:1fr 1fr}.travel-map-km-controls label{grid-column:1/-1}}
+  `;
+  document.head.appendChild(travelMapLayoutStyle);
   document.querySelectorAll('[data-view="vandaag"],[data-mobile-view="vandaag"]').forEach(btn=>btn.addEventListener("click",()=>setTimeout(renderTripFeatureHub,80)));
+
+  /* ===== Reiskijker en WhatsApp-uitnodiging =====
+     De uitnodiging heeft bewust een eigen, rustige kijkweergave. De volgende
+     stap is de servermatige deelcode: daarmee wordt deze kijker ook werkelijk
+     afgeschermd per genodigde, in plaats van alleen vereenvoudigd in beeld. */
+  (function installTravelSharing(){
+    const guestMode=()=>new URLSearchParams(location.search).get("kijk")==="reis";
+    const permittedViews=new Set(["reiskaart","momenten","hotels"]);
+    const shareUrl=()=>{
+      const url=new URL(location.href);
+      url.searchParams.set("kijk","reis");
+      url.searchParams.set("reis",currentTripId||"vakantie-2026");
+      url.searchParams.delete("refresh");
+      return url.toString();
+    };
+    const tripName=()=>tripMeta?.()?.title || "onze vakantie";
+    const inviteText=()=>`Kijk mee met ${tripName()}! Hier zie je onze route, hotels, foto’s en reisverhalen.\n\n${shareUrl()}`;
+    const style=document.createElement("style");
+    style.textContent=`
+      .travel-map-top-actions{display:flex;align-items:center;gap:6px}
+      .travel-map-share{border:0;border-radius:999px;padding:9px 12px;background:#e7f2e4;color:#176147;font:800 12px Arial;cursor:pointer;white-space:nowrap}
+      .travel-share-modal{position:fixed;inset:0;z-index:8000;display:grid;place-items:center;padding:18px;background:rgba(6,38,29,.68)}
+      .travel-share-modal[hidden]{display:none}
+      .travel-share-card{position:relative;width:min(480px,100%);padding:27px;border-radius:25px;background:#fffdf8;color:#173d31;box-shadow:0 24px 80px rgba(4,30,21,.42)}
+      .travel-share-card h2{margin:5px 36px 7px 0;font-size:26px}.travel-share-card p{margin:0 0 16px;color:#63786d;line-height:1.45}
+      .travel-share-card small{display:block;margin:12px 0 0;color:#718078;line-height:1.4}
+      .travel-share-close{position:absolute;right:13px;top:10px;border:0;background:transparent;color:#173d31;font-size:31px;cursor:pointer}
+      .travel-share-link{display:block;width:100%;box-sizing:border-box;padding:11px;border:1px solid #d6e2d1;border-radius:12px;background:#f2f7ef;color:#416354;font:12px/1.35 Arial;overflow-wrap:anywhere}
+      .travel-share-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}.travel-share-actions button{min-height:46px;border:0;border-radius:13px;padding:10px;background:#176147;color:#fff;font:800 14px Arial;cursor:pointer}.travel-share-actions button.secondary{background:#e8f2e5;color:#176147}.travel-share-actions button.preview{grid-column:1/-1;background:#fff;border:1px solid #cfe0ca}
+      .travel-share-note{margin-top:16px!important;padding:11px 12px;border-radius:12px;background:#f5f0de;color:#6a5b35!important;font-size:12px}
+      .travel-map-full-app{border:0;border-radius:999px;padding:9px 12px;background:#176147;color:#fff;font:800 12px Arial;cursor:pointer;white-space:nowrap}
+      body.travel-guest .legacy-header{padding-bottom:8px!important}body.travel-guest .legacy-nav button:not([data-view="reiskaart"]):not([data-view="momenten"]):not([data-view="hotels"]){display:none!important}body.travel-guest [data-mobile-view]:not([data-mobile-view="reiskaart"]):not([data-mobile-view="momenten"]):not([data-mobile-view="hotels"]){display:none!important}body.travel-guest #shareTravelFromMap,body.travel-guest #shareTravelFromStory,body.travel-guest .travel-map-km-controls,body.travel-guest .travel-map-gps-status,body.travel-guest #momenten .grid>.card:first-child,body.travel-guest .memory-story-actions .btn:not(#shareTravelFromStory),body.travel-guest .memory-story-actions span,body.travel-guest .journey-edit-actions,body.travel-guest .hotel-edit-actions,body.travel-guest .hotel-detail-card button:not(.journey-timeline-photo){display:none!important}
+      body.travel-guest:before{content:"Kijk mee met onze reis";display:block;padding:8px 14px;background:#176147;color:#fffdf8;text-align:center;font:800 13px Arial;letter-spacing:.02em}
+      @media(max-width:700px){.travel-map-share{padding:8px 10px;font-size:11px}.travel-share-modal{align-items:end;padding:0}.travel-share-card{border-radius:24px 24px 0 0;padding:24px 18px;max-height:90dvh;overflow:auto}.travel-share-actions{grid-template-columns:1fr}.travel-share-actions button.preview{grid-column:auto}}
+    `;
+    document.head.appendChild(style);
+    const modal=document.createElement("section");
+    modal.id="travelShareModal";modal.className="travel-share-modal";modal.hidden=true;modal.setAttribute("role","dialog");modal.setAttribute("aria-modal","true");modal.setAttribute("aria-label","Nodig iemand uit voor jullie reis");
+    modal.innerHTML=`<div class="travel-share-card"><button class="travel-share-close" type="button" aria-label="Sluiten">×</button><div class="legacy-kicker">SAMEN MEEKIJKEN</div><h2>Nodig iemand uit</h2><p>Stuur één link. De ontvanger ziet de route, hotels, foto’s en reisverhalen in een rustige kijkweergave.</p><span class="travel-share-link"></span><div class="travel-share-actions"><button type="button" data-share-whatsapp>WhatsApp openen</button><button type="button" class="secondary" data-share-copy>Link kopiëren</button><button type="button" class="preview" data-share-preview>Bekijk zoals je gast het ziet</button></div><p class="travel-share-note">Voorstel: maak bij publicatie een persoonlijke deelcode met een afloopdatum en een knop ‘toegang intrekken’. Dan kan alleen iemand met deze link meekijken.</p></div>`;
+    document.body.appendChild(modal);
+    const close=()=>{modal.hidden=true;document.activeElement?.blur?.();};
+    const open=()=>{modal.querySelector(".travel-share-link").textContent=shareUrl();modal.hidden=false;modal.querySelector("[data-share-whatsapp]").focus();};
+    modal.querySelector(".travel-share-close").onclick=close;
+    modal.addEventListener("click",event=>{if(event.target===modal)close();});
+    document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!modal.hidden)close();});
+    modal.querySelector("[data-share-whatsapp]").onclick=()=>window.open(`https://wa.me/?text=${encodeURIComponent(inviteText())}`,"_blank","noopener");
+    modal.querySelector("[data-share-copy]").onclick=async event=>{try{await navigator.clipboard.writeText(shareUrl());event.currentTarget.textContent="✓ Link gekopieerd";setTimeout(()=>event.currentTarget.textContent="Link kopiëren",1600);}catch(error){window.prompt("Kopieer deze reiskijker-link:",shareUrl());}};
+    modal.querySelector("[data-share-preview]").onclick=()=>{const url=new URL(shareUrl());location.assign(url.toString());};
+    document.getElementById("shareTravelFromMap")?.addEventListener("click",open);
+    document.getElementById("shareTravelFromStory")?.addEventListener("click",open);
+    if(guestMode()){
+      document.body.classList.add("travel-guest");
+      const leaveButton=document.createElement("button");
+      leaveButton.id="leaveTravelGuest";leaveButton.className="travel-map-full-app";leaveButton.type="button";leaveButton.textContent="Volledige app";leaveButton.title="Open jullie volledige Vakantie-app";
+      leaveButton.onclick=()=>{const url=new URL(location.href);url.searchParams.delete("kijk");url.searchParams.delete("reis");location.assign(url.toString());};
+      document.querySelector(".travel-map-top-actions")?.prepend(leaveButton);
+      const originalShowView=showView;
+      showView=function(viewId){originalShowView(permittedViews.has(viewId)?viewId:"reiskaart");};
+      setTimeout(()=>showView("reiskaart"),500);
+      setTimeout(()=>showView("reiskaart"),1800);
+    }
+  })();
 
   /* ===== v156: rustige wegwijzer voor alle opgebouwde reisfuncties ===== */
   (function installAppGuide(){
