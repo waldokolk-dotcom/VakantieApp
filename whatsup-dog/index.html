@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=3" />
   <title>Whatsup dog</title>
 </head>
 <body>
@@ -23,7 +23,7 @@
         <div id="map" class="map" aria-label="Kaart met meldingen en hondenuitlaatgebieden"></div>
         <button id="locateBtn" class="map-fab locate" aria-label="Mijn locatie">◎</button>
         <button id="reportFab" class="report-fab"><span>＋</span> MELDEN</button>
-        <aside class="map-legend"><button id="legendToggle" class="legend-title">Kaartlagen <span>⌃</span></button><div id="legendBody" class="legend-body"><label><input type="checkbox" data-layer="offleash" checked> <span class="legend-swatch offleash"></span> Losloopgebied</label><label><input type="checkbox" data-layer="onleash" checked> <span class="legend-swatch onleash"></span> Aanlijngebied</label><label><input type="checkbox" data-layer="reports" checked> <span class="legend-dot"></span> Meldingen</label></div></aside>
+        <aside class="map-legend"><button id="legendToggle" class="legend-title">Kaartlagen <span>⌃</span></button><div id="legendBody" class="legend-body"><label><input type="checkbox" data-layer="offleash" checked> <span class="legend-swatch offleash"></span> Vastgesteld losloopgebied</label><label><input type="checkbox" data-layer="reports" checked> <span class="legend-dot"></span> Meldingen</label></div></aside>
       </section>
       <section id="view-chat" class="view page-view" aria-label="Whatsup dog chat"><div class="page-head"><span class="page-icon">💬</span><div><h1>Whatsup dog</h1><p>Praat met hondenmensen in je buurt.</p></div></div><div class="notice-card"><strong>V1 demo</strong><br>Chat ziet er al echt uit, maar berichten blijven nu alleen op dit toestel. Voor multi-user chat koppelen we straks de gratis backend.</div><div id="chatList" class="chat-list"></div><form id="chatForm" class="chat-compose"><input id="chatInput" maxlength="280" placeholder="Zeg iets hondigs…" autocomplete="off" /><button aria-label="Versturen">➤</button></form></section>
       <section id="view-alerts" class="view page-view" aria-label="Meldingen"><div class="page-head"><span class="page-icon">🔔</span><div><h1>Meldingen</h1><p>Jij bepaalt waarvoor je gewaarschuwd wordt.</p></div></div><div class="settings-card"><label class="switch-row"><span><b>❗ Gevaren</b><small>Glas, gif, verkeer en andere risico's</small></span><input type="checkbox" checked></label><label class="switch-row"><span><b>🌿 Vegetatie</b><small>Grasaren, berenklauw, processierups</small></span><input type="checkbox" checked></label><label class="switch-row"><span><b>🚨 Vermiste hond</b><small>Urgente signalen in een groter gebied</small></span><input type="checkbox" checked></label><label class="switch-row"><span><b>🐾 Activiteiten</b><small>Wandelmaatjes en hondendingen</small></span><input type="checkbox"></label></div><button id="pushDemo" class="primary wide">🔔 Test een melding</button><p class="fineprint">Echte webpush wordt pas geactiveerd wanneer er een backend en pushsleutels zijn. Er staan geen geheime sleutels in de browsercode.</p></section>
@@ -35,6 +35,8 @@
   <dialog id="reportDialog" class="sheet-dialog"><form method="dialog" id="reportForm" class="sheet-card report-sheet"><button class="dialog-close" value="cancel" aria-label="Sluiten">×</button><h2>Wat heb je gespot?</h2><div id="reportTypes" class="report-grid"></div><div id="reportDetails" class="report-details hidden"><div id="vegetationKinds" class="subtype-grid hidden"></div><label class="field"><span>Korte omschrijving</span><textarea id="reportText" maxlength="220" rows="3" placeholder="Vertel kort wat andere hondenbezitters moeten weten…"></textarea></label><div class="location-card">📍 <span id="reportLocationText">Plaats op het midden van de kaart</span></div><button id="publishReport" class="primary wide" value="default">🐾 MELDEN</button></div></form></dialog>
   <dialog id="detailDialog" class="sheet-dialog"><form method="dialog" class="sheet-card detail-sheet"><button class="dialog-close" value="cancel" aria-label="Sluiten">×</button><div id="detailContent"></div></form></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script><script src="app.js"></script><script src="official-areas.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="app.js?v=3"></script>
+  <script src="official-areas.js?v=3"></script>
 </body>
 </html>
