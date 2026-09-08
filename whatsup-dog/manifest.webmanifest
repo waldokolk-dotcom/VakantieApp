@@ -7,5 +7,8 @@
   "display":"standalone",
   "background_color":"#fbf5e8",
   "theme_color":"#fbf5e8",
-  "icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+  "icons":[
+    {"src":"waldo-mark.png","sizes":"128x128","type":"image/png","purpose":"any maskable"},
+    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
 }
