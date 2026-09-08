@@ -1,34 +1,69 @@
-// Whatsup dog — gemeentelijke hondenkaartlaag Nijkerk.
-// Bron: actuele honden-uitlaatkaart gemeente Nijkerk (college 3 maart 2026).
+// Whatsup dog — officiële hondenkaartlaag gemeente Nijkerk.
+// Geen handgetekende polygonen: geometrie komt rechtstreeks uit de publieke ArcGIS FeatureServer.
 (() => {
-  if (typeof L === 'undefined' || typeof map === 'undefined' || !map || !offleashLayer) return;
+  if(typeof L==='undefined'||typeof map==='undefined'||!map||!offleashLayer)return;
 
-  const areas = [
-    {name:'Marishof',type:'omheind',center:[52.21408,5.49723],size:[32,29]},
-    {name:'Van der Flierhof',type:'omheind',center:[52.22522,5.47101],size:[34,28]},
-    {name:'Antonie Meilingstraat',type:'omheind',center:[52.22012,5.47407],size:[32,30]},
-    {name:'Bramenhof',type:'omheind',center:[52.21931,5.49910],size:[31,30]},
-    {name:'Eikepage',type:'losloop',center:[52.21308,5.46143],size:[48,30]},
-    {name:'Doornsteeg',type:'losloop',center:[52.22435,5.46266],size:[55,32]},
-    {name:'Corlaerpark',type:'losloop',polygon:[[52.2107,5.4727],[52.2125,5.4725],[52.2131,5.4751],[52.2121,5.4772],[52.2105,5.4761]]},
-    {name:'Stadspark Nijkerk',type:'losloop',polygon:[[52.2203,5.4851],[52.2214,5.4850],[52.2217,5.4870],[52.2208,5.4882],[52.2200,5.4872]]},
-    {name:'Dr. F.W. Klaarenbeeksingel, Hoevelaken',type:'omheind',center:[52.17184,5.47101],size:[32,29]}
-  ];
-  window.WHATSUP_DOG_AREAS=areas;
+  const SERVICE='https://services-eu1.arcgis.com/LULNl2XDE84l3C2w/ArcGIS/rest/services/Hondenkaart/FeatureServer/0';
+  const QUERY=`${SERVICE}/query?where=1%3D1&outFields=OBJECTID%2COPMERKING%2CCODE&returnGeometry=true&outSR=4326&f=geojson`;
+  const SOURCE_PAGE='https://www.nijkerk.eu/hondenbeleid';
 
-  const metersToBounds=([lat,lng],[width,height])=>{const dLat=(height/2)/111320;const dLng=(width/2)/(111320*Math.cos(lat*Math.PI/180));return[[lat-dLat,lng-dLng],[lat+dLat,lng+dLng]]};
-  offleashLayer.clearLayers();
+  const styleFor=code=>code==='Hondenspeeltuin'
+    ?{color:'#7435b7',weight:4,fillColor:'#c799ef',fillOpacity:.48}
+    :{color:'#0879e6',weight:4,fillColor:'#55bfff',fillOpacity:.48};
 
-  areas.forEach(area=>{
-    const fenced=area.type==='omheind';
-    const style={color:'#0879e6',weight:fenced?4.5:4,fillColor:'#55bfff',fillOpacity:fenced?.58:.48,dashArray:fenced?null:'7 4'};
-    const shape=area.polygon?L.polygon(area.polygon,style):L.rectangle(metersToBounds(area.center,area.size),style);
-    shape.bindTooltip(`🐕 ${area.name}`,{permanent:true,direction:'center',className:'dog-area-label',opacity:.98});
-    shape.on('click',()=>{if(typeof window.openDogAreaDetail==='function')window.openDogAreaDetail(area)});
-    shape.addTo(offleashLayer);
-  });
+  function safeName(properties,index){
+    const note=String(properties?.OPMERKING||'').trim();
+    if(note&&note.toLowerCase()!=='null')return note;
+    return properties?.CODE==='Hondenspeeltuin'?'Hondenspeeltuin':`Losloopgebied ${index+1}`;
+  }
 
-  const p=typeof profile==='function'?profile():null;
-  if(p&&Number.isFinite(Number(p.homeLat))&&Number.isFinite(Number(p.homeLng)))map.setView([Number(p.homeLat),Number(p.homeLng)],14);
-  else map.setView([52.2182,5.4835],14);
+  async function loadOfficialAreas(){
+    offleashLayer.clearLayers();
+    try{
+      const response=await fetch(QUERY,{headers:{Accept:'application/geo+json,application/json'}});
+      if(!response.ok)throw new Error(`ArcGIS ${response.status}`);
+      const data=await response.json();
+      if(!data||!Array.isArray(data.features))throw new Error('Geen GeoJSON-features ontvangen');
+
+      const dogFeatures=data.features.filter(feature=>['Losloop','Hondenspeeltuin'].includes(feature?.properties?.CODE));
+      const areas=[];
+
+      dogFeatures.forEach((feature,index)=>{
+        const code=feature.properties?.CODE||'Losloop';
+        const geo=L.geoJSON(feature,{style:styleFor(code)});
+        const bounds=geo.getBounds();
+        if(!bounds.isValid())return;
+        const center=bounds.getCenter();
+        const area={
+          objectId:feature.properties?.OBJECTID??index,
+          name:safeName(feature.properties,index),
+          type:code==='Hondenspeeltuin'?'hondenspeeltuin':'losloop',
+          code,
+          center:[center.lat,center.lng],
+          properties:feature.properties,
+          geometry:feature.geometry,
+          source:SERVICE
+        };
+        areas.push(area);
+        geo.bindTooltip(`${code==='Hondenspeeltuin'?'🎾':'🐕'} ${area.name}`,{permanent:true,direction:'center',className:code==='Hondenspeeltuin'?'municipal-area-label municipal-dogpark-label':'municipal-area-label',opacity:.98});
+        geo.bindPopup(`<b>${code==='Hondenspeeltuin'?'🎾':'🐕'} ${escapeHTML(area.name)}</b><br>${code==='Hondenspeeltuin'?'Hondenspeeltuin':'Officieel losloopgebied'}<br><span class="official-geometry-note">Exacte begrenzing rechtstreeks uit de GIS-laag van gemeente Nijkerk.</span><br><a href="${SOURCE_PAGE}" target="_blank" rel="noopener">Gemeentelijke hondenkaart ↗</a>`);
+        geo.on('click',()=>{if(typeof window.openDogAreaDetail==='function')window.openDogAreaDetail(area)});
+        geo.addTo(offleashLayer);
+      });
+
+      window.whatsupDogOfficialAreas=areas;
+      window.WHATSUP_DOG_AREAS=areas;
+      document.dispatchEvent(new CustomEvent('dogareasloaded',{detail:{areas,source:SERVICE}}));
+      const p=typeof profile==='function'?profile():null;
+      if(p&&Number.isFinite(Number(p.homeLat))&&Number.isFinite(Number(p.homeLng)))map.setView([Number(p.homeLat),Number(p.homeLng)],14);
+      else map.setView([52.2182,5.4835],14);
+    }catch(error){
+      console.warn('Officiële hondenkaart kon niet worden geladen',error);
+      window.whatsupDogOfficialAreas=[];
+      document.dispatchEvent(new CustomEvent('dogareasloaded',{detail:{areas:[],error:String(error)}}));
+      if(typeof toast==='function')toast('De officiële hondenkaart kon niet laden. We tekenen geen geschatte gebieden.');
+    }
+  }
+
+  loadOfficialAreas();
 })();
