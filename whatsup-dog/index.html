@@ -8,19 +8,61 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=4" />
+  <link rel="stylesheet" href="styles.css?v=5" />
+  <link rel="stylesheet" href="home.css?v=5" />
   <title>Whatsup dog</title>
 </head>
 <body>
   <div id="app" class="app-shell">
     <main>
-      <section id="view-map" class="view active map-view" aria-label="Kaart">
+      <section id="view-home" class="view active home-page" aria-label="Home">
+        <header class="home-header">
+          <div class="home-brand"><img src="icon.svg" alt=""><div><strong>Whatsup dog</strong><small>Samen op pad.</small></div></div>
+          <button class="home-avatar" data-view="profile" aria-label="Profiel"><span id="homeAvatar">🐶</span></button>
+        </header>
+
+        <section class="home-hero">
+          <div class="home-paws">🐾</div>
+          <small id="homeHello">Welkom terug</small>
+          <h1 id="homeTitle">Wat gaan jullie doen?</h1>
+          <p id="homeSubtitle">Een fijne wandeling begint met weten wat er in de buurt speelt.</p>
+          <div class="home-actions">
+            <button id="homeWalk" class="home-action primary-action"><span>🗺️</span><b>Wandelen</b><small>Open de kaart</small></button>
+            <button id="homeReport" class="home-action report-action"><span>＋</span><b>Melden</b><small>Help de buurt</small></button>
+            <button id="homeOffleash" class="home-action"><span>🐕</span><b>Losloop</b><small>Vind een plek</small></button>
+          </div>
+        </section>
+
+        <section class="home-section">
+          <div class="section-heading"><div><small>VANDAAG</small><h2>Rond jullie</h2></div><button id="homeToAlerts" data-view="alerts">Alles →</button></div>
+          <div class="neighbourhood-card">
+            <div class="neighbourhood-icon" id="homeStatusIcon">✓</div>
+            <div><b id="homeStatusTitle">Even snuffelen…</b><p id="homeStatusText">We kijken wat er rond jullie speelt.</p></div>
+          </div>
+        </section>
+
+        <section class="home-section">
+          <div class="section-heading"><div><small>OFFICIËLE DATA</small><h2>Losloop in de buurt</h2></div><button id="homeAllAreas">Op kaart →</button></div>
+          <div id="homeAreas" class="home-area-list"><div class="home-loading">🐾 We halen de officiële hondenkaart op…</div></div>
+          <p class="home-source" id="homeAreaSource">Bron: officiële hondenkaart gemeente Nijkerk.</p>
+        </section>
+
+        <section class="home-community-card" id="homeCommunity">
+          <div class="community-copy"><small>WHATSUP DOG</small><h2>Wie loopt er mee?</h2><p>Praat met hondenmensen uit je buurt, deel tips of spreek samen af.</p><button data-view="chat">Open Whatsup dog →</button></div><div class="community-dog">🐕</div>
+        </section>
+
+        <section class="home-tip-card">
+          <span>🌿</span><div><small>SEIZOENSTIP</small><b>Let onderweg op grasaren</b><p>Meld irritante of gevaarlijke vegetatie direct op de kaart.</p></div><button id="homeVegetation">Melden</button>
+        </section>
+      </section>
+
+      <section id="view-map" class="view map-view" aria-label="Kaart">
         <div id="map" class="map" aria-label="Kaart met meldingen en hondenlosloopgebieden"></div>
         <div class="map-brand-card"><img class="dog-logo-img" src="icon.svg" width="38" height="38" style="border-radius:12px" alt=""><div><strong>Whatsup dog</strong><small>Samen op pad. Een mooiere buurt.</small></div></div>
         <button id="profileQuick" class="map-search avatar-btn" aria-label="Profiel openen"><span id="profileQuickAvatar">🐶</span></button>
         <div class="map-toolbar"><div class="chip-row" id="filterRow"><button class="chip active" data-filter="all">Alles</button><button class="chip" data-filter="danger">⚠️ Gevaar</button><button class="chip" data-filter="vegetation">🌿 Vegetatie</button><button class="chip blue" data-filter="offleash">🐕 Losloop</button></div></div>
         <button id="locateBtn" class="map-fab locate" aria-label="Mijn locatie">◎</button>
-        <div class="map-bottom-card"><div class="layer-row"><div class="layer-symbol">◆</div><div class="layer-copy"><b>Vastgestelde losloopgebieden</b><small>Officiële locaties in de gemeente Nijkerk</small></div><label class="toggle" aria-label="Losloopgebieden tonen"><input id="offleashToggle" type="checkbox" checked><span></span></label></div><button id="reportFab" class="report-fab"><span>＋</span> MELDEN</button></div>
+        <div class="map-bottom-card"><div class="layer-row"><div class="layer-symbol">◆</div><div class="layer-copy"><b>Officiële hondenlocaties</b><small>Rechtstreeks uit de gemeentelijke GIS-laag</small></div><label class="toggle" aria-label="Losloopgebieden tonen"><input id="offleashToggle" type="checkbox" checked><span></span></label></div><button id="reportFab" class="report-fab"><span>＋</span> MELDEN</button></div>
       </section>
 
       <section id="view-chat" class="view page-view chat-page" aria-label="Whatsup dog chat">
@@ -44,7 +86,7 @@
       </section>
     </main>
 
-    <nav class="bottom-nav" aria-label="Hoofdnavigatie"><button class="nav-item active" data-view="map"><span>🗺️</span><small>Kaart</small></button><button class="nav-item" data-view="chat"><span>💬</span><small>Whatsup dog</small></button><button class="nav-item" data-view="alerts"><span class="nav-badge">●</span><span>🔔</span><small>Meldingen</small></button><button class="nav-item" data-view="profile"><span id="navProfileAvatar">🐶</span><small>Profiel</small></button></nav>
+    <nav class="bottom-nav five-nav" aria-label="Hoofdnavigatie"><button class="nav-item active" data-view="home"><span>🐾</span><small>Home</small></button><button class="nav-item" data-view="map"><span>🗺️</span><small>Kaart</small></button><button class="nav-item" data-view="chat"><span>💬</span><small>Whatsup</small></button><button class="nav-item" data-view="alerts"><span class="nav-badge">●</span><span>🔔</span><small>Meldingen</small></button><button class="nav-item" data-view="profile"><span id="navProfileAvatar">🐶</span><small>Profiel</small></button></nav>
   </div>
 
   <dialog id="onboardingDialog" class="full-dialog onboarding-dialog">
@@ -60,9 +102,12 @@
 
   <dialog id="reportDialog" class="sheet-dialog"><form id="reportForm" class="sheet-card report-sheet"><button type="button" class="dialog-close" data-close-dialog aria-label="Sluiten">×</button><div class="sheet-paw">🐾</div><h2>Wat heb je gespot?</h2><p>Help andere honden en baasjes in de buurt.</p><div id="reportTypes" class="report-grid"></div><div id="reportDetails" class="report-details hidden"><div id="vegetationKinds" class="subtype-grid hidden"></div><label class="field"><span>Korte omschrijving</span><textarea id="reportText" maxlength="220" rows="3" placeholder="Wat moeten andere hondenbezitters weten?"></textarea></label><div class="location-card">📍 <span id="reportLocationText">Plaats op het midden van de kaart</span></div><button id="publishReport" class="report-fab inside" type="submit">🐾 MELDEN</button></div></form></dialog>
   <dialog id="detailDialog" class="sheet-dialog"><form class="sheet-card detail-sheet"><button type="button" class="dialog-close" data-close-dialog aria-label="Sluiten">×</button><div id="detailContent"></div></form></dialog>
-  <dialog id="areaDialog" class="full-dialog area-dialog"><div class="area-card"><div class="area-photo"><img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Dog_park_photos_(14293243077).jpg?width=900" alt="Hond in een park"><button type="button" class="area-back" data-close-dialog aria-label="Terug">‹</button><button type="button" class="area-favorite" aria-label="Favoriet">♡</button></div><div class="area-body"><span class="official-pill">🐕 Officieel losloopgebied</span><h2 id="areaName">Losloopgebied</h2><p id="areaMeta">Nijkerk</p><p id="areaDescription">Een fijne plek om samen te snuffelen en te wandelen.</p><div class="feature-grid"><div>🐾<small>Loslopen<br>toegestaan</small></div><div>🌲<small>Veel<br>natuur</small></div><div>〰️<small>Ruimte om<br>te spelen</small></div><div>🪑<small>Buurtplek<br>voor baasjes</small></div></div><div class="area-actions"><button id="areaShowMap" class="outline-btn">🗺️ Toon op kaart</button><button id="areaRoute" class="blue-btn">➤ Route</button></div><div class="recent-head"><b>Recente meldingen</b><span>Bekijk alles →</span></div><div class="area-alert"><span>🌿⚠️</span><div><b>Vegetatie</b><p>Controleer meldingen in de buurt voordat je gaat wandelen.</p></div></div></div></div></dialog>
+  <dialog id="areaDialog" class="full-dialog area-dialog"><div class="area-card"><div class="area-photo"><img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Dog_park_photos_(14293243077).jpg?width=900" alt="Hond in een park"><button type="button" class="area-back" data-close-dialog aria-label="Terug">‹</button><button type="button" class="area-favorite" aria-label="Favoriet">♡</button></div><div class="area-body"><span class="official-pill">🐕 Officiële hondenlocatie</span><h2 id="areaName">Losloopgebied</h2><p id="areaMeta">Gemeente Nijkerk</p><p id="areaDescription">Een fijne plek om samen te snuffelen en te wandelen.</p><div class="feature-grid"><div>🐾<small>Officiële<br>geometrie</small></div><div>🌲<small>Op de<br>hondenkaart</small></div><div>〰️<small>Exacte<br>begrenzing</small></div><div>🗺️<small>Gemeente<br>Nijkerk</small></div></div><div class="area-actions"><button id="areaShowMap" class="outline-btn">🗺️ Toon op kaart</button><button id="areaRoute" class="blue-btn">➤ Route</button></div><div class="recent-head"><b>Recente meldingen</b><span>Bekijk alles →</span></div><div class="area-alert"><span>🌿⚠️</span><div><b>Vegetatie</b><p>Controleer meldingen in de buurt voordat je gaat wandelen.</p></div></div></div></div></dialog>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script><script src="app.js?v=4"></script><script src="official-areas.js?v=4"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="app.js?v=5"></script>
+  <script src="official-areas.js?v=5"></script>
+  <script src="home.js?v=5"></script>
 </body>
 </html>
