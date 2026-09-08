@@ -1,5 +1,5 @@
-// Whatsup dog v1 — gemeentelijke hondenkaartlaag Nijkerk.
-// Bronnen: actuele honden-uitlaatkaart gemeente Nijkerk (college 3 maart 2026)
+// Whatsup dog v1 — gemeentelijke hondenkaartlaag Nijkerk + woonplaatsgestuurde kaartstart.
+// Bronnen hondenkaart: actuele honden-uitlaatkaart gemeente Nijkerk (college 3 maart 2026)
 // en het geldende Aanwijzingsbesluit honden Nijkerk.
 (() => {
   if (typeof L === 'undefined' || typeof map === 'undefined' || !map) return;
@@ -44,7 +44,7 @@
     shape.addTo(offleashLayer);
   });
 
-  // Begin voortaan echt in Nijkerk en duidelijk verder ingezoomd.
+  // Zonder ingestelde woonplaats blijft Nijkerk de logische demonstratiestart.
   map.setView([52.2182,5.4835],14);
 
   // Zet de voorbeeldmeldingen ook in het zichtbare Nijkerkse kaartbeeld.
@@ -70,4 +70,107 @@
 
   const losloopChip=document.querySelector('[data-filter="offleash"]');
   if (losloopChip) losloopChip.title='Toon de vastgestelde hondenlosloopgebieden';
+
+  // --- Woonplaats van de hond: alleen plaatsnaam, geen huisadres of live GPS. ---
+  const dialog=document.getElementById('onboardingDialog');
+  const form=document.getElementById('onboardingForm');
+  const nameField=document.getElementById('onboardingName')?.closest('.field');
+  const privacyNote=form?.querySelector('.privacy-note');
+  const saveButton=document.getElementById('saveProfile');
+
+  if (!dialog || !form || !nameField || !saveButton) return;
+
+  const homeField=document.createElement('label');
+  homeField.className='field';
+  homeField.innerHTML='<span>Waar woont je hond?</span><input id="onboardingHome" maxlength="80" autocomplete="address-level2" placeholder="Bijv. Nijkerk" required><small style="color:#77695e;line-height:1.35">Alleen woonplaats. Geen straat, huisnummer of exacte GPS-locatie.</small>';
+  nameField.insertAdjacentElement('afterend',homeField);
+
+  const homeInput=document.getElementById('onboardingHome');
+  if (privacyNote) privacyNote.textContent='🔒 We bewaren in deze demo alleen naam/avatar en de woonplaats als kaartvoorkeur op dit toestel. Geen huisadres en geen openbare live locatie.';
+
+  const current=typeof profile==='function' ? profile() : null;
+  if (current?.homePlace) homeInput.value=current.homePlace;
+
+  const homeLabelFromResult=(result,fallback)=>{
+    const a=result.address||{};
+    return a.city||a.town||a.village||a.municipality||a.county||fallback;
+  };
+
+  async function geocodePlace(place) {
+    const url='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&addressdetails=1&accept-language=nl&q='+encodeURIComponent(place);
+    const response=await fetch(url,{headers:{Accept:'application/json'}});
+    if (!response.ok) throw new Error('geocoding-failed');
+    const results=await response.json();
+    if (!Array.isArray(results) || !results.length) return null;
+    const first=results[0];
+    const lat=Number(first.lat),lng=Number(first.lon);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+    return {lat,lng,label:homeLabelFromResult(first,place)};
+  }
+
+  function applyHomeView(p) {
+    const lat=Number(p?.homeLat),lng=Number(p?.homeLng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return false;
+    map.setView([lat,lng],14);
+    const subtitle=document.getElementById('profileSubtitle');
+    if (subtitle && p.homePlace) subtitle.textContent=`Woont in ${p.homePlace} · klaar om te snuffelen`;
+    return true;
+  }
+
+  // Een eerder ingesteld thuisgebied wint altijd van de Nijkerk-demostart.
+  applyHomeView(current);
+
+  // Bestaande profielen uit v1 zonder woonplaats krijgen de vraag één keer alsnog.
+  if (current && (!current.homePlace || !Number.isFinite(Number(current.homeLat)) || !Number.isFinite(Number(current.homeLng)))) {
+    setTimeout(()=>{
+      if (!dialog.open && typeof openProfileDialog==='function') openProfileDialog();
+      homeInput.focus();
+    },320);
+  }
+
+  // Capture-fase: deze uitgebreidere opslag vervangt de oude lokale submit-handler.
+  form.addEventListener('submit',async event=>{
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
+    const name=document.getElementById('onboardingName').value.trim();
+    const place=homeInput.value.trim();
+    if (!name) { toast('Vul eerst een naam in 🐾'); return; }
+    if (!place) { toast('Vul de woonplaats van je hond in 🐕'); homeInput.focus(); return; }
+
+    const oldText=saveButton.textContent;
+    saveButton.disabled=true;
+    saveButton.textContent='🐾 Even snuffelen naar je woonplaats…';
+
+    try {
+      const found=await geocodePlace(place);
+      if (!found) {
+        toast('Die plaats kon ik niet vinden. Probeer bijvoorbeeld “Nijkerk, Gelderland”.');
+        homeInput.focus();
+        return;
+      }
+
+      const before=typeof profile==='function' ? profile() : null;
+      const next={
+        ...(before||{}),
+        name,
+        avatar:typeof selectedAvatar!=='undefined' ? selectedAvatar : (before?.avatar||'🐶'),
+        homePlace:found.label,
+        homeLat:found.lat,
+        homeLng:found.lng,
+        createdAt:before?.createdAt||new Date().toISOString()
+      };
+      saveJSON(STORAGE.profile,next);
+      updateProfileUI();
+      applyHomeView(next);
+      dialog.close();
+      toast(`Welkom, ${name}! Kaart geopend rond ${found.label} 🐾`);
+    } catch (error) {
+      console.warn('Woonplaats kon niet worden opgezocht',error);
+      toast('Woonplaats opzoeken lukt nu niet. Controleer je internetverbinding en probeer opnieuw.');
+    } finally {
+      saveButton.disabled=false;
+      saveButton.textContent=oldText;
+    }
+  },true);
 })();
