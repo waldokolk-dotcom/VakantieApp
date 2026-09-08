@@ -1,0 +1,11 @@
+{
+  "name":"Whatsup dog",
+  "short_name":"Whatsup dog",
+  "description":"Samen veiliger, leuker en socialer wandelen met je hond.",
+  "start_url":"./",
+  "scope":"./",
+  "display":"standalone",
+  "background_color":"#fff9ec",
+  "theme_color":"#f6b84a",
+  "icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
