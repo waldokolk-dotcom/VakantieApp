@@ -60,6 +60,12 @@
     $('homeAreaSource').textContent=`Bron: officiële ArcGIS-hondenkaart gemeente Nijkerk · ${areas.length} hondenlocaties geladen.`;
   }
 
+  function refresh(){
+    updateHomeProfile();
+    updateNeighbourhood();
+    if(Array.isArray(window.whatsupDogOfficialAreas))renderAreas(window.whatsupDogOfficialAreas);
+  }
+
   function showMapAtHome(){
     showView('map');
     const [lat,lng]=homePoint();
@@ -68,19 +74,21 @@
 
   $('homeWalk')?.addEventListener('click',showMapAtHome);
   $('homeReport')?.addEventListener('click',()=>{showMapAtHome();setTimeout(()=>$('reportFab')?.click(),120)});
-  $('homeOffleash')?.addEventListener('click',()=>{showView('map');setTimeout(()=>{document.querySelector('[data-filter="offleash"]')?.click()},100)});
-  $('homeAllAreas')?.addEventListener('click',()=>{showView('map');setTimeout(()=>{document.querySelector('[data-filter="offleash"]')?.click()},100)});
+  $('homeOffleash')?.addEventListener('click',()=>{showView('map');setTimeout(()=>document.querySelector('[data-filter="offleash"]')?.click(),100)});
+  $('homeAllAreas')?.addEventListener('click',()=>{showView('map');setTimeout(()=>document.querySelector('[data-filter="offleash"]')?.click(),100)});
   $('homeVegetation')?.addEventListener('click',()=>{showMapAtHome();setTimeout(()=>{$('reportFab')?.click();setTimeout(()=>document.querySelector('[data-report-type="vegetation"]')?.click(),70)},100)});
 
   const onboarding=$('onboardingDialog');
   if(onboarding&&!hadProfileAtLoad){
     onboarding.addEventListener('close',()=>{if(profile()?.homePlace)setTimeout(()=>showView('home'),0)},{once:true});
   }
+  onboarding?.addEventListener('close',()=>setTimeout(refresh,0));
+  $('reportDialog')?.addEventListener('close',()=>setTimeout(refresh,0));
+  document.querySelectorAll('[data-view="home"]').forEach(button=>button.addEventListener('click',()=>setTimeout(refresh,0)));
 
   document.addEventListener('dogareasloaded',e=>renderAreas(e.detail?.areas||window.whatsupDogOfficialAreas||[]));
   if(Array.isArray(window.whatsupDogOfficialAreas))renderAreas(window.whatsupDogOfficialAreas);
 
-  window.refreshWhatsupHome=()=>{updateHomeProfile();updateNeighbourhood();if(Array.isArray(window.whatsupDogOfficialAreas))renderAreas(window.whatsupDogOfficialAreas)};
-  updateHomeProfile();
-  updateNeighbourhood();
+  window.refreshWhatsupHome=refresh;
+  refresh();
 })();
