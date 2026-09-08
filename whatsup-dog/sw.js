@@ -1,14 +1,11 @@
-const CACHE='whatsup-dog-v3';
-const CORE=['./','./index.html','./styles.css?v=3','./app.js?v=3','./official-areas.js?v=3','./manifest.webmanifest','./icon.svg'];
+const CACHE='whatsup-dog-v4-design';
+const CORE=['./','./index.html','./styles.css?v=4','./app.js?v=4','./official-areas.js?v=4','./manifest.webmanifest','./icon.svg'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',event=>{
   if(event.request.method!=='GET')return;
   const url=new URL(event.request.url);
-  if(url.origin!==location.origin){event.respondWith(fetch(event.request));return;}
-  if(event.request.mode==='navigate'){
-    event.respondWith(fetch(event.request).then(response=>{const clone=response.clone();caches.open(CACHE).then(cache=>cache.put('./index.html',clone));return response}).catch(()=>caches.match('./index.html')));
-    return;
-  }
-  event.respondWith(fetch(event.request).then(response=>{const clone=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,clone));return response}).catch(()=>caches.match(event.request)));
+  if(url.origin!==location.origin){event.respondWith(fetch(event.request));return}
+  if(event.request.mode==='navigate'){event.respondWith(fetch(event.request).then(response=>{const clone=response.clone();caches.open(CACHE).then(cache=>cache.put('./index.html',clone));return response}).catch(()=>caches.match('./index.html')));return}
+  event.respondWith(fetch(event.request,{cache:'no-store'}).then(response=>{const clone=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,clone));return response}).catch(()=>caches.match(event.request)))
 });
