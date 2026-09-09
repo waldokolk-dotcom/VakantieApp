@@ -10,6 +10,16 @@
     const script=document.createElement('script');script.src='./smart-report-v3.js?v=3';script.async=false;script.dataset.wdSmartReport='1';document.body.appendChild(script);
   }
 
+  // Community backend is optional and offline-first. Config is loaded before the client.
+  const loadCommunity=()=>{
+    if(document.querySelector('script[data-wd-community]'))return;
+    const script=document.createElement('script');script.src='./community-backend.js?v=1';script.async=false;script.dataset.wdCommunity='1';document.body.appendChild(script);
+  };
+  if(window.WHATSUP_DOG_BACKEND)loadCommunity();
+  else if(!document.querySelector('script[data-wd-backend-config]')){
+    const config=document.createElement('script');config.src='./backend-config.js?v=1';config.async=false;config.dataset.wdBackendConfig='1';config.onload=loadCommunity;document.body.appendChild(config);
+  }
+
   if(typeof L==='undefined'||typeof map==='undefined'||!map||typeof offleashLayer==='undefined'||!offleashLayer)return;
 
   const SOURCE_PAGE='https://www.nijkerk.eu/hondenbeleid';
