@@ -6,7 +6,7 @@
 
   const SOURCE_PAGE='https://www.nijkerk.eu/hondenbeleid';
   const OFFICIAL_NIJKERK_MAP='https://cuatro.sim-cdn.nl/nijkerk/uploads/2.2%20Hondenuitlaatkaart%20Nijkerk%20jan%202026.pdf?cb=-utJx3kH';
-  const GEOJSON_URL='./data/nijkerk-losloopgebieden.geojson?v=20260909-1';
+  const GEOJSON_URL='./data/nijkerk-losloopgebieden.geojson?v=20260909-2';
   const style={color:'#0879e6',weight:3,fillColor:'#47b9f4',fillOpacity:.36};
   const hoverStyle={color:'#0069c7',weight:4,fillColor:'#40b5f2',fillOpacity:.58};
 
@@ -24,6 +24,15 @@
   const layerSub=document.querySelector('.layer-copy small');
   if(layerTitle)layerTitle.textContent='Losloopgebieden Nijkerk';
   if(layerSub)layerSub.textContent='Even snuffelen in de officiële kaart…';
+
+  // De aanwijzing op de gemeentekaart is officieel; de digitale geometrie is onze afgeleide.
+  const officialPill=document.querySelector('.official-pill');
+  if(officialPill)officialPill.textContent='🐕 Vastgesteld losloopgebied';
+  const featureBoxes=document.querySelectorAll('.feature-grid > div');
+  if(featureBoxes[0])featureBoxes[0].innerHTML='🗺️<small>Uit officiële<br>kaart getraceerd</small>';
+  if(featureBoxes[1])featureBoxes[1].innerHTML='📅<small>Besluit<br>3 maart 2026</small>';
+  if(featureBoxes[2])featureBoxes[2].innerHTML='🐾<small>Loslopen<br>toegestaan</small>';
+  if(featureBoxes[3])featureBoxes[3].innerHTML='🏛️<small>Gemeente<br>Nijkerk</small>';
 
   try{
     const response=await fetch(GEOJSON_URL,{cache:'no-store',headers:{Accept:'application/geo+json,application/json'}});
