@@ -4,10 +4,10 @@
 (async()=>{
   // Load the smart-report module after the core app, without adding a build system.
   if(!document.querySelector('link[data-wd-smart-report]')){
-    const link=document.createElement('link');link.rel='stylesheet';link.href='./smart-report.css?v=2';link.dataset.wdSmartReport='1';document.head.appendChild(link);
+    const link=document.createElement('link');link.rel='stylesheet';link.href='./smart-report.css?v=3';link.dataset.wdSmartReport='1';document.head.appendChild(link);
   }
   if(!document.querySelector('script[data-wd-smart-report]')){
-    const script=document.createElement('script');script.src='./smart-report-v2.js?v=2';script.async=false;script.dataset.wdSmartReport='1';document.body.appendChild(script);
+    const script=document.createElement('script');script.src='./smart-report-v3.js?v=3';script.async=false;script.dataset.wdSmartReport='1';document.body.appendChild(script);
   }
 
   if(typeof L==='undefined'||typeof map==='undefined'||!map||typeof offleashLayer==='undefined'||!offleashLayer)return;
