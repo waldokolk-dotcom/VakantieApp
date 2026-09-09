@@ -10,7 +10,7 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,7 +21,7 @@ jobs:
           node --check whatsup-dog/app.js
           node --check whatsup-dog/official-areas.js
           node --check whatsup-dog/home.js
-          node --check whatsup-dog/smart-report.js
+          node --check whatsup-dog/smart-report-v2.js
           node --check whatsup-dog/sw.js
       - name: Validate Nijkerk GeoJSON
         run: |
@@ -37,10 +37,27 @@ jobs:
           }
           console.log(`Validated ${data.features.length} Nijkerk losloop polygons`);
           NODE
-      - name: Verify smart report resources
+      - name: Verify smart report v2 wiring
         run: |
-          test -s whatsup-dog/smart-report.js
+          test -s whatsup-dog/smart-report-v2.js
           test -s whatsup-dog/smart-report.css
-          grep -q 'canvas-reencoded-no-original-exif' whatsup-dog/smart-report.js
-          grep -q 'geometryType' whatsup-dog/smart-report.js
-          grep -q 'mobilenet' whatsup-dog/smart-report.js
+          grep -q 'smart-report-v2.js' whatsup-dog/official-areas.js
+          grep -q 'canvas-reencoded-no-original-exif' whatsup-dog/smart-report-v2.js
+          grep -q 'startPointPicking' whatsup-dog/smart-report-v2.js
+          grep -q 'startAreaDrawing' whatsup-dog/smart-report-v2.js
+          grep -q 'mobilenet' whatsup-dog/smart-report-v2.js
+          grep -q 'whatsup-dog-v11-smart-report-v2' whatsup-dog/sw.js
+      - name: Verify mobile reporting DOM hooks
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const html=fs.readFileSync('whatsup-dog/index.html','utf8');
+          const js=fs.readFileSync('whatsup-dog/smart-report-v2.js','utf8');
+          for(const id of ['reportDialog','reportForm','reportTypes','reportDetails','vegetationKinds','reportFab','detailDialog']){
+            if(!html.includes(`id="${id}"`)) throw new Error(`Missing DOM hook ${id}`);
+          }
+          for(const id of ['smartReportToolsV2','reportCameraV2','reportPhotoV2','recognizePhotoV2','geometryPointV2','geometryAreaV2','pickOnMapV2']){
+            if(!js.includes(id)) throw new Error(`Missing smart hook ${id}`);
+          }
+          console.log('Mobile reporting flow hooks present');
+          NODE
