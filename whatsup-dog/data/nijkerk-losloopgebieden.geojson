@@ -21,7 +21,7 @@
         "source_decision": "collegebesluit 3 maart 2026",
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 15625.2,
+        "area_m2_approx": 6115.4,
         "id": "nijkerk-losloop-01",
         "name": "Losloopgebied 1",
         "quality": "digitised-from-official-pdf-v1"
@@ -31,48 +31,48 @@
         "coordinates": [
           [
             [
-              5.4616025,
-              52.2476521
+              5.4679747,
+              52.2374845
             ],
             [
-              5.4613229,
-              52.2476521
+              5.4677915,
+              52.2374845
             ],
             [
-              5.4608908,
-              52.2461042
+              5.4675084,
+              52.2365601
             ],
             [
-              5.4606112,
-              52.244007
+              5.4673252,
+              52.2353076
             ],
             [
-              5.4607637,
-              52.2428418
+              5.4674251,
+              52.2346118
             ],
             [
-              5.4579678,
-              52.2410775
+              5.4655933,
+              52.2335582
             ],
             [
-              5.4581457,
-              52.2409443
+              5.4657099,
+              52.2334787
             ],
             [
-              5.4610433,
-              52.2427586
+              5.4676083,
+              52.2345621
             ],
             [
-              5.4609162,
-              52.2443731
+              5.4675251,
+              52.2355263
             ],
             [
-              5.4611704,
-              52.2461708
+              5.4676916,
+              52.2365999
             ],
             [
-              5.4616025,
-              52.2476521
+              5.4679747,
+              52.2374845
             ]
           ]
         ]
@@ -88,7 +88,7 @@
         "source_decision": "collegebesluit 3 maart 2026",
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 4038.2,
+        "area_m2_approx": 1579.9,
         "id": "nijkerk-losloop-02",
         "name": "Losloopgebied 2",
         "quality": "digitised-from-official-pdf-v1"
@@ -98,44 +98,44 @@
         "coordinates": [
           [
             [
-              5.4883921,
-              52.2378152
+              5.4855268,
+              52.2316099
             ],
             [
-              5.487655,
-              52.2374323
+              5.4850439,
+              52.2313813
             ],
             [
-              5.4890784,
-              52.2364503
+              5.4859764,
+              52.2307948
             ],
             [
-              5.4893072,
-              52.2363338
+              5.4861263,
+              52.2307252
             ],
             [
-              5.4896376,
-              52.2364503
+              5.4863428,
+              52.2307948
             ],
             [
-              5.489358,
-              52.2364836
+              5.4861596,
+              52.2308147
             ],
             [
-              5.4881125,
-              52.2374157
+              5.4853436,
+              52.2313713
             ],
             [
-              5.4881125,
-              52.2374656
+              5.4853436,
+              52.2314012
             ],
             [
-              5.4885192,
-              52.237682
+              5.4856101,
+              52.2315304
             ],
             [
-              5.4883921,
-              52.2378152
+              5.4855268,
+              52.2316099
             ]
           ]
         ]
@@ -151,7 +151,7 @@
         "source_decision": "collegebesluit 3 maart 2026",
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 3787.3,
+        "area_m2_approx": 1482.1,
         "id": "nijkerk-losloop-03",
         "name": "Losloopgebied 3",
         "quality": "digitised-from-official-pdf-v1"
@@ -161,24 +161,24 @@
         "coordinates": [
           [
             [
-              5.5039983,
-              52.2302086
+              5.4957517,
+              52.2270673
             ],
             [
-              5.503617,
-              52.2298258
+              5.4955019,
+              52.2268386
             ],
             [
-              5.5044558,
-              52.2294096
+              5.4960514,
+              52.2265901
             ],
             [
-              5.5048879,
-              52.2297925
+              5.4963345,
+              52.2268188
             ],
             [
-              5.5039983,
-              52.2302086
+              5.4957517,
+              52.2270673
             ]
           ]
         ]
@@ -194,9 +194,9 @@
         "source_decision": "collegebesluit 3 maart 2026",
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 2186.6,
+        "area_m2_approx": 855.5,
         "id": "nijkerk-losloop-04",
-        "name": "Doornsteeg",
+        "name": "Van der Flierhof",
         "name_basis": "confirmed location matched to official-map trace",
         "quality": "digitised-from-official-pdf-v1"
       },
@@ -205,28 +205,28 @@
         "coordinates": [
           [
             [
-              5.4660759,
-              52.2278783
+              5.4709056,
+              52.2256756
             ],
             [
-              5.4651863,
-              52.2278118
+              5.4703227,
+              52.2256359
             ],
             [
-              5.465288,
-              52.2274289
+              5.4703894,
+              52.2254073
             ],
             [
-              5.46572,
-              52.2274789
+              5.4706725,
+              52.2254371
             ],
             [
-              5.4661013,
-              52.2276952
+              5.4709222,
+              52.2255663
             ],
             [
-              5.4660759,
-              52.2278783
+              5.4709056,
+              52.2256756
             ]
           ]
         ]
@@ -242,7 +242,7 @@
         "source_decision": "collegebesluit 3 maart 2026",
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 6101.0,
+        "area_m2_approx": 2386.8,
         "id": "nijkerk-losloop-05",
         "name": "Losloopgebied 5",
         "quality": "digitised-from-official-pdf-v1"
@@ -252,24 +252,24 @@
         "coordinates": [
           [
             [
-              5.5054216,
-              52.2240667
+              5.4966842,
+              52.2233993
             ],
             [
-              5.5054216,
-              52.2235008
+              5.4966842,
+              52.2230614
             ],
             [
-              5.506845,
-              52.2235008
+              5.4976168,
+              52.2230614
             ],
             [
-              5.506845,
-              52.2240667
+              5.4976168,
+              52.2233993
             ],
             [
-              5.5054216,
-              52.2240667
+              5.4966842,
+              52.2233993
             ]
           ]
         ]
@@ -285,9 +285,10 @@
         "source_decision": "collegebesluit 3 maart 2026",
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 5332.7,
+        "area_m2_approx": 2086.5,
         "id": "nijkerk-losloop-06",
-        "name": "Losloopgebied 6",
+        "name": "Doornsteeg",
+        "name_basis": "confirmed location matched to official-map trace",
         "quality": "digitised-from-official-pdf-v1"
       },
       "geometry": {
@@ -295,24 +296,24 @@
         "coordinates": [
           [
             [
-              5.4502156,
-              52.2239669
+              5.4605142,
+              52.2233397
             ],
             [
-              5.4502156,
-              52.2234342
+              5.4605142,
+              52.2230216
             ],
             [
-              5.4515373,
-              52.2234342
+              5.4613802,
+              52.2230216
             ],
             [
-              5.4515373,
-              52.2239669
+              5.4613802,
+              52.2233397
             ],
             [
-              5.4502156,
-              52.2239669
+              5.4605142,
+              52.2233397
             ]
           ]
         ]
@@ -328,8 +329,71 @@
         "source_decision": "collegebesluit 3 maart 2026",
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 7663.8,
+        "area_m2_approx": 2998.7,
         "id": "nijkerk-losloop-07",
+        "name": "Losloopgebied 7",
+        "quality": "digitised-from-official-pdf-v1"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.4855601,
+              52.2213119
+            ],
+            [
+              5.485327,
+              52.221302
+            ],
+            [
+              5.4851604,
+              52.2212523
+            ],
+            [
+              5.4850439,
+              52.2212523
+            ],
+            [
+              5.4846275,
+              52.2210634
+            ],
+            [
+              5.4845942,
+              52.2209938
+            ],
+            [
+              5.4846275,
+              52.2208845
+            ],
+            [
+              5.4848107,
+              52.2207453
+            ],
+            [
+              5.4858099,
+              52.2210535
+            ],
+            [
+              5.4855601,
+              52.2213119
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "losloopgebied",
+        "source": "Gemeente Nijkerk",
+        "source_url": "https://www.nijkerk.eu/hondenbeleid",
+        "source_map": "https://cuatro.sim-cdn.nl/nijkerk/uploads/2.2%20Hondenuitlaatkaart%20Nijkerk%20jan%202026.pdf?cb=-utJx3kH",
+        "source_decision": "collegebesluit 3 maart 2026",
+        "digitalisation": "Whatsup dog",
+        "status": "gedigitaliseerd van officiële kaart",
+        "area_m2_approx": 2917.2,
+        "id": "nijkerk-losloop-08",
         "name": "Stadspark Nijkerk",
         "name_basis": "confirmed location matched to official-map trace",
         "quality": "digitised-from-official-pdf-v1"
@@ -339,44 +403,40 @@
         "coordinates": [
           [
             [
-              5.488443,
-              52.2205714
+              5.4849273,
+              52.2206757
             ],
             [
-              5.4880871,
-              52.2205547
+              5.4856267,
+              52.2204372
             ],
             [
-              5.487833,
-              52.2204715
+              5.486043,
+              52.2203477
             ],
             [
-              5.487655,
-              52.2204715
+              5.4861097,
+              52.2203676
             ],
             [
-              5.4870196,
-              52.2201552
+              5.4861596,
+              52.2205068
             ],
             [
-              5.4869688,
-              52.2200387
+              5.4859931,
+              52.2208149
             ],
             [
-              5.4870196,
-              52.2198556
+              5.4858266,
+              52.2208547
             ],
             [
-              5.4872992,
-              52.2196226
+              5.48571,
+              52.2209342
             ],
             [
-              5.4888242,
-              52.2201386
-            ],
-            [
-              5.488443,
-              52.2205714
+              5.4849273,
+              52.2206757
             ]
           ]
         ]
@@ -392,66 +452,7 @@
         "source_decision": "collegebesluit 3 maart 2026",
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 7456.0,
-        "id": "nijkerk-losloop-08",
-        "name": "Losloopgebied 8",
-        "quality": "digitised-from-official-pdf-v1"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              5.4874771,
-              52.2195061
-            ],
-            [
-              5.4885446,
-              52.2191066
-            ],
-            [
-              5.4891801,
-              52.2189568
-            ],
-            [
-              5.4892817,
-              52.2189901
-            ],
-            [
-              5.489358,
-              52.2192231
-            ],
-            [
-              5.4891038,
-              52.2197391
-            ],
-            [
-              5.4888496,
-              52.2198057
-            ],
-            [
-              5.4886717,
-              52.2199389
-            ],
-            [
-              5.4874771,
-              52.2195061
-            ]
-          ]
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "category": "losloopgebied",
-        "source": "Gemeente Nijkerk",
-        "source_url": "https://www.nijkerk.eu/hondenbeleid",
-        "source_map": "https://cuatro.sim-cdn.nl/nijkerk/uploads/2.2%20Hondenuitlaatkaart%20Nijkerk%20jan%202026.pdf?cb=-utJx3kH",
-        "source_decision": "collegebesluit 3 maart 2026",
-        "digitalisation": "Whatsup dog",
-        "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 2776.5,
+        "area_m2_approx": 1086.4,
         "id": "nijkerk-losloop-09",
         "name": "Antonie Meilingstraat",
         "name_basis": "confirmed location matched to official-map trace",
@@ -462,28 +463,28 @@
         "coordinates": [
           [
             [
-              5.4720997,
-              52.2187737
+              5.4748523,
+              52.2202384
             ],
             [
-              5.4720997,
-              52.2185407
+              5.4748523,
+              52.2200992
             ],
             [
-              5.4726081,
-              52.2182245
+              5.4751854,
+              52.2199104
             ],
             [
-              5.4731164,
-              52.2184575
+              5.4755184,
+              52.2200495
             ],
             [
-              5.472786,
-              52.2187737
+              5.4753019,
+              52.2202384
             ],
             [
-              5.4720997,
-              52.2187737
+              5.4748523,
+              52.2202384
             ]
           ]
         ]
@@ -499,7 +500,7 @@
         "source_decision": "collegebesluit 3 maart 2026",
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 5526.7,
+        "area_m2_approx": 2162.5,
         "id": "nijkerk-losloop-10",
         "name": "Losloopgebied 10",
         "quality": "digitised-from-official-pdf-v1"
@@ -509,52 +510,52 @@
         "coordinates": [
           [
             [
-              5.4672705,
-              52.2191898
+              5.4716883,
+              52.2204869
             ],
             [
-              5.4665842,
-              52.2189069
+              5.4712386,
+              52.2203179
             ],
             [
-              5.4668892,
-              52.218291
+              5.4714385,
+              52.2199501
             ],
             [
-              5.4670417,
-              52.2183243
+              5.4715384,
+              52.21997
             ],
             [
-              5.467118,
-              52.2182744
+              5.4715884,
+              52.2199402
             ],
             [
-              5.467118,
-              52.2182078
+              5.4715884,
+              52.2199004
             ],
             [
-              5.4669655,
-              52.2181745
+              5.4714884,
+              52.2198805
             ],
             [
-              5.4671942,
-              52.2177584
+              5.4716383,
+              52.219632
             ],
             [
-              5.4672705,
-              52.2178416
+              5.4716883,
+              52.2196817
             ],
             [
-              5.4673976,
-              52.2178583
+              5.4717715,
+              52.2196917
             ],
             [
-              5.4675755,
-              52.2179581
+              5.4718881,
+              52.2197513
             ],
             [
-              5.4672705,
-              52.2191898
+              5.4716883,
+              52.2204869
             ]
           ]
         ]
@@ -570,9 +571,72 @@
         "source_decision": "collegebesluit 3 maart 2026",
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 1454.7,
+        "area_m2_approx": 5757.9,
         "id": "nijkerk-losloop-11",
-        "name": "Marishof",
+        "name": "Losloopgebied 11",
+        "quality": "digitised-from-official-pdf-v1"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.4546524,
+              52.2193239
+            ],
+            [
+              5.453903,
+              52.2192742
+            ],
+            [
+              5.4530204,
+              52.2194631
+            ],
+            [
+              5.452321,
+              52.2182305
+            ],
+            [
+              5.4526041,
+              52.218141
+            ],
+            [
+              5.4531536,
+              52.219135
+            ],
+            [
+              5.4538031,
+              52.2188766
+            ],
+            [
+              5.4541029,
+              52.2191052
+            ],
+            [
+              5.4545691,
+              52.2192642
+            ],
+            [
+              5.4546524,
+              52.2193239
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "losloopgebied",
+        "source": "Gemeente Nijkerk",
+        "source_url": "https://www.nijkerk.eu/hondenbeleid",
+        "source_map": "https://cuatro.sim-cdn.nl/nijkerk/uploads/2.2%20Hondenuitlaatkaart%20Nijkerk%20jan%202026.pdf?cb=-utJx3kH",
+        "source_decision": "collegebesluit 3 maart 2026",
+        "digitalisation": "Whatsup dog",
+        "status": "gedigitaliseerd van officiële kaart",
+        "area_m2_approx": 857.1,
+        "id": "nijkerk-losloop-12",
+        "name": "Bramenhof",
         "name_basis": "confirmed location matched to official-map trace",
         "quality": "digitised-from-official-pdf-v1"
       },
@@ -581,20 +645,40 @@
         "coordinates": [
           [
             [
-              5.4997028,
-              52.2177085
+              5.4976001,
+              52.217803
             ],
             [
-              5.5008211,
-              52.2171093
+              5.4975335,
+              52.2177732
             ],
             [
-              5.5003128,
-              52.2177251
+              5.4974669,
+              52.2177832
             ],
             [
-              5.4997028,
-              52.2177085
+              5.4974169,
+              52.2177136
+            ],
+            [
+              5.4973004,
+              52.2176639
+            ],
+            [
+              5.4972671,
+              52.2174353
+            ],
+            [
+              5.4976168,
+              52.2174054
+            ],
+            [
+              5.4976501,
+              52.2177832
+            ],
+            [
+              5.4976001,
+              52.217803
             ]
           ]
         ]
@@ -610,50 +694,7 @@
         "source_decision": "collegebesluit 3 maart 2026",
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 1819.9,
-        "id": "nijkerk-losloop-12",
-        "name": "Losloopgebied 12",
-        "quality": "digitised-from-official-pdf-v1"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              5.5106576,
-              52.2173589
-            ],
-            [
-              5.5106576,
-              52.2167764
-            ],
-            [
-              5.5110642,
-              52.2167597
-            ],
-            [
-              5.5110642,
-              52.2173589
-            ],
-            [
-              5.5106576,
-              52.2173589
-            ]
-          ]
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "category": "losloopgebied",
-        "source": "Gemeente Nijkerk",
-        "source_url": "https://www.nijkerk.eu/hondenbeleid",
-        "source_map": "https://cuatro.sim-cdn.nl/nijkerk/uploads/2.2%20Hondenuitlaatkaart%20Nijkerk%20jan%202026.pdf?cb=-utJx3kH",
-        "source_decision": "collegebesluit 3 maart 2026",
-        "digitalisation": "Whatsup dog",
-        "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 14714.5,
+        "area_m2_approx": 37129.2,
         "id": "nijkerk-losloop-13",
         "name": "Losloopgebied 13",
         "quality": "digitised-from-official-pdf-v1"
@@ -663,44 +704,104 @@
         "coordinates": [
           [
             [
-              5.4412688,
-              52.2172424
+              5.4505891,
+              52.2162723
             ],
             [
-              5.440125,
-              52.2171592
+              5.4499063,
+              52.2159641
             ],
             [
-              5.4387779,
-              52.2174755
+              5.4495899,
+              52.2157156
             ],
             [
-              5.4377104,
-              52.2154115
+              5.4493568,
+              52.215318
             ],
             [
-              5.4381424,
-              52.2152617
+              5.4493235,
+              52.2148409
             ],
             [
-              5.4389812,
-              52.2169262
+              5.4496232,
+              52.2144433
             ],
             [
-              5.4399725,
-              52.2164934
+              5.4507223,
+              52.213996
             ],
             [
-              5.44043,
-              52.2168762
+              5.4508389,
+              52.2138369
             ],
             [
-              5.4411417,
-              52.2171426
+              5.4503726,
+              52.2134294
             ],
             [
-              5.4412688,
-              52.2172424
+              5.4509222,
+              52.2129622
+            ],
+            [
+              5.451938,
+              52.2127932
+            ],
+            [
+              5.452321,
+              52.2129423
+            ],
+            [
+              5.4527706,
+              52.2129324
+            ],
+            [
+              5.4528039,
+              52.2134095
+            ],
+            [
+              5.4509055,
+              52.2150894
+            ],
+            [
+              5.4504226,
+              52.2150695
+            ],
+            [
+              5.4500895,
+              52.2149403
+            ],
+            [
+              5.4498564,
+              52.2150198
+            ],
+            [
+              5.4498231,
+              52.2153379
+            ],
+            [
+              5.4500562,
+              52.215825
+            ],
+            [
+              5.4502227,
+              52.2158647
+            ],
+            [
+              5.4510387,
+              52.2157355
+            ],
+            [
+              5.4512719,
+              52.2159144
+            ],
+            [
+              5.4513052,
+              52.2161927
+            ],
+            [
+              5.4505891,
+              52.2162723
             ]
           ]
         ]
@@ -716,9 +817,10 @@
         "source_decision": "collegebesluit 3 maart 2026",
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 2190.5,
+        "area_m2_approx": 1057.7,
         "id": "nijkerk-losloop-14",
-        "name": "Losloopgebied 14",
+        "name": "Marishof",
+        "name_basis": "confirmed location matched to official-map trace",
         "quality": "digitised-from-official-pdf-v1"
       },
       "geometry": {
@@ -726,40 +828,28 @@
         "coordinates": [
           [
             [
-              5.5068196,
-              52.2146958
+              5.4923711,
+              52.2144333
             ],
             [
-              5.5067179,
-              52.2146459
+              5.4921879,
+              52.214155
             ],
             [
-              5.5066162,
-              52.2146625
+              5.4925043,
+              52.2139463
             ],
             [
-              5.50654,
-              52.214546
+              5.4926875,
+              52.2142544
             ],
             [
-              5.5063621,
-              52.2144628
+              5.4926209,
+              52.2143638
             ],
             [
-              5.5063112,
-              52.21408
-            ],
-            [
-              5.506845,
-              52.21403
-            ],
-            [
-              5.5068958,
-              52.2146625
-            ],
-            [
-              5.5068196,
-              52.2146958
+              5.4923711,
+              52.2144333
             ]
           ]
         ]
@@ -775,9 +865,10 @@
         "source_decision": "collegebesluit 3 maart 2026",
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 94904.2,
+        "area_m2_approx": 4202.4,
         "id": "nijkerk-losloop-15",
-        "name": "Losloopgebied 15",
+        "name": "Corlaerpark",
+        "name_basis": "confirmed location matched to official-map trace",
         "quality": "digitised-from-official-pdf-v1"
       },
       "geometry": {
@@ -785,104 +876,24 @@
         "coordinates": [
           [
             [
-              5.435067,
-              52.2121325
+              5.4728873,
+              52.213827
             ],
             [
-              5.4340249,
-              52.2116166
+              5.4725376,
+              52.2138866
             ],
             [
-              5.4335419,
-              52.2112004
+              5.4710888,
+              52.2124155
             ],
             [
-              5.4331861,
-              52.2105347
+              5.4715884,
+              52.2125248
             ],
             [
-              5.4331353,
-              52.2097357
-            ],
-            [
-              5.4335928,
-              52.2090699
-            ],
-            [
-              5.4352703,
-              52.2083209
-            ],
-            [
-              5.4354482,
-              52.2080546
-            ],
-            [
-              5.4347365,
-              52.2073722
-            ],
-            [
-              5.4355753,
-              52.2065899
-            ],
-            [
-              5.4371258,
-              52.2063069
-            ],
-            [
-              5.4377104,
-              52.2065566
-            ],
-            [
-              5.4383966,
-              52.20654
-            ],
-            [
-              5.4384474,
-              52.2073389
-            ],
-            [
-              5.4355499,
-              52.2101518
-            ],
-            [
-              5.4348128,
-              52.2101185
-            ],
-            [
-              5.4343045,
-              52.2099022
-            ],
-            [
-              5.4339486,
-              52.2100353
-            ],
-            [
-              5.4338978,
-              52.2105679
-            ],
-            [
-              5.4342536,
-              52.2113835
-            ],
-            [
-              5.4345078,
-              52.2114501
-            ],
-            [
-              5.4357532,
-              52.2112337
-            ],
-            [
-              5.4361091,
-              52.2115333
-            ],
-            [
-              5.4361599,
-              52.2119994
-            ],
-            [
-              5.435067,
-              52.2121325
+              5.4728873,
+              52.213827
             ]
           ]
         ]
@@ -898,9 +909,10 @@
         "source_decision": "collegebesluit 3 maart 2026",
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 2703.7,
+        "area_m2_approx": 1890.8,
         "id": "nijkerk-losloop-16",
-        "name": "Losloopgebied 16",
+        "name": "Eikepage",
+        "name_basis": "confirmed location matched to official-map trace",
         "quality": "digitised-from-official-pdf-v1"
       },
       "geometry": {
@@ -908,28 +920,56 @@
         "coordinates": [
           [
             [
-              5.4988386,
-              52.2090533
+              5.4619963,
+              52.2128628
             ],
             [
-              5.498559,
-              52.2085872
+              5.4623127,
+              52.2127435
             ],
             [
-              5.4990419,
-              52.2082377
+              5.462779,
+              52.2124155
             ],
             [
-              5.4993215,
-              52.2087537
+              5.463595,
+              52.212336
             ],
             [
-              5.4992198,
-              52.2089368
+              5.463595,
+              52.2124453
             ],
             [
-              5.4988386,
-              52.2090533
+              5.4627623,
+              52.2125248
+            ],
+            [
+              5.462729,
+              52.2127435
+            ],
+            [
+              5.4626624,
+              52.212833
+            ],
+            [
+              5.4625625,
+              52.2128827
+            ],
+            [
+              5.4623793,
+              52.2129224
+            ],
+            [
+              5.4621628,
+              52.2129224
+            ],
+            [
+              5.4620962,
+              52.2129423
+            ],
+            [
+              5.4619963,
+              52.2128628
             ]
           ]
         ]
@@ -945,7 +985,7 @@
         "source_decision": "collegebesluit 3 maart 2026",
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 10740.5,
+        "area_m2_approx": 3115.5,
         "id": "nijkerk-losloop-17",
         "name": "Losloopgebied 17",
         "quality": "digitised-from-official-pdf-v1"
@@ -955,142 +995,24 @@
         "coordinates": [
           [
             [
-              5.4691005,
-              52.208038
+              5.4577498,
+              52.2098708
             ],
             [
-              5.4685668,
-              52.2081378
+              5.4574834,
+              52.2095229
             ],
             [
-              5.4663555,
-              52.2056744
+              5.4584159,
+              52.2091849
             ],
             [
-              5.467118,
-              52.2058575
+              5.4586824,
+              52.2095229
             ],
             [
-              5.4691005,
-              52.208038
-            ]
-          ]
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "category": "losloopgebied",
-        "source": "Gemeente Nijkerk",
-        "source_url": "https://www.nijkerk.eu/hondenbeleid",
-        "source_map": "https://cuatro.sim-cdn.nl/nijkerk/uploads/2.2%20Hondenuitlaatkaart%20Nijkerk%20jan%202026.pdf?cb=-utJx3kH",
-        "source_decision": "collegebesluit 3 maart 2026",
-        "digitalisation": "Whatsup dog",
-        "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 4834.5,
-        "id": "nijkerk-losloop-18",
-        "name": "Losloopgebied 18",
-        "quality": "digitised-from-official-pdf-v1"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              5.4524777,
-              52.2064234
-            ],
-            [
-              5.4529606,
-              52.2062237
-            ],
-            [
-              5.4536723,
-              52.2056744
-            ],
-            [
-              5.4549178,
-              52.2055413
-            ],
-            [
-              5.4549178,
-              52.2057244
-            ],
-            [
-              5.4536469,
-              52.2058575
-            ],
-            [
-              5.4535961,
-              52.2062237
-            ],
-            [
-              5.4534944,
-              52.2063735
-            ],
-            [
-              5.4533419,
-              52.2064567
-            ],
-            [
-              5.4530623,
-              52.2065233
-            ],
-            [
-              5.4527319,
-              52.2065233
-            ],
-            [
-              5.4526302,
-              52.2065566
-            ],
-            [
-              5.4524777,
-              52.2064234
-            ]
-          ]
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "category": "losloopgebied",
-        "source": "Gemeente Nijkerk",
-        "source_url": "https://www.nijkerk.eu/hondenbeleid",
-        "source_map": "https://cuatro.sim-cdn.nl/nijkerk/uploads/2.2%20Hondenuitlaatkaart%20Nijkerk%20jan%202026.pdf?cb=-utJx3kH",
-        "source_decision": "collegebesluit 3 maart 2026",
-        "digitalisation": "Whatsup dog",
-        "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 7963.6,
-        "id": "nijkerk-losloop-19",
-        "name": "Losloopgebied 19",
-        "quality": "digitised-from-official-pdf-v1"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              5.4459963,
-              52.2014134
-            ],
-            [
-              5.4455897,
-              52.2008309
-            ],
-            [
-              5.447013,
-              52.2002649
-            ],
-            [
-              5.4474197,
-              52.2008309
-            ],
-            [
-              5.4459963,
-              52.2014134
+              5.4577498,
+              52.2098708
             ]
           ]
         ]
