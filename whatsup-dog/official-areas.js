@@ -1,61 +1,87 @@
-// Whatsup dog — hondenkaart gemeente Nijkerk.
-// Belangrijk: gebruik uitsluitend bronnen die aantoonbaar van gemeente Nijkerk zijn.
-(() => {
-  if(typeof map==='undefined'||!map||typeof offleashLayer==='undefined'||!offleashLayer)return;
+// Whatsup dog — gedigitaliseerde hondenkaart gemeente Nijkerk.
+// Bronvormen zijn automatisch kleurgetraceerd uit de officiële 2026-PDF van de gemeente.
+// Dit is een digitale afgeleide, geen door de gemeente geleverde bron-GIS.
+(async()=>{
+  if(typeof L==='undefined'||typeof map==='undefined'||!map||typeof offleashLayer==='undefined'||!offleashLayer)return;
 
   const SOURCE_PAGE='https://www.nijkerk.eu/hondenbeleid';
   const OFFICIAL_NIJKERK_MAP='https://cuatro.sim-cdn.nl/nijkerk/uploads/2.2%20Hondenuitlaatkaart%20Nijkerk%20jan%202026.pdf?cb=-utJx3kH';
+  const GEOJSON_URL='./data/nijkerk-losloopgebieden.geojson?v=20260909-1';
+  const style={color:'#0879e6',weight:3,fillColor:'#47b9f4',fillOpacity:.36};
+  const hoverStyle={color:'#0069c7',weight:4,fillColor:'#40b5f2',fillOpacity:.58};
 
-  // De eerder gekoppelde ArcGIS FeatureServer bleek geografisch bij
-  // Rijswijk/Pijnacker-Nootdorp te horen en is daarom volledig verwijderd.
-  // We tekenen geen geschatte polygonen alsof die officieel zijn.
   offleashLayer.clearLayers();
   window.whatsupDogOfficialAreas=[];
   window.WHATSUP_DOG_AREAS=[];
-  window.WHATSUP_DOG_OFFICIAL_SOURCE={page:SOURCE_PAGE,map:OFFICIAL_NIJKERK_MAP,place:'Nijkerk'};
+  window.WHATSUP_DOG_OFFICIAL_SOURCE={page:SOURCE_PAGE,map:OFFICIAL_NIJKERK_MAP,place:'Nijkerk',status:'digitised-from-official-pdf'};
 
   const p=typeof profile==='function'?profile():null;
-  if(p&&Number.isFinite(Number(p.homeLat))&&Number.isFinite(Number(p.homeLng))){
-    map.setView([Number(p.homeLat),Number(p.homeLng)],14);
-  }else{
-    map.setView([52.2182,5.4835],14);
-  }
+  const hasHome=p&&Number.isFinite(Number(p.homeLat))&&Number.isFinite(Number(p.homeLng));
+  if(hasHome)map.setView([Number(p.homeLat),Number(p.homeLng)],14);
+  else map.setView([52.2182,5.4835],14);
 
   const layerTitle=document.querySelector('.layer-copy b');
   const layerSub=document.querySelector('.layer-copy small');
-  if(layerTitle)layerTitle.textContent='Officiële hondenkaart Nijkerk';
-  if(layerSub)layerSub.textContent='Kaart 2026 · alleen geverifieerde Nijkerk-data';
+  if(layerTitle)layerTitle.textContent='Losloopgebieden Nijkerk';
+  if(layerSub)layerSub.textContent='Even snuffelen in de officiële kaart…';
 
-  const toggle=document.getElementById('offleashToggle');
-  if(toggle){
-    const label=toggle.closest('label');
-    if(label){
-      const link=document.createElement('button');
-      link.type='button';
-      link.textContent='Kaart ↗';
-      link.setAttribute('aria-label','Open officiële hondenkaart van gemeente Nijkerk');
-      link.style.cssText='border:0;border-radius:999px;background:#2f7a2d;color:white;font-weight:900;padding:8px 11px;';
-      link.addEventListener('click',()=>window.open(SOURCE_PAGE,'_blank','noopener'));
-      label.replaceWith(link);
-    }
+  try{
+    const response=await fetch(GEOJSON_URL,{cache:'no-store',headers:{Accept:'application/geo+json,application/json'}});
+    if(!response.ok)throw new Error(`GeoJSON ${response.status}`);
+    const data=await response.json();
+    if(data?.type!=='FeatureCollection'||!Array.isArray(data.features))throw new Error('Ongeldige GeoJSON');
+
+    const areas=[];
+    const geo=L.geoJSON(data,{
+      style:()=>style,
+      onEachFeature:(feature,leafletLayer)=>{
+        const props=feature.properties||{};
+        const bounds=leafletLayer.getBounds?.();
+        if(!bounds?.isValid?.())return;
+        const c=bounds.getCenter();
+        const area={
+          objectId:props.id,
+          id:props.id,
+          name:props.name||'Losloopgebied',
+          type:'losloop',
+          center:[c.lat,c.lng],
+          properties:props,
+          geometry:feature.geometry,
+          source:OFFICIAL_NIJKERK_MAP,
+          derived:true
+        };
+        areas.push(area);
+
+        leafletLayer.on('mouseover',()=>leafletLayer.setStyle?.(hoverStyle));
+        leafletLayer.on('mouseout',()=>leafletLayer.setStyle?.(style));
+        leafletLayer.on('click',()=>{
+          if(typeof window.openDogAreaDetail==='function')window.openDogAreaDetail(area);
+        });
+        const named=props.name_basis&&props.name&&!String(props.name).startsWith('Losloopgebied ');
+        const label=named?`🐕 ${props.name}`:'🐕 Losloopgebied';
+        leafletLayer.bindTooltip(label,{sticky:true,direction:'top',className:'municipal-area-label',opacity:.98});
+      }
+    });
+    geo.eachLayer(layer=>layer.addTo(offleashLayer));
+
+    window.whatsupDogOfficialAreas=areas;
+    window.WHATSUP_DOG_AREAS=areas;
+    if(layerTitle)layerTitle.textContent='Losloopgebieden Nijkerk';
+    if(layerSub)layerSub.textContent=`${areas.length} gebieden · gedigitaliseerd uit officiële kaart 2026`;
+
+    document.dispatchEvent(new CustomEvent('dogareasloaded',{detail:{
+      areas,
+      source:OFFICIAL_NIJKERK_MAP,
+      sourceType:'official-pdf-derived-geojson',
+      place:'Nijkerk',
+      derived:true
+    }}));
+  }catch(error){
+    console.warn('Gedigitaliseerde Nijkerk-hondenkaart kon niet laden',error);
+    offleashLayer.clearLayers();
+    if(layerTitle)layerTitle.textContent='Losloopgebieden Nijkerk';
+    if(layerSub)layerSub.textContent='Kaartlaag kon niet laden · geen geschatte vlakken getoond';
+    document.dispatchEvent(new CustomEvent('dogareasloaded',{detail:{areas:[],source:OFFICIAL_NIJKERK_MAP,error:String(error)}}));
+    if(typeof toast==='function')toast('Losloopgebieden konden niet laden. We tonen geen geschatte gebieden.');
   }
-
-  const offleashChip=document.querySelector('[data-filter="offleash"]');
-  if(offleashChip){
-    offleashChip.textContent='🐕 Nijkerk kaart';
-    offleashChip.addEventListener('click',event=>{
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      map.setView([52.2182,5.4835],14);
-      window.open(SOURCE_PAGE,'_blank','noopener');
-    },true);
-  }
-
-  document.dispatchEvent(new CustomEvent('dogareasloaded',{detail:{
-    areas:[],
-    source:OFFICIAL_NIJKERK_MAP,
-    sourceType:'official-pdf',
-    place:'Nijkerk',
-    pendingVectorisation:true
-  }}));
 })();
