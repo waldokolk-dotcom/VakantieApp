@@ -4,13 +4,14 @@ on:
   push:
     paths:
       - 'whatsup-dog/**'
+      - 'tools/whatsup-dog-ui-smoke.mjs'
       - '.github/workflows/validate-whatsup-dog.yml'
   workflow_dispatch:
 
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -23,6 +24,7 @@ jobs:
           node --check whatsup-dog/home.js
           node --check whatsup-dog/smart-report-v2.js
           node --check whatsup-dog/sw.js
+          node --check tools/whatsup-dog-ui-smoke.mjs
       - name: Validate Nijkerk GeoJSON
         run: |
           node - <<'NODE'
@@ -61,3 +63,9 @@ jobs:
           }
           console.log('Mobile reporting flow hooks present');
           NODE
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Mobile browser reporting smoke test
+        run: node tools/whatsup-dog-ui-smoke.mjs
