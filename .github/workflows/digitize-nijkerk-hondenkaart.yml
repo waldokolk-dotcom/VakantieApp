@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - 'tools/digitize_nijkerk_hondenkaart.py'
+      - 'tools/filter_nijkerk_digitization.py'
       - '.github/workflows/digitize-nijkerk-hondenkaart.yml'
 
 permissions:
@@ -31,19 +32,28 @@ jobs:
       - name: Digitize official Nijkerk map
         run: python tools/digitize_nijkerk_hondenkaart.py
 
+      - name: Remove PDF annotation artifacts and verify anchors
+        run: python tools/filter_nijkerk_digitization.py
+
       - name: Validate GeoJSON
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
           p=Path('whatsup-dog/data/nijkerk-losloopgebieden.geojson')
+          r=Path('whatsup-dog/data/digitize-report.json')
           data=json.loads(p.read_text())
+          report=json.loads(r.read_text())
           assert data['type']=='FeatureCollection'
-          assert 8 <= len(data['features']) <= 30
+          assert report['ok'] is True
+          assert 15 <= len(data['features']) <= 22
+          assert len(data['features']) == report['feature_count']
           for f in data['features']:
               assert f['geometry']['type']=='Polygon'
               assert f['properties']['status']=='gedigitaliseerd van officiële kaart'
-          print('Validated', len(data['features']), 'losloop polygons')
+              assert f['properties']['quality']=='digitised-from-official-pdf-v1'
+          print('Validated', len(data['features']), 'clean losloop polygons')
+          print('Anchor checks:', report['anchor_checks'])
           PY
 
       - name: Commit derived map data
@@ -54,6 +64,6 @@ jobs:
           if git diff --cached --quiet; then
             echo 'No data changes to commit'
           else
-            git commit -m 'Digitize official Nijkerk dog map to GeoJSON'
+            git commit -m 'Refine official Nijkerk dog map GeoJSON'
             git push
           fi
