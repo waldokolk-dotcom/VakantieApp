@@ -20,23 +20,29 @@ def dist_m(a,b):
     q=math.sin(dp/2)**2+math.cos(p1)*math.cos(p2)*math.sin(dl/2)**2
     return 2*r*math.atan2(math.sqrt(q),math.sqrt(1-q))
 
-# The official PDF contains one blue explanatory note at the west side:
-# "Doornsteeg: geen uitlaatstroken, wel afvalbakken." Its glyphs are bright cyan and
-# therefore appear in a pure colour extraction. This geographic box is where those
-# glyphs land after georeferencing; it is not a designated blue polygon on the map.
-ANNOTATION_BOX={'lat_min':52.2268,'lat_max':52.2292,'lon_min':5.4455,'lon_max':5.4510}
+# The PDF contains one bright-blue explanatory note:
+# "Doornsteeg: geen uitlaatstroken, wel afvalbakken." Its letters are not map areas.
+# The first box covers the calibrated-frame transform; the second the improved exact-label
+# transform. Real Doornsteeg/Eikepage polygons lie just outside these boxes.
+ANNOTATION_BOXES=[
+  {'lat_min':52.2268,'lat_max':52.2292,'lon_min':5.4455,'lon_max':5.4510},
+  {'lat_min':52.2247,'lat_max':52.2262,'lon_min':5.4575,'lon_max':5.4612},
+]
 
-# Confirmed named Nijkerk locations used as an independent positional sanity check.
+# Independently located labels/known locations used as positional sanity checks.
 ANCHORS={
   'Marishof':(52.2140797,5.4972254),
   'Bramenhof':(52.2193080,5.4990967),
   'Van der Flierhof':(52.2252229,5.4710108),
-  'Antonie Meilingstraat':(52.22012,5.47407),
+  'Antonie Meilingstraat':(52.2201230,5.4740711),
   'Doornsteeg':(52.22435,5.46266),
-  'Eikepage':(52.21308,5.46143),
+  'Eikepage':(52.2130779,5.4614262),
   'Stadspark Nijkerk':(52.2208,5.4865),
   'Corlaerpark':(52.2115,5.4750),
 }
+
+def in_annotation_box(lat,lon):
+    return any(b['lat_min']<=lat<=b['lat_max'] and b['lon_min']<=lon<=b['lon_max'] for b in ANNOTATION_BOXES)
 
 data=json.loads(GEO.read_text(encoding='utf-8'))
 report=json.loads(REPORT.read_text(encoding='utf-8'))
@@ -45,29 +51,23 @@ kept=[]; removed=[]
 for feature in raw:
     lat,lon=centroid(feature)
     area=float(feature['properties'].get('area_m2_approx') or 0)
-    annotation=(ANNOTATION_BOX['lat_min']<=lat<=ANNOTATION_BOX['lat_max'] and ANNOTATION_BOX['lon_min']<=lon<=ANNOTATION_BOX['lon_max'])
-    tiny=area<800
-    if annotation or tiny:
-        removed.append({'old_id':feature['properties'].get('id'),'centroid':[lat,lon],'area_m2':area,'reason':'pdf-annotation' if annotation else 'tiny-colour-artifact'})
+    if in_annotation_box(lat,lon):
+        removed.append({'old_id':feature['properties'].get('id'),'centroid':[lat,lon],'area_m2':area,'reason':'pdf-annotation'})
     else:
         kept.append(feature)
 
-# Assign a name only where a traced polygon is clearly nearest to a confirmed anchor.
-# Generic polygons remain generic; we do not invent names.
+# Assign names only on a tight positional match. Otherwise keep a generic area name.
 used=set(); anchor_checks={}
 for name,anchor in ANCHORS.items():
-    choices=[]
-    for i,f in enumerate(kept):
-        d=dist_m(anchor,centroid(f))
-        choices.append((d,i))
+    choices=[(dist_m(anchor,centroid(f)),i) for i,f in enumerate(kept)]
     d,i=min(choices) if choices else (999999,None)
     anchor_checks[name]={'nearest_m':round(d,1),'feature_index':i}
-    if i is not None and d<=450 and i not in used:
+    if i is not None and d<=200 and i not in used:
         kept[i]['properties']['name']=name
         kept[i]['properties']['name_basis']='confirmed location matched to official-map trace'
         used.add(i)
 
-# Final stable IDs.
+# Stable IDs north-to-south / west-to-east.
 kept.sort(key=lambda f:(-centroid(f)[0],centroid(f)[1]))
 for i,f in enumerate(kept,1):
     f['properties']['id']=f'nijkerk-losloop-{i:02d}'
@@ -76,15 +76,15 @@ for i,f in enumerate(kept,1):
     f['properties']['quality']='digitised-from-official-pdf-v1'
 
 data['features']=kept
-data['properties']['quality_note']='Automatisch kleurgetraceerd uit de officiële PDF; blauwe toelichtingstekst verwijderd; kaartgeometrie gegeorefereerd naar Nijkerk.'
+data['properties']['quality_note']='Kleurgetraceerd uit de officiële gemeentelijke PDF; blauwe toelichtingstekst verwijderd; gegeorefereerd met Nijkerkse kaartlabels.'
 GEO.write_text(json.dumps(data,indent=2,ensure_ascii=False),encoding='utf-8')
 
 report['raw_feature_count']=len(raw)
 report['feature_count']=len(kept)
 report['removed_artifacts']=removed
 report['anchor_checks']=anchor_checks
-report['qc_expected_range']=[15,22]
-report['ok']=15<=len(kept)<=22 and all(v['nearest_m']<800 for v in anchor_checks.values())
+report['qc_expected_range']=[18,20]
+report['ok']=18<=len(kept)<=20 and all(v['nearest_m']<500 for v in anchor_checks.values())
 REPORT.write_text(json.dumps(report,indent=2,ensure_ascii=False),encoding='utf-8')
 
 print(json.dumps({'raw':len(raw),'kept':len(kept),'removed':len(removed),'anchors':anchor_checks,'ok':report['ok']},indent=2,ensure_ascii=False))
