@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - 'tools/digitize_nijkerk_hondenkaart.py'
+      - 'tools/digitize_nijkerk_hondenkaart_v2.py'
       - 'tools/filter_nijkerk_digitization.py'
       - '.github/workflows/digitize-nijkerk-hondenkaart.yml'
 
@@ -29,8 +30,8 @@ jobs:
       - name: Install map tooling
         run: python -m pip install --disable-pip-version-check pymupdf opencv-python-headless numpy
 
-      - name: Digitize official Nijkerk map
-        run: python tools/digitize_nijkerk_hondenkaart.py
+      - name: Digitize and georeference official Nijkerk map
+        run: python tools/digitize_nijkerk_hondenkaart_v2.py
 
       - name: Remove PDF annotation artifacts and verify anchors
         run: python tools/filter_nijkerk_digitization.py
@@ -53,6 +54,7 @@ jobs:
               assert f['properties']['status']=='gedigitaliseerd van officiële kaart'
               assert f['properties']['quality']=='digitised-from-official-pdf-v1'
           print('Validated', len(data['features']), 'clean losloop polygons')
+          print('Georeference:', report['georef'])
           print('Anchor checks:', report['anchor_checks'])
           PY
 
@@ -64,6 +66,6 @@ jobs:
           if git diff --cached --quiet; then
             echo 'No data changes to commit'
           else
-            git commit -m 'Refine official Nijkerk dog map GeoJSON'
+            git commit -m 'Improve Nijkerk dog map georeferencing'
             git push
           fi
