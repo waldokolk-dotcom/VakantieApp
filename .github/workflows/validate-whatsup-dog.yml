@@ -22,7 +22,7 @@ jobs:
           node --check whatsup-dog/app.js
           node --check whatsup-dog/official-areas.js
           node --check whatsup-dog/home.js
-          node --check whatsup-dog/smart-report-v2.js
+          node --check whatsup-dog/smart-report-v3.js
           node --check whatsup-dog/sw.js
           node --check tools/whatsup-dog-ui-smoke.mjs
       - name: Validate Nijkerk GeoJSON
@@ -39,22 +39,22 @@ jobs:
           }
           console.log(`Validated ${data.features.length} Nijkerk losloop polygons`);
           NODE
-      - name: Verify smart report v2 wiring
+      - name: Verify smart report v3 wiring
         run: |
-          test -s whatsup-dog/smart-report-v2.js
+          test -s whatsup-dog/smart-report-v3.js
           test -s whatsup-dog/smart-report.css
-          grep -q 'smart-report-v2.js' whatsup-dog/official-areas.js
-          grep -q 'canvas-reencoded-no-original-exif' whatsup-dog/smart-report-v2.js
-          grep -q 'startPointPicking' whatsup-dog/smart-report-v2.js
-          grep -q 'startAreaDrawing' whatsup-dog/smart-report-v2.js
-          grep -q 'mobilenet' whatsup-dog/smart-report-v2.js
-          grep -q 'whatsup-dog-v11-smart-report-v2' whatsup-dog/sw.js
+          grep -q 'smart-report-v3.js' whatsup-dog/official-areas.js
+          grep -q 'canvas-reencoded-no-original-exif' whatsup-dog/smart-report-v3.js
+          grep -q 'beginPick' whatsup-dog/smart-report-v3.js
+          grep -q 'finishArea' whatsup-dog/smart-report-v3.js
+          grep -q 'mobilenet' whatsup-dog/smart-report-v3.js
+          grep -q 'whatsup-dog-v12-smart-report-v3' whatsup-dog/sw.js
       - name: Verify mobile reporting DOM hooks
         run: |
           node - <<'NODE'
           const fs=require('fs');
           const html=fs.readFileSync('whatsup-dog/index.html','utf8');
-          const js=fs.readFileSync('whatsup-dog/smart-report-v2.js','utf8');
+          const js=fs.readFileSync('whatsup-dog/smart-report-v3.js','utf8');
           for(const id of ['reportDialog','reportForm','reportTypes','reportDetails','vegetationKinds','reportFab','detailDialog']){
             if(!html.includes(`id="${id}"`)) throw new Error(`Missing DOM hook ${id}`);
           }
