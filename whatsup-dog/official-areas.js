@@ -2,6 +2,14 @@
 // Bronvormen zijn automatisch kleurgetraceerd uit de officiële 2026-PDF van de gemeente.
 // Dit is een digitale afgeleide, geen door de gemeente geleverde bron-GIS.
 (async()=>{
+  // Load the optional smart-report module after the core app, without adding a build system.
+  if(!document.querySelector('link[data-wd-smart-report]')){
+    const link=document.createElement('link');link.rel='stylesheet';link.href='./smart-report.css?v=1';link.dataset.wdSmartReport='1';document.head.appendChild(link);
+  }
+  if(!document.querySelector('script[data-wd-smart-report]')){
+    const script=document.createElement('script');script.src='./smart-report.js?v=1';script.async=false;script.dataset.wdSmartReport='1';document.body.appendChild(script);
+  }
+
   if(typeof L==='undefined'||typeof map==='undefined'||!map||typeof offleashLayer==='undefined'||!offleashLayer)return;
 
   const SOURCE_PAGE='https://www.nijkerk.eu/hondenbeleid';
@@ -25,7 +33,7 @@
     title.className='offleash-layer-control-label';
     title.innerHTML='<b>🐕 Losloop</b><small>kaartlaag</small>';
     control.appendChild(title);
-    control.appendChild(toggleLabel); // move existing switch: existing app.js listener stays attached
+    control.appendChild(toggleLabel);
     mapView.appendChild(control);
 
     const css=document.createElement('style');
@@ -59,7 +67,6 @@
   if(layerTitle)layerTitle.textContent='Hondenkaart Nijkerk';
   if(layerSub)layerSub.textContent='Even snuffelen in de officiële kaart…';
 
-  // De aanwijzing op de gemeentekaart is officieel; de digitale geometrie is onze afgeleide.
   const officialPill=document.querySelector('.official-pill');
   if(officialPill)officialPill.textContent='🐕 Vastgesteld losloopgebied';
   const featureBoxes=document.querySelectorAll('.feature-grid > div');
@@ -82,24 +89,12 @@
         const bounds=leafletLayer.getBounds?.();
         if(!bounds?.isValid?.())return;
         const c=bounds.getCenter();
-        const area={
-          objectId:props.id,
-          id:props.id,
-          name:props.name||'Losloopgebied',
-          type:'losloop',
-          center:[c.lat,c.lng],
-          properties:props,
-          geometry:feature.geometry,
-          source:OFFICIAL_NIJKERK_MAP,
-          derived:true
-        };
+        const area={objectId:props.id,id:props.id,name:props.name||'Losloopgebied',type:'losloop',center:[c.lat,c.lng],properties:props,geometry:feature.geometry,source:OFFICIAL_NIJKERK_MAP,derived:true};
         areas.push(area);
 
         leafletLayer.on('mouseover',()=>leafletLayer.setStyle?.(hoverStyle));
         leafletLayer.on('mouseout',()=>leafletLayer.setStyle?.(style));
-        leafletLayer.on('click',()=>{
-          if(typeof window.openDogAreaDetail==='function')window.openDogAreaDetail(area);
-        });
+        leafletLayer.on('click',()=>{if(typeof window.openDogAreaDetail==='function')window.openDogAreaDetail(area)});
         const named=props.name_basis&&props.name&&!String(props.name).startsWith('Losloopgebied ');
         const label=named?`🐕 ${props.name}`:'🐕 Losloopgebied';
         leafletLayer.bindTooltip(label,{sticky:true,direction:'top',className:'municipal-area-label',opacity:.98});
@@ -112,13 +107,7 @@
     if(layerTitle)layerTitle.textContent='Hondenkaart Nijkerk';
     if(layerSub)layerSub.textContent=`${areas.length} losloopgebieden · officiële kaart 2026`;
 
-    document.dispatchEvent(new CustomEvent('dogareasloaded',{detail:{
-      areas,
-      source:OFFICIAL_NIJKERK_MAP,
-      sourceType:'official-pdf-derived-geojson',
-      place:'Nijkerk',
-      derived:true
-    }}));
+    document.dispatchEvent(new CustomEvent('dogareasloaded',{detail:{areas,source:OFFICIAL_NIJKERK_MAP,sourceType:'official-pdf-derived-geojson',place:'Nijkerk',derived:true}}));
   }catch(error){
     console.warn('Gedigitaliseerde Nijkerk-hondenkaart kon niet laden',error);
     offleashLayer.clearLayers();
