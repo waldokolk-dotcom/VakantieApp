@@ -10,6 +10,40 @@
   const style={color:'#0879e6',weight:3,fillColor:'#47b9f4',fillOpacity:.36};
   const hoverStyle={color:'#0069c7',weight:4,fillColor:'#40b5f2',fillOpacity:.58};
 
+  function moveLayerSwitch(){
+    const toggle=document.getElementById('offleashToggle');
+    const toggleLabel=toggle?.closest('label.toggle');
+    const mapView=document.getElementById('view-map');
+    if(!toggle||!toggleLabel||!mapView||document.querySelector('.offleash-layer-control'))return;
+
+    const control=document.createElement('div');
+    control.className='offleash-layer-control';
+    control.setAttribute('role','group');
+    control.setAttribute('aria-label','Kaartlaag losloopgebieden');
+
+    const title=document.createElement('span');
+    title.className='offleash-layer-control-label';
+    title.innerHTML='<b>🐕 Losloop</b><small>kaartlaag</small>';
+    control.appendChild(title);
+    control.appendChild(toggleLabel); // move existing switch: existing app.js listener stays attached
+    mapView.appendChild(control);
+
+    const css=document.createElement('style');
+    css.textContent=`
+      .offleash-layer-control{position:absolute;z-index:525;right:14px;top:139px;display:flex;align-items:center;gap:10px;background:rgba(255,253,248,.97);border:1px solid rgba(59,36,24,.10);border-radius:18px;padding:8px 10px 8px 12px;box-shadow:0 7px 20px rgba(44,34,25,.14);backdrop-filter:blur(8px)}
+      .offleash-layer-control-label{display:grid;line-height:1.05;color:#3b2418;white-space:nowrap}
+      .offleash-layer-control-label b{font-size:13px;font-weight:1000}
+      .offleash-layer-control-label small{font-size:9px;color:#71655c;margin-top:3px}
+      .offleash-layer-control .toggle span{width:41px;height:25px}
+      .offleash-layer-control .toggle span:after{width:19px;height:19px}
+      .offleash-layer-control .toggle input:checked+span:after{left:19px}
+      .map-bottom-card .layer-row{padding-right:2px}
+      @media(max-width:380px){.offleash-layer-control{right:10px;top:137px;padding:7px 8px}.offleash-layer-control-label small{display:none}}
+    `;
+    document.head.appendChild(css);
+  }
+
+  moveLayerSwitch();
   offleashLayer.clearLayers();
   window.whatsupDogOfficialAreas=[];
   window.WHATSUP_DOG_AREAS=[];
@@ -22,7 +56,7 @@
 
   const layerTitle=document.querySelector('.layer-copy b');
   const layerSub=document.querySelector('.layer-copy small');
-  if(layerTitle)layerTitle.textContent='Losloopgebieden Nijkerk';
+  if(layerTitle)layerTitle.textContent='Hondenkaart Nijkerk';
   if(layerSub)layerSub.textContent='Even snuffelen in de officiële kaart…';
 
   // De aanwijzing op de gemeentekaart is officieel; de digitale geometrie is onze afgeleide.
@@ -75,8 +109,8 @@
 
     window.whatsupDogOfficialAreas=areas;
     window.WHATSUP_DOG_AREAS=areas;
-    if(layerTitle)layerTitle.textContent='Losloopgebieden Nijkerk';
-    if(layerSub)layerSub.textContent=`${areas.length} gebieden · gedigitaliseerd uit officiële kaart 2026`;
+    if(layerTitle)layerTitle.textContent='Hondenkaart Nijkerk';
+    if(layerSub)layerSub.textContent=`${areas.length} losloopgebieden · officiële kaart 2026`;
 
     document.dispatchEvent(new CustomEvent('dogareasloaded',{detail:{
       areas,
@@ -88,7 +122,7 @@
   }catch(error){
     console.warn('Gedigitaliseerde Nijkerk-hondenkaart kon niet laden',error);
     offleashLayer.clearLayers();
-    if(layerTitle)layerTitle.textContent='Losloopgebieden Nijkerk';
+    if(layerTitle)layerTitle.textContent='Hondenkaart Nijkerk';
     if(layerSub)layerSub.textContent='Kaartlaag kon niet laden · geen geschatte vlakken getoond';
     document.dispatchEvent(new CustomEvent('dogareasloaded',{detail:{areas:[],source:OFFICIAL_NIJKERK_MAP,error:String(error)}}));
     if(typeof toast==='function')toast('Losloopgebieden konden niet laden. We tonen geen geschatte gebieden.');
