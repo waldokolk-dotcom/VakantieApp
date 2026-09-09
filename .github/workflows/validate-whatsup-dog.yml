@@ -4,14 +4,16 @@ on:
   push:
     paths:
       - 'whatsup-dog/**'
+      - 'supabase/**'
       - 'tools/whatsup-dog-ui-smoke.mjs'
+      - 'tools/whatsup-dog-community-smoke.mjs'
       - '.github/workflows/validate-whatsup-dog.yml'
   workflow_dispatch:
 
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 14
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -23,8 +25,11 @@ jobs:
           node --check whatsup-dog/official-areas.js
           node --check whatsup-dog/home.js
           node --check whatsup-dog/smart-report-v3.js
+          node --check whatsup-dog/backend-config.js
+          node --check whatsup-dog/community-backend.js
           node --check whatsup-dog/sw.js
           node --check tools/whatsup-dog-ui-smoke.mjs
+          node --check tools/whatsup-dog-community-smoke.mjs
       - name: Validate Nijkerk GeoJSON
         run: |
           node - <<'NODE'
@@ -48,7 +53,22 @@ jobs:
           grep -q 'beginPick' whatsup-dog/smart-report-v3.js
           grep -q 'finishArea' whatsup-dog/smart-report-v3.js
           grep -q 'mobilenet' whatsup-dog/smart-report-v3.js
-          grep -q 'whatsup-dog-v12-smart-report-v3' whatsup-dog/sw.js
+          grep -q 'whatsup-dog-v13-community-backend' whatsup-dog/sw.js
+      - name: Verify secure community backend wiring
+        run: |
+          test -s whatsup-dog/backend-config.js
+          test -s whatsup-dog/community-backend.js
+          test -s supabase/migrations/20260909_whatsup_dog.sql
+          grep -q 'signInAnonymously' whatsup-dog/community-backend.js
+          grep -q 'createSignedUrl' whatsup-dog/community-backend.js
+          grep -q 'wd_shared_report_queue_v1' whatsup-dog/community-backend.js
+          grep -q 'community-backend.js' whatsup-dog/official-areas.js
+          grep -q 'enable row level security' supabase/migrations/20260909_whatsup_dog.sql
+          grep -q "public=false" supabase/migrations/20260909_whatsup_dog.sql
+          grep -q 'owner_id' supabase/migrations/20260909_whatsup_dog.sql
+          if grep -Rqi 'service_role' whatsup-dog/backend-config.js; then
+            echo 'backend-config.js must never contain service_role'; exit 1;
+          fi
       - name: Verify mobile reporting DOM hooks
         run: |
           node - <<'NODE'
@@ -69,3 +89,5 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Mobile browser reporting smoke test
         run: node tools/whatsup-dog-ui-smoke.mjs
+      - name: Shared community backend smoke test
+        run: node tools/whatsup-dog-community-smoke.mjs
