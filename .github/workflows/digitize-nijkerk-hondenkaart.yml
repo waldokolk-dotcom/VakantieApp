@@ -1,0 +1,59 @@
+name: Digitize Nijkerk hondenkaart
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'tools/digitize_nijkerk_hondenkaart.py'
+      - '.github/workflows/digitize-nijkerk-hondenkaart.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  digitize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install map tooling
+        run: python -m pip install --disable-pip-version-check pymupdf opencv-python-headless numpy
+
+      - name: Digitize official Nijkerk map
+        run: python tools/digitize_nijkerk_hondenkaart.py
+
+      - name: Validate GeoJSON
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('whatsup-dog/data/nijkerk-losloopgebieden.geojson')
+          data=json.loads(p.read_text())
+          assert data['type']=='FeatureCollection'
+          assert 8 <= len(data['features']) <= 30
+          for f in data['features']:
+              assert f['geometry']['type']=='Polygon'
+              assert f['properties']['status']=='gedigitaliseerd van officiële kaart'
+          print('Validated', len(data['features']), 'losloop polygons')
+          PY
+
+      - name: Commit derived map data
+        run: |
+          git config user.name 'whatsup-dog-map-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add whatsup-dog/data/nijkerk-losloopgebieden.geojson whatsup-dog/data/digitize-report.json
+          if git diff --cached --quiet; then
+            echo 'No data changes to commit'
+          else
+            git commit -m 'Digitize official Nijkerk dog map to GeoJSON'
+            git push
+          fi
