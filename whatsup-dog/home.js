@@ -45,20 +45,20 @@
   function areaName(area,index){
     const note=(area.name||'').trim();
     if(note&&note.toLowerCase()!=='null')return note;
-    return area.type==='hondenspeeltuin'?'Hondenspeeltuin':`Losloopgebied ${index+1}`;
+    return `Losloopgebied ${index+1}`;
   }
 
   function renderAreas(areas){
     if(!Array.isArray(areas)||!areas.length){
-      $('homeAreas').innerHTML='<div class="gis-error"><b>Alleen Nijkerk-data.</b><br>De verkeerde kaartlaag uit Nootdorp is verwijderd. De officiële Nijkerkse honden-uitlaatkaart van 2026 is nu de bron. Totdat de grenzen betrouwbaar naar interactieve vlakken zijn omgezet, tonen we bewust geen geschatte polygonen.</div>';
+      $('homeAreas').innerHTML='<div class="gis-error"><b>De Nijkerkse kaartlaag is even niet beschikbaar.</b><br>We tonen dan bewust geen geschatte vlakken. De officiële gemeentelijke PDF blijft de bron.</div>';
       $('homeAreaSource').innerHTML='Bron: <a href="https://www.nijkerk.eu/hondenbeleid" target="_blank" rel="noopener">officiële honden-uitlaatkaart gemeente Nijkerk</a>.';
       return;
     }
     const [lat,lng]=homePoint();
     const ranked=areas.map((a,i)=>({...a,_index:i,_distance:distanceKm(lat,lng,a.center[0],a.center[1])})).sort((a,b)=>a._distance-b._distance).slice(0,3);
-    $('homeAreas').innerHTML=ranked.map(a=>`<button class="home-area" data-area-id="${a.objectId??a._index}"><span class="home-area-icon">${a.type==='hondenspeeltuin'?'🎾':'🐕'}</span><span><b>${escapeHTML(areaName(a,a._index))}</b><p>${a.type==='hondenspeeltuin'?'Hondenspeeltuin':'Officieel losloopgebied'}</p></span><span class="home-area-distance">${a._distance<1?`${Math.round(a._distance*1000)} m`:`${a._distance.toFixed(1)} km`} ›</span></button>`).join('');
+    $('homeAreas').innerHTML=ranked.map(a=>`<button class="home-area" data-area-id="${a.objectId??a._index}"><span class="home-area-icon">🐕</span><span><b>${escapeHTML(areaName(a,a._index))}</b><p>Vastgesteld losloopgebied · uit officiële kaart getraceerd</p></span><span class="home-area-distance">${a._distance<1?`${Math.round(a._distance*1000)} m`:`${a._distance.toFixed(1)} km`} ›</span></button>`).join('');
     $('homeAreas').querySelectorAll('[data-area-id]').forEach((button,i)=>button.addEventListener('click',()=>openDogAreaDetail(ranked[i])));
-    $('homeAreaSource').textContent=`Bron: officiële hondenkaart gemeente Nijkerk · ${areas.length} hondenlocaties geladen.`;
+    $('homeAreaSource').textContent=`Gedigitaliseerd uit officiële honden-uitlaatkaart gemeente Nijkerk · ${areas.length} losloopvlakken · besluit 3 maart 2026.`;
   }
 
   function refresh(){
