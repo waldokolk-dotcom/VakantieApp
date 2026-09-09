@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "feature_count": 28,
+  "feature_count": 19,
   "pdf_page": [
     1190.550048828125,
     841.8900146484375
@@ -353,5 +353,127 @@
         404
       ]
     }
+  ],
+  "raw_feature_count": 28,
+  "removed_artifacts": [
+    {
+      "old_id": "nijkerk-losloop-04",
+      "centroid": [
+        52.228083184615386,
+        5.447681694871795
+      ],
+      "area_m2": 1490.2,
+      "reason": "pdf-annotation"
+    },
+    {
+      "old_id": "nijkerk-losloop-06",
+      "centroid": [
+        52.227649470833335,
+        5.448473450000001
+      ],
+      "area_m2": 546.2,
+      "reason": "pdf-annotation"
+    },
+    {
+      "old_id": "nijkerk-losloop-07",
+      "centroid": [
+        52.227636585714286,
+        5.4496443
+      ],
+      "area_m2": 701.5,
+      "reason": "pdf-annotation"
+    },
+    {
+      "old_id": "nijkerk-losloop-08",
+      "centroid": [
+        52.22762422666666,
+        5.45047992
+      ],
+      "area_m2": 490.1,
+      "reason": "pdf-annotation"
+    },
+    {
+      "old_id": "nijkerk-losloop-09",
+      "centroid": [
+        52.22759675416666,
+        5.446879575
+      ],
+      "area_m2": 695.1,
+      "reason": "pdf-annotation"
+    },
+    {
+      "old_id": "nijkerk-losloop-10",
+      "centroid": [
+        52.22719341,
+        5.448125025
+      ],
+      "area_m2": 464.5,
+      "reason": "pdf-annotation"
+    },
+    {
+      "old_id": "nijkerk-losloop-11",
+      "centroid": [
+        52.22718111111111,
+        5.448960261111111
+      ],
+      "area_m2": 544.8,
+      "reason": "pdf-annotation"
+    },
+    {
+      "old_id": "nijkerk-losloop-12",
+      "centroid": [
+        52.22717301666666,
+        5.4469632458333335
+      ],
+      "area_m2": 541.3,
+      "reason": "pdf-annotation"
+    },
+    {
+      "old_id": "nijkerk-losloop-16",
+      "centroid": [
+        52.22001876,
+        5.489296980000001
+      ],
+      "area_m2": 764.1,
+      "reason": "tiny-colour-artifact"
+    }
+  ],
+  "anchor_checks": {
+    "Marishof": {
+      "nearest_m": 434.9,
+      "feature_index": 10
+    },
+    "Bramenhof": {
+      "nearest_m": 215.1,
+      "feature_index": 10
+    },
+    "Van der Flierhof": {
+      "nearest_m": 453.3,
+      "feature_index": 3
+    },
+    "Antonie Meilingstraat": {
+      "nearest_m": 202.9,
+      "feature_index": 8
+    },
+    "Doornsteeg": {
+      "nearest_m": 421.3,
+      "feature_index": 3
+    },
+    "Eikepage": {
+      "nearest_m": 694.0,
+      "feature_index": 9
+    },
+    "Stadspark Nijkerk": {
+      "nearest_m": 104.0,
+      "feature_index": 6
+    },
+    "Corlaerpark": {
+      "nearest_m": 707.3,
+      "feature_index": 16
+    }
+  },
+  "qc_expected_range": [
+    15,
+    22
   ]
 }
