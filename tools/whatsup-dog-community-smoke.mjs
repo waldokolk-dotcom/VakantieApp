@@ -49,10 +49,10 @@ try{
   const result=await page.evaluate(()=>({writes:window.__wdSharedWrites,uploads:window.__wdUploads,reports:JSON.parse(localStorage.getItem('wd_reports_v1')||'[]'),queue:JSON.parse(localStorage.getItem('wd_shared_report_queue_v1')||'[]'),status:document.getElementById('profileStatus')?.textContent}));
   const write=result.writes.find(x=>x.table==='reports');
   if(!write)throw new Error('No shared report write');
-  if(write.row.user_id!=='${USER_ID}')throw new Error('Wrong user ownership');
+  if(write.row.user_id!==USER_ID)throw new Error('Wrong user ownership');
   if(write.row.type!=='vegetation'||write.row.subtype!=='Distels')throw new Error('Wrong report classification');
   if(write.row.status!=='active')throw new Error('Report not active');
-  if(!write.row.photo_path?.startsWith('${USER_ID}/'))throw new Error('Photo path not scoped to user');
+  if(!write.row.photo_path?.startsWith(USER_ID+'/'))throw new Error('Photo path not scoped to user');
   if(result.uploads.length!==1||result.uploads[0].type!=='image/jpeg')throw new Error('Photo was not re-encoded/uploaded as JPEG');
   if(result.queue.length!==0)throw new Error('Shared queue not cleared after successful sync');
   if(result.status!=='Community aan')throw new Error('Community status not connected');
