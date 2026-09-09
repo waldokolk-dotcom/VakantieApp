@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "feature_count": 17,
+  "feature_count": 20,
   "pdf_page": [
     1190.550048828125,
     841.8900146484375
@@ -388,7 +388,7 @@
         5.458854048717948
       ],
       "area_m2": 583.1,
-      "reason": "tiny-colour-artifact"
+      "reason": "pdf-annotation"
     },
     {
       "old_id": "nijkerk-losloop-06",
@@ -397,7 +397,7 @@
         5.459372795833333
       ],
       "area_m2": 213.8,
-      "reason": "tiny-colour-artifact"
+      "reason": "pdf-annotation"
     },
     {
       "old_id": "nijkerk-losloop-07",
@@ -406,7 +406,7 @@
         5.460139923809524
       ],
       "area_m2": 274.5,
-      "reason": "tiny-colour-artifact"
+      "reason": "pdf-annotation"
     },
     {
       "old_id": "nijkerk-losloop-08",
@@ -415,7 +415,7 @@
         5.4606874
       ],
       "area_m2": 191.8,
-      "reason": "tiny-colour-artifact"
+      "reason": "pdf-annotation"
     },
     {
       "old_id": "nijkerk-losloop-09",
@@ -424,7 +424,7 @@
         5.458328529166667
       ],
       "area_m2": 272.1,
-      "reason": "tiny-colour-artifact"
+      "reason": "pdf-annotation"
     },
     {
       "old_id": "nijkerk-losloop-10",
@@ -433,7 +433,7 @@
         5.45914452
       ],
       "area_m2": 181.8,
-      "reason": "tiny-colour-artifact"
+      "reason": "pdf-annotation"
     },
     {
       "old_id": "nijkerk-losloop-11",
@@ -442,7 +442,7 @@
         5.459691744444445
       ],
       "area_m2": 213.3,
-      "reason": "tiny-colour-artifact"
+      "reason": "pdf-annotation"
     },
     {
       "old_id": "nijkerk-losloop-12",
@@ -451,44 +451,17 @@
         5.458383333333334
       ],
       "area_m2": 211.9,
-      "reason": "tiny-colour-artifact"
-    },
-    {
-      "old_id": "nijkerk-losloop-16",
-      "centroid": [
-        52.22098192,
-        5.48611966
-      ],
-      "area_m2": 299.0,
-      "reason": "tiny-colour-artifact"
-    },
-    {
-      "old_id": "nijkerk-losloop-20",
-      "centroid": [
-        52.21948626666667,
-        5.493314766666667
-      ],
-      "area_m2": 569.4,
-      "reason": "tiny-colour-artifact"
-    },
-    {
-      "old_id": "nijkerk-losloop-21",
-      "centroid": [
-        52.21921705,
-        5.50024795
-      ],
-      "area_m2": 712.4,
-      "reason": "tiny-colour-artifact"
+      "reason": "pdf-annotation"
     }
   ],
   "anchor_checks": {
     "Marishof": {
       "nearest_m": 324.1,
-      "feature_index": 13
+      "feature_index": 16
     },
     "Bramenhof": {
-      "nearest_m": 212.8,
-      "feature_index": 11
+      "nearest_m": 79.1,
+      "feature_index": 12
     },
     "Van der Flierhof": {
       "nearest_m": 43.7,
@@ -496,27 +469,27 @@
     },
     "Antonie Meilingstraat": {
       "nearest_m": 73.0,
-      "feature_index": 8
+      "feature_index": 9
     },
     "Doornsteeg": {
       "nearest_m": 174.7,
       "feature_index": 5
     },
     "Eikepage": {
-      "nearest_m": 91.7,
-      "feature_index": 15
+      "nearest_m": 91.8,
+      "feature_index": 18
     },
     "Stadspark Nijkerk": {
-      "nearest_m": 51.9,
+      "nearest_m": 32.9,
       "feature_index": 7
     },
     "Corlaerpark": {
       "nearest_m": 274.4,
-      "feature_index": 14
+      "feature_index": 17
     }
   },
   "qc_expected_range": [
-    15,
-    22
+    18,
+    20
   ]
 }

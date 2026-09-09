@@ -8,7 +8,7 @@
     "decision_date": "2026-03-03",
     "digitalisation": "Whatsup dog",
     "status": "afgeleid van officiële honden-uitlaatkaart; geen gemeentelijke bron-GIS",
-    "quality_note": "Automatisch kleurgetraceerd uit de officiële PDF; blauwe toelichtingstekst verwijderd; kaartgeometrie gegeorefereerd naar Nijkerk."
+    "quality_note": "Kleurgetraceerd uit de officiële gemeentelijke PDF; blauwe toelichtingstekst verwijderd; gegeorefereerd met Nijkerkse kaartlabels."
   },
   "features": [
     {
@@ -392,10 +392,57 @@
         "source_decision": "collegebesluit 3 maart 2026",
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
-        "area_m2_approx": 2917.2,
+        "area_m2_approx": 299.0,
         "id": "nijkerk-losloop-08",
         "name": "Stadspark Nijkerk",
         "name_basis": "confirmed location matched to official-map trace",
+        "quality": "digitised-from-official-pdf-v1"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.4863428,
+              52.220974
+            ],
+            [
+              5.4862096,
+              52.2210833
+            ],
+            [
+              5.4858765,
+              52.2209839
+            ],
+            [
+              5.4859931,
+              52.2209342
+            ],
+            [
+              5.4861763,
+              52.2209342
+            ],
+            [
+              5.4863428,
+              52.220974
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "losloopgebied",
+        "source": "Gemeente Nijkerk",
+        "source_url": "https://www.nijkerk.eu/hondenbeleid",
+        "source_map": "https://cuatro.sim-cdn.nl/nijkerk/uploads/2.2%20Hondenuitlaatkaart%20Nijkerk%20jan%202026.pdf?cb=-utJx3kH",
+        "source_decision": "collegebesluit 3 maart 2026",
+        "digitalisation": "Whatsup dog",
+        "status": "gedigitaliseerd van officiële kaart",
+        "area_m2_approx": 2917.2,
+        "id": "nijkerk-losloop-09",
+        "name": "Losloopgebied 9",
         "quality": "digitised-from-official-pdf-v1"
       },
       "geometry": {
@@ -453,7 +500,7 @@
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
         "area_m2_approx": 1086.4,
-        "id": "nijkerk-losloop-09",
+        "id": "nijkerk-losloop-10",
         "name": "Antonie Meilingstraat",
         "name_basis": "confirmed location matched to official-map trace",
         "quality": "digitised-from-official-pdf-v1"
@@ -501,8 +548,8 @@
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
         "area_m2_approx": 2162.5,
-        "id": "nijkerk-losloop-10",
-        "name": "Losloopgebied 10",
+        "id": "nijkerk-losloop-11",
+        "name": "Losloopgebied 11",
         "quality": "digitised-from-official-pdf-v1"
       },
       "geometry": {
@@ -571,9 +618,92 @@
         "source_decision": "collegebesluit 3 maart 2026",
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
+        "area_m2_approx": 569.4,
+        "id": "nijkerk-losloop-12",
+        "name": "Losloopgebied 12",
+        "quality": "digitised-from-official-pdf-v1"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.4929373,
+              52.2196022
+            ],
+            [
+              5.49367,
+              52.2192444
+            ],
+            [
+              5.493337,
+              52.2196122
+            ],
+            [
+              5.4929373,
+              52.2196022
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "losloopgebied",
+        "source": "Gemeente Nijkerk",
+        "source_url": "https://www.nijkerk.eu/hondenbeleid",
+        "source_map": "https://cuatro.sim-cdn.nl/nijkerk/uploads/2.2%20Hondenuitlaatkaart%20Nijkerk%20jan%202026.pdf?cb=-utJx3kH",
+        "source_decision": "collegebesluit 3 maart 2026",
+        "digitalisation": "Whatsup dog",
+        "status": "gedigitaliseerd van officiële kaart",
+        "area_m2_approx": 712.4,
+        "id": "nijkerk-losloop-13",
+        "name": "Bramenhof",
+        "name_basis": "confirmed location matched to official-map trace",
+        "quality": "digitised-from-official-pdf-v1"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.5001147,
+              52.2193935
+            ],
+            [
+              5.5001147,
+              52.2190456
+            ],
+            [
+              5.5003812,
+              52.2190356
+            ],
+            [
+              5.5003812,
+              52.2193935
+            ],
+            [
+              5.5001147,
+              52.2193935
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "losloopgebied",
+        "source": "Gemeente Nijkerk",
+        "source_url": "https://www.nijkerk.eu/hondenbeleid",
+        "source_map": "https://cuatro.sim-cdn.nl/nijkerk/uploads/2.2%20Hondenuitlaatkaart%20Nijkerk%20jan%202026.pdf?cb=-utJx3kH",
+        "source_decision": "collegebesluit 3 maart 2026",
+        "digitalisation": "Whatsup dog",
+        "status": "gedigitaliseerd van officiële kaart",
         "area_m2_approx": 5757.9,
-        "id": "nijkerk-losloop-11",
-        "name": "Losloopgebied 11",
+        "id": "nijkerk-losloop-14",
+        "name": "Losloopgebied 14",
         "quality": "digitised-from-official-pdf-v1"
       },
       "geometry": {
@@ -635,9 +765,8 @@
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
         "area_m2_approx": 857.1,
-        "id": "nijkerk-losloop-12",
-        "name": "Bramenhof",
-        "name_basis": "confirmed location matched to official-map trace",
+        "id": "nijkerk-losloop-15",
+        "name": "Losloopgebied 15",
         "quality": "digitised-from-official-pdf-v1"
       },
       "geometry": {
@@ -695,8 +824,8 @@
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
         "area_m2_approx": 37129.2,
-        "id": "nijkerk-losloop-13",
-        "name": "Losloopgebied 13",
+        "id": "nijkerk-losloop-16",
+        "name": "Losloopgebied 16",
         "quality": "digitised-from-official-pdf-v1"
       },
       "geometry": {
@@ -818,9 +947,8 @@
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
         "area_m2_approx": 1057.7,
-        "id": "nijkerk-losloop-14",
-        "name": "Marishof",
-        "name_basis": "confirmed location matched to official-map trace",
+        "id": "nijkerk-losloop-17",
+        "name": "Losloopgebied 17",
         "quality": "digitised-from-official-pdf-v1"
       },
       "geometry": {
@@ -866,9 +994,8 @@
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
         "area_m2_approx": 4202.4,
-        "id": "nijkerk-losloop-15",
-        "name": "Corlaerpark",
-        "name_basis": "confirmed location matched to official-map trace",
+        "id": "nijkerk-losloop-18",
+        "name": "Losloopgebied 18",
         "quality": "digitised-from-official-pdf-v1"
       },
       "geometry": {
@@ -910,7 +1037,7 @@
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
         "area_m2_approx": 1890.8,
-        "id": "nijkerk-losloop-16",
+        "id": "nijkerk-losloop-19",
         "name": "Eikepage",
         "name_basis": "confirmed location matched to official-map trace",
         "quality": "digitised-from-official-pdf-v1"
@@ -986,8 +1113,8 @@
         "digitalisation": "Whatsup dog",
         "status": "gedigitaliseerd van officiële kaart",
         "area_m2_approx": 3115.5,
-        "id": "nijkerk-losloop-17",
-        "name": "Losloopgebied 17",
+        "id": "nijkerk-losloop-20",
+        "name": "Losloopgebied 20",
         "quality": "digitised-from-official-pdf-v1"
       },
       "geometry": {
