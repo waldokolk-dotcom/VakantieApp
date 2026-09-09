@@ -10,3 +10,11 @@ window.WHATSUP_DOG_BACKEND={
   maxSharedReports:200,
   signedPhotoSeconds:3600
 };
+
+if(!document.querySelector('script[data-wd-community-ui]')){
+  const bridge=document.createElement('script');
+  bridge.src='./community-ui-bridge.js?v=1';
+  bridge.async=false;
+  bridge.dataset.wdCommunityUi='1';
+  document.body.appendChild(bridge);
+}
