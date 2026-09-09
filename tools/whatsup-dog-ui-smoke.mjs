@@ -21,17 +21,17 @@ try{
     if(await page.locator(sel).count()!==1) throw new Error(`Missing ${sel}`);
   }
 
-  // A tiny valid PNG verifies that file selection, canvas re-encoding and preview work.
-  const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAQAAABFaP0WAAAADUlEQVR42mNk+M/wHwAF/gL+4T2V5QAAAABJRU5ErkJggg==','base64');
-  await page.locator('#reportPhotoV2').setInputFiles({name:'plant.png',mimeType:'image/png',buffer:png});
-  await page.locator('#photoPreviewWrapV2.has-photo').waitFor({state:'visible'});
+  // A small SVG is a deterministic browser-decodable image. The app must re-encode it to JPEG.
+  const svg=Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="90"><rect width="120" height="90" fill="#7eaa55"/><path d="M60 80 C55 50 50 28 62 8" stroke="#315f2b" stroke-width="6" fill="none"/><circle cx="64" cy="18" r="12" fill="#a66383"/></svg>');
+  await page.locator('#reportPhotoV2').setInputFiles({name:'plant.svg',mimeType:'image/svg+xml',buffer:svg});
+  await page.locator('#photoPreviewWrapV2.has-photo').waitFor({state:'visible',timeout:10000});
   if(await page.locator('#recognizePhotoV2').isDisabled()) throw new Error('Recognize button should be enabled after photo');
 
   // Exact point selection round-trip.
   await page.locator('#geometryPointV2').click();
   await page.locator('#pickOnMapV2').click();
   await page.locator('#map').click({position:{x:205,y:360}});
-  await page.locator('#reportDialog[open]').waitFor({state:'visible'});
+  await page.locator('#reportDialog[open]').waitFor({state:'visible',timeout:10000});
   const pointStatus=await page.locator('#drawStatusV2').innerText();
   if(!pointStatus.includes('Exacte plek')) throw new Error(`Point selection failed: ${pointStatus}`);
 
@@ -43,11 +43,11 @@ try{
   await mapBox.click({position:{x:255,y:315}});
   await mapBox.click({position:{x:225,y:430}});
   await page.locator('.draw-done').click();
-  await page.locator('#reportDialog[open]').waitFor({state:'visible'});
+  await page.locator('#reportDialog[open]').waitFor({state:'visible',timeout:10000});
   await page.locator('[data-subtype="Distels"]').click();
   await page.locator('#reportText').fill('Distels langs het wandelpad');
   await page.locator('#publishReport').click();
-  await page.waitForTimeout(150);
+  await page.waitForTimeout(200);
   const reports=await page.evaluate(()=>JSON.parse(localStorage.getItem('wd_reports_v1')||'[]'));
   if(reports.length!==1) throw new Error(`Expected 1 report, got ${reports.length}`);
   if(reports[0].geometryType!=='polygon'||!Array.isArray(reports[0].polygon)||reports[0].polygon.length<3) throw new Error('Polygon report was not persisted');
