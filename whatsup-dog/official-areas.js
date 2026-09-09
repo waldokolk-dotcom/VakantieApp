@@ -2,12 +2,12 @@
 // Bronvormen zijn automatisch kleurgetraceerd uit de officiële 2026-PDF van de gemeente.
 // Dit is een digitale afgeleide, geen door de gemeente geleverde bron-GIS.
 (async()=>{
-  // Load the optional smart-report module after the core app, without adding a build system.
+  // Load the smart-report module after the core app, without adding a build system.
   if(!document.querySelector('link[data-wd-smart-report]')){
-    const link=document.createElement('link');link.rel='stylesheet';link.href='./smart-report.css?v=1';link.dataset.wdSmartReport='1';document.head.appendChild(link);
+    const link=document.createElement('link');link.rel='stylesheet';link.href='./smart-report.css?v=2';link.dataset.wdSmartReport='1';document.head.appendChild(link);
   }
   if(!document.querySelector('script[data-wd-smart-report]')){
-    const script=document.createElement('script');script.src='./smart-report.js?v=1';script.async=false;script.dataset.wdSmartReport='1';document.body.appendChild(script);
+    const script=document.createElement('script');script.src='./smart-report-v2.js?v=2';script.async=false;script.dataset.wdSmartReport='1';document.body.appendChild(script);
   }
 
   if(typeof L==='undefined'||typeof map==='undefined'||!map||typeof offleashLayer==='undefined'||!offleashLayer)return;
