@@ -1,0 +1,28 @@
+name: Houd VakantieApp actief
+
+on:
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vakantieapp-supabase-keepalive
+  cancel-in-progress: true
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      # Dit zijn dezelfde openbare URL en publishable key die de browserapp gebruikt.
+      # Er staat bewust geen service-role key of databasewachtwoord in de repository.
+      SUPABASE_URL: https://hyuqpqueswoabhsiswww.supabase.co
+      SUPABASE_PUBLISHABLE_KEY: sb_publishable_2myvIM4AglliVISIQC3Y_g_pXfyxyp5
+    steps:
+      - name: Repository ophalen
+        uses: actions/checkout@v4
+      - name: Echte databasecontrole uitvoeren
+        run: node scripts/supabase-keepalive.mjs
