@@ -6,7 +6,9 @@ if (!url || !key) {
   process.exit(1);
 }
 
-const endpoint = `${url}/rest/v1/app_health?select=id&limit=1`;
+// Een echte, minimale databasequery. Door RLS ziet de publishable key geen
+// privé-inhoud; een HTTP 200 bewijst wel dat PostgREST en Postgres bereikbaar zijn.
+const endpoint = `${url}/rest/v1/memories?select=id&limit=1`;
 const response = await fetch(endpoint, {
   headers: {
     apikey: key,
@@ -23,4 +25,4 @@ if (!response.ok) {
   process.exit(1);
 }
 
-console.log(`Supabase actief: ${response.status}; app_health bereikbaar.`);
+console.log(`Supabase actief: ${response.status}; databasequery geslaagd.`);
