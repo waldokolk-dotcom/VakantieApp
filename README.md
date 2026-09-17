@@ -2,6 +2,8 @@
 
 De complete mobiele vakantie-app van Waldo en Brigitte.
 
+De app is meerjarig: iedere vakantie is een aparte reis binnen dezelfde vaste applicatie. De technische continuiteitsopzet, dagelijkse Supabase-controle en herstelstappen staan in [docs/CONTINUITEIT.md](docs/CONTINUITEIT.md).
+
 ## Publiceren met GitHub Pages
 
 Upload `index.html` en `apple-touch-icon.png` samen naar de hoofdmap van de `main`-branch. GitHub Pages opent daarna automatisch `index.html`.
