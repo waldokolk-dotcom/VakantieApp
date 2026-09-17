@@ -15,9 +15,9 @@ test('continuiteitsmigratie bevat alle VakantieApp-onderdelen', () => {
   assert.match(sql, /enable row level security/i);
 });
 
-test('keepalive gebruikt uitsluitend de beperkte health endpoint', () => {
+test('keepalive gebruikt uitsluitend een beperkte bestaande tabel', () => {
   const script = read('scripts/supabase-keepalive.mjs');
-  assert.match(script, /app_health\?select=id&limit=1/);
+  assert.match(script, /memories\?select=id&limit=1/);
   assert.doesNotMatch(script, /service[_-]?role/i);
   assert.doesNotMatch(script, /password/i);
 });
